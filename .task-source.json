@@ -5,6 +5,7 @@
   "project_subdirection": "数据库",
   "supported_task_types": [
     "功能开发",
+    "Bugfix",
     "代码重构",
     "功能优化",
     "依赖升级与迁移",
@@ -25,8 +26,8 @@
       ]
     },
     "Bugfix": {
-      "status": "no_verified_defect",
-      "reason": "未保留已证实的基线缺陷；不为出题制造故障。"
+      "status": "supported",
+      "reason": "用户明确要求隔离预埋 Bugfix；健康生产源码保持不变，仅在私有任务分支植入并验证回归。"
     },
     "代码重构": {
       "status": "supported",
