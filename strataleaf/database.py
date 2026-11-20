@@ -7,7 +7,7 @@ from .indexes import Indexes
 from .mvcc import read_record
 from .patch import patch_document
 from .query import QueryEngine
-from .replica import Replication
+from .replica import Replication, recover_rebaseline
 from .retention import Retention
 from .storage import Storage
 from .transaction import WriteBatch
@@ -17,6 +17,7 @@ from .transfer import Transfer
 class Database:
     """An embedded, single-file, revisioned JSON document database."""
     def __init__(self, path, timeout=5.0):
+        recover_rebaseline(path)
         self._store = Storage(path, timeout)
         self.catalog = Catalog(self._store)
         self.indexes = Indexes(self._store)

@@ -102,6 +102,51 @@ def run(flow):
                     if replica.diagnostics.fingerprint() != db.diagnostics.fingerprint() or not replica.diagnostics.inspect(True)["ok"]:
                         raise RuntimeError("replica differs from source")
                     output = {"first_packet": applied, "repeat": repeat, "readonly": readonly, "fingerprint": replica.diagnostics.fingerprint()}
+            elif flow == "rebaseline":
+                db.archives.backup(folder / "base.db")
+                Archives.restore(folder / "base.db", folder / "replica.db", follower=True)
+                db.batch().put("segments", "seg_00", {"region": "north", "sequence": 19}).commit()
+                late_packet = db.replication.export(first)
+                db.batch().delete("segments", "seg_01").commit()
+                db.retention.compact(db.revision)
+                blocked = rejected(lambda: db.replication.export(first), SnapshotTooOld)
+                db.archives.backup(folder / "rebase.db")
+                with Database(folder / "replica.db") as replica:
+                    replica.feed.register("mirror", first)
+                    plan = replica.replication.rebaseline_prepare(folder / "rebase.db")
+                    serving_read = replica.get("segments", "seg_00").document
+                    db.batch().put("segments", "seg_02", {"region": "south", "sequence": 9}).commit()
+                with Database(folder / "replica.db") as replica:
+                    midway = replica.replication.rebaseline_status()
+                    absorbed = replica.replication.rebaseline_apply(late_packet)
+                    stale = rejected(lambda: replica.replication.rebaseline_switch(db.replication.verification()), ReplicationError)
+                    caught = replica.replication.rebaseline_apply(db.replication.export(absorbed["staged_head"]))
+                    switched = replica.replication.rebaseline_switch(db.replication.verification())
+                    retired_read = replica.get("segments", "seg_00").document
+                    retired_apply = rejected(lambda: replica.replication.apply(late_packet), ReadOnly)
+                    retired_write = rejected(lambda: replica.batch().delete("segments", "seg_00").commit(), ReadOnly)
+                with Database(folder / "replica.db") as current:
+                    status = current.replication.rebaseline_status()
+                    if status["generation"] != 1 or current.diagnostics.fingerprint() != db.diagnostics.fingerprint():
+                        raise RuntimeError("new generation does not match the primary")
+                    current.feed.register("mirror", status["floor"])
+                    late_again = current.replication.apply(late_packet)
+                    still_readonly = rejected(lambda: current.batch().delete("segments", "seg_00").commit(), ReadOnly)
+                    db.batch().put("segments", "seg_03", {"region": "east", "sequence": 10}).commit()
+                    current.replication.apply(db.replication.export(current.revision))
+                    current.feed.acknowledge("mirror", current.revision)
+                    db.archives.backup(folder / "refresh.db")
+                    current.replication.rebaseline_prepare(folder / "refresh.db")
+                    carried = current.replication.rebaseline_switch(db.replication.verification())
+                with Database(folder / "replica.db") as final:
+                    if final.feed.position("mirror") != carried["revision"] or final.replication.rebaseline_status()["generation"] != 2:
+                        raise RuntimeError("consumer carry-over or generation persistence failed")
+                    output = {"export_blocked": blocked, "plan": plan, "serving_read": serving_read, "midway": midway,
+                              "late_on_staged": absorbed, "stale_verification": stale, "caught_up": caught,
+                              "switched": switched, "retired_read": retired_read, "retired_apply": retired_apply,
+                              "retired_write": retired_write, "reopened": status, "late_on_current": late_again,
+                              "still_readonly": still_readonly, "proactive_switch": carried,
+                              "final": final.replication.rebaseline_status()}
             elif flow == "compact":
                 db.retention.pin("reader", first)
                 db.feed.register("slow_copy", first)

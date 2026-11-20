@@ -32,6 +32,7 @@ class Storage:
         self.path = str(path)
         self.lock = threading.RLock()
         self.closed = False
+        self.retired = False
         self.connection = sqlite3.connect(self.path, timeout=timeout, isolation_level=None, check_same_thread=False)
         self.connection.row_factory = sqlite3.Row
         self.connection.execute("PRAGMA foreign_keys=ON")
@@ -40,7 +41,8 @@ class Storage:
         self.connection.executescript(DDL)
         with self.atomic():
             initial = {"format": "1", "head": "0", "floor": "0", "database_id": str(uuid.uuid4()),
-                       "cursor_secret": secrets.token_hex(32), "mode": "primary", "upstream": "", "catalog_epoch": "0"}
+                       "cursor_secret": secrets.token_hex(32), "mode": "primary", "upstream": "", "catalog_epoch": "0",
+                       "replica_generation": "0"}
             for key, value in initial.items():
                 self.connection.execute("INSERT OR IGNORE INTO meta VALUES (?,?)", (key, value))
             if self.get("format") != "1":
@@ -60,6 +62,8 @@ class Storage:
         with self.lock:
             if self.closed:
                 raise DatabaseError("database handle is closed")
+            if self.retired:
+                raise ReadOnly("replica handle was superseded by a rebaseline switch; reopen the database")
             self.connection.execute("BEGIN IMMEDIATE")
             try:
                 if writable and self.get("mode") != "primary":

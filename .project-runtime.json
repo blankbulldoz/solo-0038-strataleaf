@@ -45,6 +45,10 @@
       "command": "python3 -m examples.workflows replica"
     },
     {
+      "workflow_id": "rebaseline",
+      "command": "python3 -m examples.workflows rebaseline"
+    },
+    {
       "workflow_id": "compact",
       "command": "python3 -m examples.workflows compact"
     },

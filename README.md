@@ -29,7 +29,7 @@ with Database("strataleaf.db") as db:
 
 `python3 -m compileall -q strataleaf examples` 检查源码可编译。`python3 -m examples.workflows commit` 在独立临时目录运行多集合提交、重复请求和回滚示例，打印实际结果后自动清理。可用示例名：
 
-`catalog schema commit snapshot query index feed backup replica compact expire aggregate patch inspect transfer`
+`catalog schema commit snapshot query index feed backup replica rebaseline compact expire aggregate patch inspect transfer`
 
 每个示例约一秒以内，不需要联网。它们是生产 API 的有限工作流演示；自动化测试仍为 **deferred**，仓库不含测试套件，也不声明测试命令。`examples.observations` 另外提供写锁竞争与保留水位的可复现观测。
 
@@ -44,6 +44,7 @@ with Database("strataleaf.db") as db:
 - 变更流一次交付完整提交，消费方负责成功处理后确认；确认可前进到当前 head，系统不替消费方证明处理成功。释放消费者即放弃它的历史保护。
 - 备份使用 SQLite 在线备份 API，发布到未占用目标；校验摘要后恢复到新文件，禁止覆盖现有文件。恢复为新主库会生成新的数据库标识及游标签名密钥，保留文档版本；恢复为副本则绑定原主库。进程间不得直接复制活动 WAL 主文件代替备份。
 - 副本只能接收同一上游、连续的提交包。重复范围不重复写入；校验错误和缺口整包失败。分段追赶时使用版本扫描，追到导出端 head 才安装最新索引。目录 epoch 防止过时的同版本包倒退目录。副本不接收主库写入；基线不提供提升接口、双向复制或网络传输。导出校验和检测意外损坏，不代替对端身份认证。
+- 副本落后到主库 floor 之上时，用 `replication.rebaseline_prepare(备份)` 在同路径旁暂存下一代基线，旧副本继续只读服务；`rebaseline_apply` 向暂存代追赶，`rebaseline_switch(verification)` 在文档指纹、目录与上游关系全部核对通过后原子切换。切换由日志提交点保证：失败或重开后继续使用的代始终明确，重开路径即落在已提交的一代。切换不经过可主写状态；被替换的旧句柄继续可读但拒绝写入，调用方重开路径使用新代。确认位置不低于新 floor 的消费者随切换携带，其余消费者在结果中具名、需按新 floor 重新登记。普通新路径恢复用法不变。
 - SQLite 保证进程间单写者；同一句柄的锁协调线程操作，多个句柄通过 SQLite 锁协调。长读可能延缓 WAL checkpoint；忙超时由连接 timeout 控制，调用方处理 `sqlite3.OperationalError`。
 - 当前实现适合本地中小型嵌入式数据集，版本扫描、分组和逻辑导出会物化输入；不承诺常数内存。单文档上限 1 MiB、深度 32；筛选按键排序。磁盘加密、租户鉴权、分布式共识均不在现有承诺内。
 
