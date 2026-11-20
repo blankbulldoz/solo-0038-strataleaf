@@ -1,0 +1,23 @@
+[
+  {
+    "counts": {
+      "collections": 1,
+      "commits": 1,
+      "consumers": 1,
+      "index_defs": 0,
+      "index_values": 0,
+      "pins": 0,
+      "versions": 5
+    },
+    "database_id": "3bfe2d8a-4924-4646-a34a-d03513d0ef00",
+    "floor": 7,
+    "foreign_keys": [],
+    "head": 8,
+    "issues": [],
+    "mode": "primary",
+    "ok": true,
+    "sqlite": [
+      "ok"
+    ]
+  }
+]

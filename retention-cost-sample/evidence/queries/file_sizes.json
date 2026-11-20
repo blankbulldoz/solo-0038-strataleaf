@@ -1,0 +1,152 @@
+{
+  "main_db_measurements": [
+    {
+      "bytes": {
+        "sample.db": 86016,
+        "sample.db-shm": 32768,
+        "sample.db-wal": 387312
+      },
+      "pragmas": {
+        "freelist_count": 0,
+        "page_count": 21,
+        "page_size": 4096
+      },
+      "stage": "stage0_before_compaction"
+    },
+    {
+      "bytes": {
+        "sample.db": 86016,
+        "sample.db-shm": 32768,
+        "sample.db-wal": 387312
+      },
+      "pragmas": {
+        "freelist_count": 0,
+        "page_count": 21,
+        "page_size": 4096
+      },
+      "stage": "stage1_floor_2"
+    },
+    {
+      "bytes": {
+        "sample.db": 86016,
+        "sample.db-shm": 32768,
+        "sample.db-wal": 387312
+      },
+      "pragmas": {
+        "freelist_count": 0,
+        "page_count": 21,
+        "page_size": 4096
+      },
+      "stage": "stage2_floor_4"
+    },
+    {
+      "bytes": {
+        "sample.db": 86016,
+        "sample.db-shm": 32768,
+        "sample.db-wal": 387312
+      },
+      "pragmas": {
+        "freelist_count": 0,
+        "page_count": 21,
+        "page_size": 4096
+      },
+      "stage": "stage3_floor_7"
+    },
+    {
+      "bytes": {
+        "sample.db": 86016,
+        "sample.db-shm": 32768,
+        "sample.db-wal": 387312
+      },
+      "pragmas": {
+        "freelist_count": 0,
+        "page_count": 21,
+        "page_size": 4096
+      },
+      "stage": "stage3_after_new_write_r8"
+    }
+  ],
+  "snapshots": [
+    {
+      "bytes": 86016,
+      "file": "stage0.db",
+      "floor": 0,
+      "head": 7,
+      "sha256": "1438f44537a7faa1c46a7bbc38b0ec4cda2977658396d9773bca58dad8e1c1dc",
+      "stage": "stage0"
+    },
+    {
+      "bytes": 86016,
+      "file": "stage1.db",
+      "floor": 2,
+      "head": 7,
+      "sha256": "29201e65da9eeabd62c3a24f10f6aaa31c41e5751f667ee90d58e8cf25c841f7",
+      "stage": "stage1"
+    },
+    {
+      "bytes": 86016,
+      "file": "stage2.db",
+      "floor": 4,
+      "head": 7,
+      "sha256": "475c689389c6eb06288b032447c5ebc2b0f7ed7a12a8a05aa1e4dc644d8c6572",
+      "stage": "stage2"
+    },
+    {
+      "bytes": 86016,
+      "file": "stage3.db",
+      "floor": 7,
+      "head": 7,
+      "sha256": "4971cfbb151f797050efcfae14ac116f2ebb09787bda97371564fac4a608c984",
+      "stage": "stage3"
+    }
+  ],
+  "space_probe": {
+    "compact_result": {
+      "blocked": false,
+      "floor": 2,
+      "removed_commits": 2,
+      "removed_versions": 1500,
+      "requested": 2
+    },
+    "db_file": "retention-cost-sample/evidence/live/space_probe.db",
+    "observations": [
+      {
+        "auto_vacuum": 0,
+        "freelist_count": 0,
+        "main_bytes": 86016,
+        "page_count": 21,
+        "page_size": 4096,
+        "stage": "probe_empty_after_schema",
+        "wal_bytes": 148352
+      },
+      {
+        "auto_vacuum": 0,
+        "freelist_count": 0,
+        "main_bytes": 462848,
+        "page_count": 113,
+        "page_size": 4096,
+        "stage": "probe_after_seed_1500",
+        "wal_bytes": 416152
+      },
+      {
+        "auto_vacuum": 0,
+        "freelist_count": 117,
+        "main_bytes": 684032,
+        "page_count": 167,
+        "page_size": 4096,
+        "stage": "probe_after_delete_and_compact",
+        "wal_bytes": 902312
+      },
+      {
+        "auto_vacuum": 0,
+        "freelist_count": 25,
+        "main_bytes": 684032,
+        "page_count": 167,
+        "page_size": 4096,
+        "stage": "probe_after_reseed_1500",
+        "wal_bytes": 902312
+      }
+    ],
+    "rows": 1500
+  }
+}

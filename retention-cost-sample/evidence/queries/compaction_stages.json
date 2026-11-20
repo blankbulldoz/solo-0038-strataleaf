@@ -1,0 +1,64 @@
+[
+  {
+    "compact_result": {
+      "blocked": true,
+      "floor": 2,
+      "removed_commits": 2,
+      "removed_versions": 1,
+      "requested": 7
+    },
+    "protectors": {
+      "consumers": [
+        {
+          "ack": 4,
+          "name": "mirror_feed"
+        }
+      ],
+      "pins": [
+        {
+          "name": "audit_pin",
+          "rev": 2
+        }
+      ]
+    },
+    "stage": "stage1_pin_and_consumer_hold"
+  },
+  {
+    "compact_result": {
+      "blocked": true,
+      "floor": 4,
+      "removed_commits": 2,
+      "removed_versions": 1,
+      "requested": 7
+    },
+    "protectors": {
+      "consumers": [
+        {
+          "ack": 4,
+          "name": "mirror_feed"
+        }
+      ],
+      "pins": []
+    },
+    "stage": "stage2_only_consumer_holds"
+  },
+  {
+    "compact_result": {
+      "blocked": false,
+      "floor": 7,
+      "removed_commits": 3,
+      "removed_versions": 3,
+      "requested": 7
+    },
+    "protectors": {
+      "consumers": [
+        {
+          "ack": 7,
+          "name": "mirror_feed"
+        }
+      ],
+      "pins": []
+    },
+    "stage": "stage3_all_protection_released"
+  }
+]

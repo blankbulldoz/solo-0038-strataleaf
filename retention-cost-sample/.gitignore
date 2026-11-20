@@ -1,0 +1,6 @@
+# 二进制数据库产物由 build_sample.py 重新生成，不纳入版本控制；
+# report.md 与 evidence/queries/*.json 是可离线阅读的文本证据。
+*.db
+*.db-wal
+*.db-shm
+__pycache__/

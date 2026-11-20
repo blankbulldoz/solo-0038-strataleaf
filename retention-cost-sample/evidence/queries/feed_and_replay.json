@@ -1,0 +1,118 @@
+{
+  "feed": [
+    {
+      "floor": 2,
+      "probes": [
+        {
+          "detail": "revision 0 is older than retained floor 2",
+          "outcome": "rejected_below_floor",
+          "since": 0
+        },
+        {
+          "detail": "revision 1 is older than retained floor 2",
+          "outcome": "rejected_below_floor",
+          "since": 1
+        },
+        {
+          "commit_revisions": [
+            3,
+            4,
+            5,
+            6,
+            7
+          ],
+          "outcome": "readable",
+          "since": 2
+        },
+        {
+          "commit_revisions": [
+            5,
+            6,
+            7
+          ],
+          "outcome": "readable",
+          "since": 4
+        },
+        {
+          "commit_revisions": [],
+          "outcome": "readable",
+          "since": 7
+        }
+      ],
+      "stage": "stage1"
+    },
+    {
+      "consumer_reads_tail": [
+        5,
+        6,
+        7
+      ],
+      "floor": 4,
+      "stage": "stage3_pre_ack"
+    },
+    {
+      "floor": 7,
+      "probes": [
+        {
+          "detail": "revision 2 is older than retained floor 7",
+          "outcome": "rejected_below_floor",
+          "since": 2
+        },
+        {
+          "detail": "revision 4 is older than retained floor 7",
+          "outcome": "rejected_below_floor",
+          "since": 4
+        },
+        {
+          "commit_revisions": [],
+          "outcome": "readable",
+          "since": 7
+        }
+      ],
+      "stage": "stage3"
+    }
+  ],
+  "replays_after_compaction": [
+    {
+      "count": 3,
+      "replayed": true,
+      "request_key": "seed_notices_r1",
+      "revision": 1
+    },
+    {
+      "count": 1,
+      "replayed": true,
+      "request_key": "revise_a_r2",
+      "revision": 2
+    },
+    {
+      "count": 1,
+      "replayed": true,
+      "request_key": "remove_b_r3",
+      "revision": 3
+    },
+    {
+      "count": 1,
+      "replayed": true,
+      "request_key": "add_c_r4",
+      "revision": 4
+    },
+    {
+      "count": 1,
+      "replayed": true,
+      "request_key": "archive_a_r5",
+      "revision": 5
+    },
+    {
+      "count": 1,
+      "replayed": true,
+      "request_key": "renew_c_r7",
+      "revision": 7
+    }
+  ],
+  "same_key_different_payload": {
+    "detail": "request key was used with different operations",
+    "error": "Conflict",
+    "outcome": "rejected"
+  }
+}

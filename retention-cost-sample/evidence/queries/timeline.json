@@ -1,0 +1,89 @@
+[
+  {
+    "schema_generation": 1,
+    "step": "create_collection"
+  },
+  {
+    "commit": 1,
+    "kind": "atomic_seed",
+    "operations": 3,
+    "replayed": false,
+    "request_key": "seed_notices_r1"
+  },
+  {
+    "commit": 2,
+    "kind": "rewrite",
+    "operations": 1,
+    "replayed": false,
+    "request_key": "revise_a_r2"
+  },
+  {
+    "commit": 3,
+    "kind": "explicit_delete",
+    "operations": 1,
+    "replayed": false,
+    "request_key": "remove_b_r3"
+  },
+  {
+    "commit": 4,
+    "kind": "insert_with_ttl",
+    "operations": 1,
+    "replayed": false,
+    "request_key": "add_c_r4"
+  },
+  {
+    "consumer": {
+      "ack": 4,
+      "name": "mirror_feed"
+    },
+    "pin": {
+      "name": "audit_pin",
+      "revision": 2
+    },
+    "step": "protectors_installed"
+  },
+  {
+    "commit": 5,
+    "kind": "rewrite",
+    "operations": 1,
+    "replayed": false,
+    "request_key": "archive_a_r5"
+  },
+  {
+    "notice_d_current_read_before_sweep": {
+      "owner": "he",
+      "priority": 2,
+      "status": "draft"
+    },
+    "notice_d_history_after_sweep": {
+      "owner": "he",
+      "priority": 2,
+      "status": "draft"
+    },
+    "result": {
+      "expired": 1,
+      "revision": 6
+    },
+    "step": "sweep_500"
+  },
+  {
+    "commit": 7,
+    "kind": "rewrite_renews_ttl",
+    "operations": 1,
+    "replayed": false,
+    "request_key": "renew_c_r7"
+  },
+  {
+    "result": {
+      "expired": 0,
+      "revision": null
+    },
+    "step": "sweep_1000_after_renewal"
+  },
+  {
+    "commit": 8,
+    "kind": "write_after_compaction",
+    "operations": 1,
+    "request_key": "post_compaction_add_e_r8"
+  }
+]

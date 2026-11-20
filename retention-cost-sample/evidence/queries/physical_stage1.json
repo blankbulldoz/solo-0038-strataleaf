@@ -1,0 +1,145 @@
+{
+  "commits": [
+    {
+      "payload_bytes": 118,
+      "request_key": "remove_b_r3",
+      "rev": 3
+    },
+    {
+      "payload_bytes": 158,
+      "request_key": "add_c_r4",
+      "rev": 4
+    },
+    {
+      "payload_bytes": 162,
+      "request_key": "archive_a_r5",
+      "rev": 5
+    },
+    {
+      "payload_bytes": 118,
+      "request_key": null,
+      "rev": 6
+    },
+    {
+      "payload_bytes": 162,
+      "request_key": "renew_c_r7",
+      "rev": 7
+    }
+  ],
+  "consumers": [
+    {
+      "ack": 4,
+      "name": "mirror_feed"
+    }
+  ],
+  "database_id": "3bfe2d8a-4924-4646-a34a-d03513d0ef00",
+  "floor": 2,
+  "head": 7,
+  "pins": [
+    {
+      "name": "audit_pin",
+      "rev": 2
+    }
+  ],
+  "pragmas": {
+    "freelist_count": 0,
+    "page_count": 21,
+    "page_size": 4096
+  },
+  "receipts": [
+    {
+      "count": 3,
+      "request_hash": "679eb688898fb23c4507d2c72e7d27b3cb29f187a7b6739635ae9f1db508b810",
+      "request_key": "seed_notices_r1",
+      "rev": 1
+    },
+    {
+      "count": 1,
+      "request_hash": "47d602068e7489381d85fb5b66a4de8e7eb686ee8c7d68ec1f855ed114a17cf6",
+      "request_key": "revise_a_r2",
+      "rev": 2
+    },
+    {
+      "count": 1,
+      "request_hash": "f9063a21f6b32799c09dc91ab9d227e3bc8bb720ff74a37bb34490d9a9fa91dc",
+      "request_key": "remove_b_r3",
+      "rev": 3
+    },
+    {
+      "count": 1,
+      "request_hash": "0d45e749c307923197d1b0004e00090083ab3622fbfde7951abb8310563d30f1",
+      "request_key": "add_c_r4",
+      "rev": 4
+    },
+    {
+      "count": 1,
+      "request_hash": "73fce6c694521c74e4be06be88b51479b58cba4dc53aab4f577df74aa6bf8401",
+      "request_key": "archive_a_r5",
+      "rev": 5
+    },
+    {
+      "count": 1,
+      "request_hash": "a24cee085dce40e195739cb43ec2584dd1d639323757143ba4c75d92d9b7eba1",
+      "request_key": "renew_c_r7",
+      "rev": 7
+    }
+  ],
+  "versions": [
+    {
+      "collection": "notices",
+      "expires": null,
+      "is_tombstone": 0,
+      "key": "notice_a",
+      "rev": 2
+    },
+    {
+      "collection": "notices",
+      "expires": null,
+      "is_tombstone": 0,
+      "key": "notice_a",
+      "rev": 5
+    },
+    {
+      "collection": "notices",
+      "expires": null,
+      "is_tombstone": 0,
+      "key": "notice_b",
+      "rev": 1
+    },
+    {
+      "collection": "notices",
+      "expires": null,
+      "is_tombstone": 1,
+      "key": "notice_b",
+      "rev": 3
+    },
+    {
+      "collection": "notices",
+      "expires": 1000.0,
+      "is_tombstone": 0,
+      "key": "notice_c",
+      "rev": 4
+    },
+    {
+      "collection": "notices",
+      "expires": 2000.0,
+      "is_tombstone": 0,
+      "key": "notice_c",
+      "rev": 7
+    },
+    {
+      "collection": "notices",
+      "expires": 500.0,
+      "is_tombstone": 0,
+      "key": "notice_d",
+      "rev": 1
+    },
+    {
+      "collection": "notices",
+      "expires": null,
+      "is_tombstone": 1,
+      "key": "notice_d",
+      "rev": 6
+    }
+  ]
+}
