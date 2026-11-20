@@ -128,6 +128,46 @@ def run(flow):
                 if sum(item["count"] for item in output["groups"]) != 6:
                     raise RuntimeError("aggregation lost visible documents")
                 output["invalid"] = rejected(lambda: db.aggregates.group("unknown", "region"), Exception)
+
+                db.catalog.create("tagged")
+                tags = {
+                    "t0": {"labels": ["red", "blue", "red"], "weight": 2},
+                    "t1": {"labels": ["blue", 1], "weight": 4},
+                    "t2": {"labels": ["1"], "weight": 6},
+                    "t3": {"labels": [], "weight": 8},
+                    "t4": {"labels": None, "weight": 10},
+                    "t5": {"weight": 12},
+                }
+                batch = db.batch()
+                for key, document in tags.items():
+                    batch.put("tagged", key, document)
+                revision = batch.commit().revision
+
+                report = db.aggregates.report("tagged", "labels", "weight", revision=revision,
+                                              arrays="members", missing="separate", trace=True)
+                accounting = report["accounting"]
+                if accounting["covered_documents"] + accounting["excluded_documents"] != accounting["matched_documents"]:
+                    raise RuntimeError("document accounting does not add up")
+                if not accounting["contributions"] > accounting["covered_documents"]:
+                    raise RuntimeError("member expansion must be visible as extra contributions")
+                if accounting["duplicate_contributions"] != 1:
+                    raise RuntimeError("repeated label inside one document must only contribute once")
+                string_one = next(item for item in report["groups"] if item["id"] == 'value:"1"')
+                number_one = next(item for item in report["groups"] if item["id"] == "value:1")
+                if string_one["label"] != number_one["label"] or string_one["id"] == number_one["id"]:
+                    raise RuntimeError("same display label must keep distinct group identities")
+
+                whole = db.aggregates.report("tagged", "labels", "weight", revision=revision, arrays="whole")
+                legacy = {json.dumps(item["key"], sort_keys=True): (item["contributions"], item["numeric_contributions"], item["sum"])
+                          for item in whole["groups"] if item["kind"] != "missing"}
+                grouped = {json.dumps(item["key"], sort_keys=True): (item["count"], item["numeric_count"], item["sum"])
+                           for item in db.aggregates.group("tagged", "labels", "weight", revision=revision)["groups"]}
+                if legacy != grouped:
+                    raise RuntimeError("whole-array report must agree with the default aggregation")
+                output["legacy_groups"] = grouped
+                output["report"] = report
+                output["merged_missing"] = db.aggregates.report("tagged", "labels", "weight", revision=revision,
+                                                                arrays="members", missing="merge")["groups"]
             elif flow == "patch":
                 result = db.patch("segments", "seg_00", {"code": None, "detail": {"block": 4}}, expected=first)
                 output = {"patch": result.__dict__, "document": db.get("segments", "seg_00").document,
