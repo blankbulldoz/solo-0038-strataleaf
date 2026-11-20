@@ -1,4 +1,4 @@
-from .codec import dumps, loads
+from .codec import dumps, key as checked_key, loads
 from .errors import InvalidDocument, NotFound
 from .mvcc import checked_revision, record, visible_rows
 from .transaction import WriteBatch
@@ -24,6 +24,7 @@ class Transfer:
             raise InvalidDocument("replace must be a boolean")
         batch = WriteBatch(self.store, request_key)
         count = 0
+        seen = set()
         for line in lines:
             count += 1
             if count > 10000 or not isinstance(line, str) or len(line.encode()) > 2 * 1024 * 1024:
@@ -34,6 +35,13 @@ class Transfer:
                 raise InvalidDocument("invalid JSON at input line " + str(count)) from exc
             if not isinstance(item, dict) or set(item) - {"key", "document", "expires_at"} or not {"key", "document"}.issubset(item):
                 raise InvalidDocument("line requires key and document, optional expires_at")
-            batch.put(collection, item["key"], item["document"], expected=None if replace else 0,
+            document_key = checked_key(item["key"])
+            # A logical import is a document stream, not a sequence of edits:
+            # the same key twice would make the result depend on line order, so
+            # it stays rejected even though a write batch now accepts it.
+            if document_key in seen:
+                raise InvalidDocument("import contains duplicate keys")
+            seen.add(document_key)
+            batch.put(collection, document_key, item["document"], expected=None if replace else 0,
                       expires_at=item.get("expires_at"))
         return batch.commit()

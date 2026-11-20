@@ -14,6 +14,22 @@ class CommitResult:
     replayed: bool = False
 
 
+def effective_operations(operations):
+    """Return the last staged operation for every document, in staged order.
+
+    All operations in a batch share one commit revision, so only this reduced
+    sequence describes the documents that the commit actually publishes.
+    Earlier operations for the same collection/key are intermediate steps: they
+    are kept in the commit log for audit and replay, but never become a visible
+    document version of their own.
+    """
+    last = {}
+    for position, operation in enumerate(operations):
+        last[(operation["collection"], operation["key"])] = position
+    return [operation for position, operation in enumerate(operations)
+            if last[(operation["collection"], operation["key"])] == position]
+
+
 class WriteBatch:
     def __init__(self, store, request_key=None):
         self.store = store
@@ -24,9 +40,6 @@ class WriteBatch:
     def _append(self, operation):
         if self.state != "open":
             raise Conflict("batch is already " + self.state)
-        identity = (operation["collection"], operation["key"])
-        if any((op["collection"], op["key"]) == identity for op in self.operations):
-            raise InvalidDocument("one operation per document per batch")
         expected = operation["expected"]
         if expected is not None and (isinstance(expected, bool) or not isinstance(expected, int) or expected < 0):
             raise InvalidDocument("expected revision must be nonnegative or None")
@@ -58,7 +71,8 @@ class WriteBatch:
             raise Conflict("batch is already " + self.state)
         if not self.operations or len(self.operations) > 10000:
             raise InvalidDocument("batch must contain between 1 and 10000 operations")
-        fingerprint = digest(self.operations)
+        steps = list(self.operations)
+        fingerprint = digest(steps)
         try:
             with self.store.atomic(writable=True) as connection:
                 if self.request_key is not None:
@@ -69,30 +83,46 @@ class WriteBatch:
                         self.state = "committed"
                         return CommitResult(prior["rev"], prior["count"], True)
                 head = int(self.store.get("head"))
-                for op in self.operations:
-                    schema = connection.execute("SELECT schema FROM collections WHERE name=?", (op["collection"],)).fetchone()
+                base = {}
+                schemas = {}
+                for op in steps:
+                    identity = (op["collection"], op["key"])
+                    if identity not in base:
+                        old = latest_row(connection, op["collection"], op["key"], head)
+                        base[identity] = old["rev"] if old is not None else 0
+                    schema = schemas.get(op["collection"])
                     if schema is None:
-                        raise NotFound("unknown collection: " + op["collection"])
-                    old = latest_row(connection, op["collection"], op["key"], head)
-                    current = old["rev"] if old is not None else 0
-                    if op["expected"] is not None and op["expected"] != current:
-                        raise Conflict(f"revision conflict for {op['collection']}/{op['key']}: expected {op['expected']}, found {current}")
+                        row = connection.execute("SELECT schema FROM collections WHERE name=?", (op["collection"],)).fetchone()
+                        if row is None:
+                            raise NotFound("unknown collection: " + op["collection"])
+                        schema = schemas[op["collection"]] = loads(row[0])
+                    if op["expected"] is not None and op["expected"] != base[identity]:
+                        raise Conflict(f"revision conflict for {op['collection']}/{op['key']}: expected {op['expected']}, found {base[identity]}")
                     if op["document"] is not None:
-                        validate_document(op["document"], loads(schema[0]))
+                        validate_document(op["document"], schema)
                 revision = head + 1
-                for op in self.operations:
+                # Steps run in staged order and each sees the logical document and
+                # index projection left by the steps before it. Only the last step
+                # for a key is published as a version at this revision.
+                for op in steps:
+                    refresh_document(connection, op["collection"], op["key"], op["document"])
+                final = effective_operations(steps)
+                for op in final:
                     body = dumps(op["document"]) if op["document"] is not None else None
                     connection.execute("INSERT INTO versions VALUES (?,?,?,?,?)",
                                        (op["collection"], op["key"], revision, body, op["expires_at"]))
-                    refresh_document(connection, op["collection"], op["key"], op["document"])
-                payload = {"revision": revision, "operations": self.operations}
+                payload = {"revision": revision, "operations": final}
+                if len(final) != len(steps):
+                    payload["steps"] = steps
                 connection.execute("INSERT INTO commits VALUES (?,?,?,?)",
                                    (revision, dumps(payload), self.request_key, fingerprint))
                 if self.request_key is not None:
-                    connection.execute("INSERT INTO receipts VALUES (?,?,?,?)", (self.request_key, revision, fingerprint, len(self.operations)))
+                    connection.execute("INSERT INTO receipts VALUES (?,?,?,?)", (self.request_key, revision, fingerprint, len(final)))
                 self.store.set("head", revision)
         except BaseException:
             self.state = "aborted"
             raise
         self.state = "committed"
-        return CommitResult(revision, len(self.operations))
+        # count is the number of document versions this revision publishes;
+        # repeated steps for one key collapse into their last step.
+        return CommitResult(revision, len(final))

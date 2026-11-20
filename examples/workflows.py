@@ -42,7 +42,17 @@ def run(flow):
                 conflict = rejected(lambda: db.batch().put("marks", "discard", {}).put("segments", "seg_01", {"region": "x", "sequence": 1}, expected=0).commit(), Conflict)
                 if db.get("marks", "discard") is not None or not replay.replayed:
                     raise RuntimeError("atomicity or replay observation failed")
-                output = {"commit": result.__dict__, "replay": replay.__dict__, "conflict": conflict}
+                collapsed = db.batch("chained_seg").put("segments", "seg_01", {"region": "south", "sequence": 8}, expected=first).delete(
+                    "segments", "seg_01").put("segments", "seg_01", {"region": "south", "sequence": 9}).commit()
+                chained_replay = db.batch("chained_seg").put("segments", "seg_01", {"region": "south", "sequence": 8}, expected=first).delete(
+                    "segments", "seg_01").put("segments", "seg_01", {"region": "south", "sequence": 9}).commit()
+                if (db.get("segments", "seg_01").document["sequence"] != 9 or chained_replay.revision != collapsed.revision
+                        or not chained_replay.replayed):
+                    raise RuntimeError("same-key batch observation failed")
+                output = {"commit": result.__dict__, "replay": replay.__dict__, "conflict": conflict,
+                          "same_key": {"commit": collapsed.__dict__, "replay": chained_replay.__dict__,
+                                       "document": db.get("segments", "seg_01").document,
+                                       "feed": db.feed.read(collapsed.revision - 1, limit=1)[0]}}
             elif flow == "snapshot":
                 db.batch().delete("segments", "seg_00", expected=first).commit()
                 output = {"past": db.get("segments", "seg_00", first).__dict__, "present": db.get("segments", "seg_00"),
