@@ -7,6 +7,9 @@ class InvalidDocument(DatabaseError):
 class Conflict(DatabaseError):
     pass
 
+class StalePreview(Conflict):
+    """A logical-import confirmation no longer matches the database; preview again."""
+
 class NotFound(DatabaseError):
     pass
 

@@ -15,11 +15,14 @@ class CommitResult:
 
 
 class WriteBatch:
-    def __init__(self, store, request_key=None):
+    def __init__(self, store, request_key=None, guard=None, context=None, note=None):
         self.store = store
         self.request_key = checked_key(request_key) if request_key is not None else None
         self.operations = []
         self.state = "open"
+        self.guard = guard
+        self.context = context
+        self.note = note
 
     def _append(self, operation):
         if self.state != "open":
@@ -58,7 +61,9 @@ class WriteBatch:
             raise Conflict("batch is already " + self.state)
         if not self.operations or len(self.operations) > 10000:
             raise InvalidDocument("batch must contain between 1 and 10000 operations")
-        fingerprint = digest(self.operations)
+        # Keep the historical fingerprint for plain batches so existing request keys replay unchanged.
+        fingerprint = digest(self.operations) if self.context is None else digest({
+            "operations": digest(self.operations), "context": self.context})
         try:
             with self.store.atomic(writable=True) as connection:
                 if self.request_key is not None:
@@ -68,6 +73,8 @@ class WriteBatch:
                             raise Conflict("request key was used with different operations")
                         self.state = "committed"
                         return CommitResult(prior["rev"], prior["count"], True)
+                if self.guard is not None:
+                    self.guard(connection)
                 head = int(self.store.get("head"))
                 for op in self.operations:
                     schema = connection.execute("SELECT schema FROM collections WHERE name=?", (op["collection"],)).fetchone()
@@ -86,6 +93,8 @@ class WriteBatch:
                                        (op["collection"], op["key"], revision, body, op["expires_at"]))
                     refresh_document(connection, op["collection"], op["key"], op["document"])
                 payload = {"revision": revision, "operations": self.operations}
+                if self.note is not None:
+                    payload["skipped"] = self.note
                 connection.execute("INSERT INTO commits VALUES (?,?,?,?)",
                                    (revision, dumps(payload), self.request_key, fingerprint))
                 if self.request_key is not None:

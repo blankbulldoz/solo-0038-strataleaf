@@ -2,7 +2,7 @@ import json
 import sys
 import tempfile
 from pathlib import Path
-from strataleaf import Database, Archives, Conflict, InvalidDocument, InvalidCursor, ReadOnly, SnapshotTooOld, ReplicationError
+from strataleaf import Database, Archives, Conflict, InvalidDocument, InvalidCursor, ReadOnly, SnapshotTooOld, ReplicationError, StalePreview
 
 SCHEMA = {"fields": {"region": "string", "sequence": "integer", "code": "string"}, "required": ["region", "sequence"]}
 
@@ -141,10 +141,37 @@ def run(flow):
                 exported = db.transfer.export_lines("segments")
                 db.catalog.create("copy_segments", SCHEMA)
                 imported = db.transfer.import_lines("copy_segments", exported["lines"])
-                output = {"revision": exported["revision"], "imported": imported.__dict__,
-                          "duplicate": rejected(lambda: db.transfer.import_lines("copy_segments", exported["lines"]), Conflict)}
+                duplicate = rejected(lambda: db.transfer.import_lines("copy_segments", exported["lines"]), Conflict)
                 if len(db.query("copy_segments").records) != 6:
                     raise RuntimeError("logical import differs")
+
+                incoming = [
+                    exported["lines"][0].replace('"sequence":0', '"sequence":40'),
+                    json.dumps({"key": "seg_new", "document": {"region": "north", "sequence": 99}}),
+                    json.dumps({"key": "seg_01", "document": {"region": "west", "sequence": 51}}),
+                    json.dumps({"key": "seg_01", "document": {"region": "west", "sequence": 52}}),
+                    "{ not json",
+                    json.dumps({"key": "seg_bad", "document": {"sequence": "not-a-region"}}),
+                ]
+                preview = db.transfer.preview_lines("copy_segments", incoming)
+                applied = db.transfer.apply_preview(preview, on_existing="replace",
+                                                    on_duplicate="last", on_incompatible="drop")
+                if db.get("copy_segments", "seg_new") is None or db.get("copy_segments", "seg_bad") is not None:
+                    raise RuntimeError("preview decisions were not applied")
+
+                stale_preview = db.transfer.preview_lines("copy_segments", [
+                    json.dumps({"key": "seg_02", "document": {"region": "south", "sequence": 60}})])
+                db.batch().put("copy_segments", "seg_02", {"region": "south", "sequence": 61}).commit()
+                stale = rejected(lambda: db.transfer.apply_preview(stale_preview, on_existing="replace"), StalePreview)
+                if db.get("copy_segments", "seg_02").document["sequence"] != 61:
+                    raise RuntimeError("stale preview overwrote a newer version")
+                refreshed = db.transfer.preview_lines("copy_segments", [
+                    json.dumps({"key": "seg_02", "document": {"region": "south", "sequence": 62}})])
+                confirmed = db.transfer.apply_preview(refreshed, on_existing="replace")
+                output = {"revision": exported["revision"], "imported": imported.__dict__,
+                          "duplicate": duplicate, "preview": preview.summary(),
+                          "applied": applied.__dict__, "stale": stale,
+                          "refreshed": confirmed.__dict__}
             else:
                 raise ValueError("unknown example workflow: " + flow)
             print(json.dumps({"workflow": flow, "result": output}, ensure_ascii=False, sort_keys=True, default=str))
