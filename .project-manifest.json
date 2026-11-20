@@ -169,8 +169,8 @@
     {
       "id": "transfer",
       "path": "strataleaf/transfer.py",
-      "responsibility": "文档流边界与原子导入",
-      "owned_facts": "文档流边界与原子导入",
+      "responsibility": "文档流边界、分段导出与原子导入",
+      "owned_facts": "文档流边界、分段导出进度、读保留与接收清单",
       "consumers": [
         "transfer"
       ]
@@ -498,20 +498,22 @@
     {
       "id": "transfer",
       "name": "逻辑数据转移",
-      "entry": "Database.transfer.import_lines",
+      "entry": "Database.transfer.import_session",
       "module_ids": [
         "transfer",
+        "compact",
         "commit",
         "schema",
         "snapshot"
       ],
       "steps": [
         "输入校验与读取已有事实",
+        "冻结读修订、分段清单与续传进度",
         "文档流边界与原子导入",
         "形成可观察结果"
       ],
-      "success": "外部文档流验证后整批导入",
-      "failure": "重复键整体拒绝",
+      "success": "外部文档流按冻结修订分段取回、校验清单后续传，并整批导入",
+      "failure": "缺失、重复、乱序、替换段或重复键拒绝",
       "verification": "python3 -m examples.workflows transfer"
     }
   ],

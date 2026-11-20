@@ -45,7 +45,28 @@ def retention_pressure(folder):
         return {'both_holds': both, 'one_hold': one, 'released': none, 'inspection': db.diagnostics.inspect(True)}
 
 
+def export_resume(folder):
+    """Show a segmented export holding the floor until it is finished or abandoned."""
+    with Database(folder / 'observe.db') as db:
+        first = seed(db)
+        export = db.transfer.begin('segments', first, segment_size=2)
+        export_id = export['export']
+        db.transfer.fetch(export_id, 0)
+        partial = db.transfer.advance(export_id, 0)
+        db.batch().put('segments', 'seg_00', {'region': 'north', 'sequence': 20}).commit()
+        held = db.retention.compact(db.revision)
+        resumed = db.transfer.finish(export_id, complete=False)
+        released = db.retention.compact(db.revision)
+        try:
+            db.transfer.fetch(export_id, 1)
+        except Exception as exc:
+            after = {'error': type(exc).__name__, 'message': str(exc)}
+        return {'partial': {key: partial[key] for key in ('state', 'progress', 'next_segment')},
+                'held_floor': held, 'abandoned': resumed['state'], 'released_floor': released, 'fetch_after': after}
+
+
 if __name__ == '__main__':
     with tempfile.TemporaryDirectory(prefix='strataleaf-observation-') as directory:
-        operation = {'contention': contention, 'retention_pressure': retention_pressure}[sys.argv[1]]
+        operation = {'contention': contention, 'retention_pressure': retention_pressure,
+                     'export_resume': export_resume}[sys.argv[1]]
         print(json.dumps(operation(Path(directory)), ensure_ascii=False, sort_keys=True))

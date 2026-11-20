@@ -2,7 +2,9 @@ import json
 import sys
 import tempfile
 from pathlib import Path
-from strataleaf import Database, Archives, Conflict, InvalidDocument, InvalidCursor, ReadOnly, SnapshotTooOld, ReplicationError
+from strataleaf import (Database, Archives, Conflict, InvalidDocument, InvalidCursor, ReadOnly, SnapshotTooOld,
+                        ReplicationError, TransferError)
+from strataleaf.transfer import verify_manifest
 
 SCHEMA = {"fields": {"region": "string", "sequence": "integer", "code": "string"}, "required": ["region", "sequence"]}
 
@@ -138,12 +140,30 @@ def run(flow):
                 if not output["inspection"]["ok"]:
                     raise RuntimeError("integrity inspection failed")
             elif flow == "transfer":
-                exported = db.transfer.export_lines("segments")
+                one_shot = db.transfer.export_lines("segments")
                 db.catalog.create("copy_segments", SCHEMA)
-                imported = db.transfer.import_lines("copy_segments", exported["lines"])
-                output = {"revision": exported["revision"], "imported": imported.__dict__,
-                          "duplicate": rejected(lambda: db.transfer.import_lines("copy_segments", exported["lines"]), Conflict)}
-                if len(db.query("copy_segments").records) != 6:
+                imported = db.transfer.import_lines("copy_segments", one_shot["lines"])
+                segmented = db.transfer.begin("segments", one_shot["revision"], segment_size=2)
+                export_id = segmented["export"]
+                manifest = db.transfer.segments(export_id)
+                received = [db.transfer.fetch(export_id, 0)]
+                db.transfer.advance(export_id, 0)
+                resumed = db.transfer.status(export_id)
+                resumable = {"next_segment": resumed["next_segment"], "progress": resumed["progress"]}
+                partial = rejected(lambda: verify_manifest(manifest, received), TransferError)
+                while resumed["next_segment"] is not None:
+                    received.append(db.transfer.fetch(export_id, resumed["next_segment"]))
+                    resumed = db.transfer.advance(export_id, resumed["next_segment"])
+                reordered = rejected(lambda: verify_manifest(manifest, [received[1], received[0]] + received[2:]), TransferError)
+                db.catalog.create("segment_copy", SCHEMA)
+                resumed_import = db.transfer.import_session(export_id, "segment_copy")
+                output = {"revision": one_shot["revision"], "imported": imported.__dict__,
+                          "segments": {key: manifest[key] for key in ("export", "total_segments", "total_documents", "digest")},
+                          "resume_point": resumable, "partial": partial, "reordered": reordered,
+                          "received": len(received), "state": db.transfer.status(export_id)["state"],
+                          "segmented_import": resumed_import.__dict__,
+                          "duplicate": rejected(lambda: db.transfer.import_lines("copy_segments", one_shot["lines"]), Conflict)}
+                if len(db.query("copy_segments").records) != 6 or len(db.query("segment_copy").records) != 6:
                     raise RuntimeError("logical import differs")
             else:
                 raise ValueError("unknown example workflow: " + flow)

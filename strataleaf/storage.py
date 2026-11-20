@@ -24,6 +24,15 @@ CREATE TABLE IF NOT EXISTS index_values (
 CREATE INDEX IF NOT EXISTS index_document ON index_values(collection,key);
 CREATE TABLE IF NOT EXISTS pins (name TEXT PRIMARY KEY, rev INTEGER NOT NULL);
 CREATE TABLE IF NOT EXISTS consumers (name TEXT PRIMARY KEY, ack INTEGER NOT NULL);
+CREATE TABLE IF NOT EXISTS export_sessions (
+ export_id TEXT PRIMARY KEY, database_id TEXT NOT NULL, collection TEXT NOT NULL, revision INTEGER NOT NULL,
+ pin TEXT NOT NULL UNIQUE, segment_size INTEGER NOT NULL, total_segments INTEGER NOT NULL,
+ total_documents INTEGER NOT NULL, digest TEXT NOT NULL, state TEXT NOT NULL, progress INTEGER NOT NULL,
+ FOREIGN KEY(collection) REFERENCES collections(name));
+CREATE TABLE IF NOT EXISTS export_segments (
+ export_id TEXT NOT NULL, idx INTEGER NOT NULL, first_key TEXT NOT NULL, last_key TEXT NOT NULL,
+ documents INTEGER NOT NULL, digest TEXT NOT NULL, PRIMARY KEY(export_id,idx),
+ FOREIGN KEY(export_id) REFERENCES export_sessions(export_id) ON DELETE CASCADE);
 """
 
 

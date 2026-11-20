@@ -12,7 +12,8 @@ class Diagnostics:
             integrity = [row[0] for row in connection.execute("PRAGMA integrity_check" if deep else "PRAGMA quick_check")]
             references = [tuple(row) for row in connection.execute("PRAGMA foreign_key_check")]
             counts = {table: connection.execute("SELECT COUNT(*) FROM " + table).fetchone()[0]
-                      for table in ("collections", "versions", "commits", "index_defs", "index_values", "pins", "consumers")}
+                      for table in ("collections", "versions", "commits", "index_defs", "index_values", "pins",
+                                    "consumers", "export_sessions", "export_segments")}
             revisions = [row[0] for row in connection.execute("SELECT rev FROM commits WHERE rev>? ORDER BY rev", (floor,))]
             issues = []
             if revisions != list(range(floor + 1, head + 1)):
@@ -26,6 +27,20 @@ class Diagnostics:
             for pin in connection.execute("SELECT name,rev FROM pins"):
                 if not floor <= pin["rev"] <= head:
                     issues.append("read pin outside retained history: " + pin["name"])
+            for session in connection.execute("SELECT * FROM export_sessions"):
+                if session["state"] == "open":
+                    if not 0 <= session["progress"] <= session["total_segments"] or session["total_segments"] < 1:
+                        issues.append("export has inconsistent segment progress: " + session["export_id"])
+                    if not connection.execute("SELECT 1 FROM pins WHERE name=? AND rev=?",
+                                              (session["pin"], session["revision"])).fetchone():
+                        issues.append("open export lost its read pin: " + session["export_id"])
+                elif session["progress"] != session["total_segments"]:
+                    issues.append("finished export has incomplete progress: " + session["export_id"])
+                elif not session["state"] in ("complete", "abandoned"):
+                    issues.append("export has unknown state: " + session["export_id"])
+                if session["state"] != "open" and connection.execute(
+                        "SELECT 1 FROM pins WHERE name=?", (session["pin"],)).fetchone():
+                    issues.append("finished export still holds a read pin: " + session["export_id"])
             if deep:
                 expected = set()
                 for definition in connection.execute("SELECT * FROM index_defs"):

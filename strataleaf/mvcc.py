@@ -27,11 +27,23 @@ def latest_row(connection, collection, key, revision):
                               (collection, key, revision)).fetchone()
 
 
-def visible_rows(connection, collection, revision):
+def visible_stream(connection, collection, revision):
     return connection.execute("""SELECT v.* FROM versions v JOIN
       (SELECT key,MAX(rev) AS r FROM versions WHERE collection=? AND rev<=? GROUP BY key) latest
       ON v.collection=? AND v.key=latest.key AND v.rev=latest.r
-      WHERE v.body IS NOT NULL ORDER BY v.key""", (collection, revision, collection)).fetchall()
+      WHERE v.body IS NOT NULL ORDER BY v.key""", (collection, revision, collection))
+
+
+def visible_range(connection, collection, revision, lower, upper):
+    return connection.execute("""SELECT v.* FROM versions v JOIN
+      (SELECT key,MAX(rev) AS r FROM versions WHERE collection=? AND rev<=? GROUP BY key) latest
+      ON v.collection=? AND v.key=latest.key AND v.rev=latest.r
+      WHERE v.body IS NOT NULL AND latest.key>=? AND latest.key<=? ORDER BY v.key""",
+      (collection, revision, collection, lower, upper)).fetchall()
+
+
+def visible_rows(connection, collection, revision):
+    return visible_stream(connection, collection, revision).fetchall()
 
 
 def record(row):

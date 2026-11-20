@@ -86,6 +86,8 @@ class Archives:
                 target.execute("UPDATE meta SET value=? WHERE key='cursor_secret'", (secrets.token_hex(32),))
             target.execute("DELETE FROM pins")
             target.execute("DELETE FROM consumers")
+            target.execute("DELETE FROM export_segments")
+            target.execute("DELETE FROM export_sessions")
             target.commit()
             target.close()
             target = None
