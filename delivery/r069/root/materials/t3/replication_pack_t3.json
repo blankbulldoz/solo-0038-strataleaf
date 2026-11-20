@@ -1,0 +1,58 @@
+{
+  "body": {
+    "catalog_epoch": 5,
+    "collections": [
+      {
+        "generation": 2,
+        "name": "segments",
+        "schema": "{\"additional\":true,\"fields\":{\"code\":\"string\",\"region\":\"string\",\"sequence\":\"integer\",\"zone\":\"string\"},\"required\":[\"region\",\"sequence\"]}"
+      }
+    ],
+    "commits": [
+      {
+        "operations": [
+          {
+            "collection": "segments",
+            "document": {
+              "code": "c9",
+              "region": "south",
+              "sequence": 9,
+              "zone": "z2"
+            },
+            "expected": null,
+            "expires_at": 1000.0,
+            "key": "seg_ttl"
+          }
+        ],
+        "revision": 4
+      },
+      {
+        "operations": [
+          {
+            "collection": "segments",
+            "document": null,
+            "expected": 4,
+            "expires_at": null,
+            "key": "seg_ttl"
+          }
+        ],
+        "revision": 5
+      }
+    ],
+    "floor": 3,
+    "format": 1,
+    "head": 5,
+    "indexes": [
+      {
+        "collection": "segments",
+        "field": "code",
+        "name": "unique_code",
+        "unique_flag": 1
+      }
+    ],
+    "since": 3,
+    "source": "1168a063-3da3-4230-8b96-550492284b59",
+    "through": 5
+  },
+  "sha256": "cdbd9ba382e9a5946bff25e6be8d589c84719646f94cee7a2fcf62a208f4b58f"
+}

@@ -1,0 +1,46 @@
+{
+  "heads": {
+    "origin_c_replayed": 5,
+    "t1": 2,
+    "t2": 3,
+    "t3": 5
+  },
+  "origin_a_database_id": "1168a063-3da3-4230-8b96-550492284b59",
+  "source_path": "/tmp/strataleaf-handoff/root/live_source/source_primary.db",
+  "steps": [
+    {
+      "count": 4,
+      "replayed": false,
+      "request_key": "seed_segments",
+      "revision": 1,
+      "step": "t1_seed"
+    },
+    {
+      "revision": 2,
+      "step": "t1_update"
+    },
+    {
+      "head_after_catalog_only": 2,
+      "schema_generation": 2,
+      "step": "t2_catalog_only"
+    },
+    {
+      "count": 2,
+      "revision": 3,
+      "step": "t2_documents"
+    },
+    {
+      "expired": 1,
+      "revision": 5,
+      "step": "t3_sweep"
+    },
+    {
+      "blocked": true,
+      "floor": 3,
+      "removed_commits": 3,
+      "removed_versions": 2,
+      "requested": 5,
+      "step": "t3_compact"
+    }
+  ]
+}

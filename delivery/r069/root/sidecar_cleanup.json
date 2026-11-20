@@ -1,0 +1,12 @@
+{
+  "removed": [
+    "materials/t1/.strataleaf-z_pjqrjs-shm",
+    "materials/t1/.strataleaf-z_pjqrjs-wal",
+    "materials/t2/.strataleaf-xr9vg4ip-shm",
+    "materials/t2/.strataleaf-xr9vg4ip-wal",
+    "materials/t3/.strataleaf-zb2jfcxl-shm",
+    "materials/t3/.strataleaf-zb2jfcxl-wal",
+    "materials/t3/backup_t3.db-shm",
+    "materials/t3/backup_t3.db-wal"
+  ]
+}

@@ -1,0 +1,87 @@
+{
+  "body": {
+    "catalog_epoch": 1,
+    "collections": [
+      {
+        "generation": 1,
+        "name": "segments",
+        "schema": "{\"additional\":true,\"fields\":{\"code\":\"string\",\"region\":\"string\",\"sequence\":\"integer\"},\"required\":[\"region\",\"sequence\"]}"
+      }
+    ],
+    "commits": [
+      {
+        "operations": [
+          {
+            "collection": "segments",
+            "document": {
+              "code": "c0",
+              "region": "east",
+              "sequence": 0
+            },
+            "expected": null,
+            "expires_at": null,
+            "key": "seg_00"
+          },
+          {
+            "collection": "segments",
+            "document": {
+              "code": "c1",
+              "region": "west",
+              "sequence": 1
+            },
+            "expected": null,
+            "expires_at": null,
+            "key": "seg_01"
+          },
+          {
+            "collection": "segments",
+            "document": {
+              "code": "c2",
+              "region": "east",
+              "sequence": 2
+            },
+            "expected": null,
+            "expires_at": null,
+            "key": "seg_02"
+          },
+          {
+            "collection": "segments",
+            "document": {
+              "code": "c3",
+              "region": "west",
+              "sequence": 3
+            },
+            "expected": null,
+            "expires_at": null,
+            "key": "seg_03"
+          }
+        ],
+        "revision": 1
+      },
+      {
+        "operations": [
+          {
+            "collection": "segments",
+            "document": {
+              "code": "c1",
+              "region": "west",
+              "sequence": 11
+            },
+            "expected": 1,
+            "expires_at": null,
+            "key": "seg_01"
+          }
+        ],
+        "revision": 2
+      }
+    ],
+    "floor": 0,
+    "format": 1,
+    "head": 2,
+    "indexes": [],
+    "since": 0,
+    "source": "1168a063-3da3-4230-8b96-550492284b59",
+    "through": 2
+  },
+  "sha256": "c9fd3e5bbdffe633c87795acf5514d8c3eb3b9dc694faa25d611d2836220b2bc"
+}

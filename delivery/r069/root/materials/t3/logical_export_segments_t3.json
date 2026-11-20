@@ -1,0 +1,9 @@
+{
+  "lines": [
+    "{\"document\":{\"code\":\"c0\",\"region\":\"east\",\"sequence\":0},\"expires_at\":null,\"key\":\"seg_00\"}",
+    "{\"document\":{\"code\":\"c1\",\"region\":\"west\",\"sequence\":11},\"expires_at\":null,\"key\":\"seg_01\"}",
+    "{\"document\":{\"code\":\"c2\",\"region\":\"east\",\"sequence\":2},\"expires_at\":null,\"key\":\"seg_02\"}",
+    "{\"document\":{\"code\":\"c4\",\"region\":\"north\",\"sequence\":4,\"zone\":\"z1\"},\"expires_at\":null,\"key\":\"seg_04\"}"
+  ],
+  "revision": 5
+}

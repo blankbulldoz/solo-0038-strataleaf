@@ -1,0 +1,26 @@
+{
+  "rev2": {
+    "count": 1,
+    "replayed": false,
+    "revision": 2
+  },
+  "rev3": {
+    "count": 2,
+    "replayed": false,
+    "revision": 3
+  },
+  "rev4": {
+    "count": 1,
+    "replayed": false,
+    "revision": 4
+  },
+  "seed_import": {
+    "count": 4,
+    "replayed": false,
+    "revision": 1
+  },
+  "sweep": {
+    "expired": 1,
+    "revision": 5
+  }
+}

@@ -1,0 +1,124 @@
+{
+  "body": {
+    "catalog_epoch": 4,
+    "collections": [
+      {
+        "generation": 2,
+        "name": "segments",
+        "schema": "{\"additional\":true,\"fields\":{\"code\":\"string\",\"region\":\"string\",\"sequence\":\"integer\",\"zone\":\"string\"},\"required\":[\"region\",\"sequence\"]}"
+      }
+    ],
+    "commits": [
+      {
+        "operations": [
+          {
+            "collection": "segments",
+            "document": {
+              "code": "c0",
+              "region": "east",
+              "sequence": 0
+            },
+            "expected": null,
+            "expires_at": null,
+            "key": "seg_00"
+          },
+          {
+            "collection": "segments",
+            "document": {
+              "code": "c1",
+              "region": "west",
+              "sequence": 1
+            },
+            "expected": null,
+            "expires_at": null,
+            "key": "seg_01"
+          },
+          {
+            "collection": "segments",
+            "document": {
+              "code": "c2",
+              "region": "east",
+              "sequence": 2
+            },
+            "expected": null,
+            "expires_at": null,
+            "key": "seg_02"
+          },
+          {
+            "collection": "segments",
+            "document": {
+              "code": "c3",
+              "region": "west",
+              "sequence": 3
+            },
+            "expected": null,
+            "expires_at": null,
+            "key": "seg_03"
+          }
+        ],
+        "revision": 1
+      },
+      {
+        "operations": [
+          {
+            "collection": "segments",
+            "document": {
+              "code": "c1",
+              "region": "west",
+              "sequence": 11
+            },
+            "expected": 1,
+            "expires_at": null,
+            "key": "seg_01"
+          }
+        ],
+        "revision": 2
+      },
+      {
+        "operations": [
+          {
+            "collection": "segments",
+            "document": {
+              "code": "c4",
+              "region": "north",
+              "sequence": 4,
+              "zone": "z1"
+            },
+            "expected": null,
+            "expires_at": null,
+            "key": "seg_04"
+          },
+          {
+            "collection": "segments",
+            "document": null,
+            "expected": null,
+            "expires_at": null,
+            "key": "seg_03"
+          }
+        ],
+        "revision": 3
+      }
+    ],
+    "floor": 0,
+    "format": 1,
+    "head": 3,
+    "indexes": [
+      {
+        "collection": "segments",
+        "field": "region",
+        "name": "by_region",
+        "unique_flag": 0
+      },
+      {
+        "collection": "segments",
+        "field": "code",
+        "name": "unique_code",
+        "unique_flag": 1
+      }
+    ],
+    "since": 0,
+    "source": "1168a063-3da3-4230-8b96-550492284b59",
+    "through": 3
+  },
+  "sha256": "e5d0d648360d957ee4378efb0ad3f889892712f43022f1ee3e9c080023c3d342"
+}

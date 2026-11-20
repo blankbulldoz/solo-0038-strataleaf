@@ -1,0 +1,47 @@
+{
+  "cross_view_fingerprints": {
+    "t1": "7b1a32438032f2600ff33f1756062b5bbe8c0d8a26d4c769e4486bd99b31b88d",
+    "t2": "2d92308cb685b1df33f7d5d5c0a86e6654c62bd3362e42d7dabbe34fc24c41ce",
+    "t3": "2d92308cb685b1df33f7d5d5c0a86e6654c62bd3362e42d7dabbe34fc24c41ce"
+  },
+  "overwrite_existing_destination": {
+    "error": "Conflict",
+    "message": "restore requires an unused destination"
+  },
+  "restore_t1": {
+    "fingerprint": {
+      "documents": 4,
+      "revision": 2,
+      "sha256": "7b1a32438032f2600ff33f1756062b5bbe8c0d8a26d4c769e4486bd99b31b88d"
+    },
+    "head": 2,
+    "inspect_deep_ok": true,
+    "mode": "primary"
+  },
+  "restore_t2": {
+    "fingerprint": {
+      "documents": 4,
+      "revision": 3,
+      "sha256": "2d92308cb685b1df33f7d5d5c0a86e6654c62bd3362e42d7dabbe34fc24c41ce"
+    },
+    "head": 3,
+    "inspect_deep_ok": true,
+    "mode": "primary"
+  },
+  "restore_t3": {
+    "fingerprint": {
+      "documents": 4,
+      "revision": 5,
+      "sha256": "2d92308cb685b1df33f7d5d5c0a86e6654c62bd3362e42d7dabbe34fc24c41ce"
+    },
+    "head": 5,
+    "inspect_deep_ok": true,
+    "mode": "primary"
+  },
+  "t2_t3_current_view_equal_despite_different_files": true,
+  "t3_head": 5,
+  "t3_read_revision_1": {
+    "error": "SnapshotTooOld",
+    "message": "revision 1 is older than retained floor 3"
+  }
+}

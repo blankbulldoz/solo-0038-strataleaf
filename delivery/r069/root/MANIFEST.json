@@ -1,0 +1,601 @@
+{
+  "schema_version": 1,
+  "generated_by": "handoff scripts (public strataleaf API + read-only SQLite)",
+  "package": "strataleaf 0.1.0, on-disk format 1",
+  "material_classes": {
+    "live_documents": "versions rows whose body IS NOT NULL at the read head",
+    "historical_baseline": "pre-floor version rows plus the T1 backup that still serves them",
+    "tombstones": "versions rows with body IS NULL (deletes, including TTL sweep deletes)",
+    "index_definitions": "index_defs rows plus their current-head index_values projection",
+    "consumer_positions": "consumers.ack acknowledgements and pins read-retention points"
+  },
+  "time_points": {
+    "t1": {
+      "directory": "materials/t1",
+      "head": 2,
+      "floor": 0,
+      "catalog_epoch": 1,
+      "schema_generation": 1,
+      "index_definitions": [],
+      "tombstones": [],
+      "consumers": [
+        {
+          "ack": 0,
+          "name": "mirror_a"
+        },
+        {
+          "ack": 0,
+          "name": "mirror_b"
+        }
+      ],
+      "pins": [
+        {
+          "name": "long_reader",
+          "rev": 2
+        }
+      ],
+      "retained_commit_revisions": [
+        1,
+        2
+      ],
+      "visible_document_keys": [
+        "seg_00",
+        "seg_01",
+        "seg_02",
+        "seg_03"
+      ],
+      "logical_fingerprint": {
+        "documents": 4,
+        "revision": 2,
+        "sha256": "7b1a32438032f2600ff33f1756062b5bbe8c0d8a26d4c769e4486bd99b31b88d"
+      },
+      "files": {
+        "backup_t1.db": {
+          "bytes": 86016,
+          "sha256": "9889ff1609a8bc000024bd722565840beb6294e134e3829ea5856239aeedfad8"
+        },
+        "logical_export_segments_t1.json": {
+          "bytes": 493,
+          "sha256": "b92455962c808fddafdf25991c58c6720c1297da5bef09782e6a468947e7c629"
+        },
+        "replication_pack_t1.json": {
+          "bytes": 2112,
+          "sha256": "b794cdb15ac25dfb094f9a97d0346f9f02849be356aee3adcb63a27a13bc6db8"
+        }
+      },
+      "replication_pack": {
+        "header": {
+          "catalog_epoch": 1,
+          "collections": [
+            {
+              "generation": 1,
+              "name": "segments",
+              "schema": "{\"additional\":true,\"fields\":{\"code\":\"string\",\"region\":\"string\",\"sequence\":\"integer\"},\"required\":[\"region\",\"sequence\"]}"
+            }
+          ],
+          "floor": 0,
+          "format": 1,
+          "head": 2,
+          "indexes": [],
+          "since": 0,
+          "source": "1168a063-3da3-4230-8b96-550492284b59",
+          "through": 2
+        },
+        "commit_revisions": [
+          1,
+          2
+        ]
+      },
+      "logical_export": {
+        "line_count": 4,
+        "revision": 2
+      },
+      "sqlite_integrity_check": "ok",
+      "foreign_key_check_rows": 0,
+      "backup_receipt_hash_reverified": true
+    },
+    "t2": {
+      "directory": "materials/t2",
+      "head": 3,
+      "floor": 0,
+      "catalog_epoch": 4,
+      "schema_generation": 2,
+      "index_definitions": [
+        {
+          "collection": "segments",
+          "field": "region",
+          "name": "by_region",
+          "unique_flag": 0
+        },
+        {
+          "collection": "segments",
+          "field": "code",
+          "name": "unique_code",
+          "unique_flag": 1
+        }
+      ],
+      "tombstones": [
+        {
+          "key": "seg_03",
+          "revision": 3
+        }
+      ],
+      "consumers": [
+        {
+          "ack": 3,
+          "name": "mirror_a"
+        },
+        {
+          "ack": 0,
+          "name": "mirror_b"
+        }
+      ],
+      "pins": [
+        {
+          "name": "long_reader",
+          "rev": 2
+        }
+      ],
+      "retained_commit_revisions": [
+        1,
+        2,
+        3
+      ],
+      "visible_document_keys": [
+        "seg_00",
+        "seg_01",
+        "seg_02",
+        "seg_04"
+      ],
+      "logical_fingerprint": {
+        "documents": 4,
+        "revision": 3,
+        "sha256": "2d92308cb685b1df33f7d5d5c0a86e6654c62bd3362e42d7dabbe34fc24c41ce"
+      },
+      "files": {
+        "backup_t2.db": {
+          "bytes": 86016,
+          "sha256": "9dac0195979a0401c6dab7355380ddd77e905e841b8b87e62b1bc24f221259c1"
+        },
+        "logical_export_segments_t2.json": {
+          "bytes": 510,
+          "sha256": "bd9fd63e884e4d1ff8f009e6dc3671278a599873b6a769710765a12245b205e0"
+        },
+        "replication_pack_t2.json": {
+          "bytes": 2967,
+          "sha256": "88dfc8ae61eb363d848ada2f059a3effb10dfc87c8c192494e1c37ef6f3ac5c5"
+        }
+      },
+      "replication_pack": {
+        "header": {
+          "catalog_epoch": 4,
+          "collections": [
+            {
+              "generation": 2,
+              "name": "segments",
+              "schema": "{\"additional\":true,\"fields\":{\"code\":\"string\",\"region\":\"string\",\"sequence\":\"integer\",\"zone\":\"string\"},\"required\":[\"region\",\"sequence\"]}"
+            }
+          ],
+          "floor": 0,
+          "format": 1,
+          "head": 3,
+          "indexes": [
+            {
+              "collection": "segments",
+              "field": "region",
+              "name": "by_region",
+              "unique_flag": 0
+            },
+            {
+              "collection": "segments",
+              "field": "code",
+              "name": "unique_code",
+              "unique_flag": 1
+            }
+          ],
+          "since": 0,
+          "source": "1168a063-3da3-4230-8b96-550492284b59",
+          "through": 3
+        },
+        "commit_revisions": [
+          1,
+          2,
+          3
+        ]
+      },
+      "logical_export": {
+        "line_count": 4,
+        "revision": 3
+      },
+      "sqlite_integrity_check": "ok",
+      "foreign_key_check_rows": 0,
+      "backup_receipt_hash_reverified": true
+    },
+    "t3": {
+      "directory": "materials/t3",
+      "head": 5,
+      "floor": 3,
+      "catalog_epoch": 5,
+      "schema_generation": 2,
+      "index_definitions": [
+        {
+          "collection": "segments",
+          "field": "code",
+          "name": "unique_code",
+          "unique_flag": 1
+        }
+      ],
+      "tombstones": [
+        {
+          "key": "seg_03",
+          "revision": 3
+        },
+        {
+          "key": "seg_ttl",
+          "revision": 5
+        }
+      ],
+      "consumers": [
+        {
+          "ack": 5,
+          "name": "mirror_a"
+        },
+        {
+          "ack": 3,
+          "name": "mirror_b"
+        }
+      ],
+      "pins": [],
+      "retained_commit_revisions": [
+        4,
+        5
+      ],
+      "visible_document_keys": [
+        "seg_00",
+        "seg_01",
+        "seg_02",
+        "seg_04"
+      ],
+      "logical_fingerprint": {
+        "documents": 4,
+        "revision": 5,
+        "sha256": "2d92308cb685b1df33f7d5d5c0a86e6654c62bd3362e42d7dabbe34fc24c41ce"
+      },
+      "files": {
+        "backup_t3.db": {
+          "bytes": 86016,
+          "sha256": "c6a9349c0d9d5325c0ae71cb42a3a817ec10d267aafaf8a625923001145996a3"
+        },
+        "logical_export_segments_t3.json": {
+          "bytes": 510,
+          "sha256": "ec43de42ac62dba528d77e519c763905e7d429716ac9a0f534492e23596e4fb4"
+        },
+        "replication_pack_t3.json": {
+          "bytes": 1355,
+          "sha256": "1c8c36cb0eff06e67597623180a153ebf08d8998ed43f2583d49a244f3d22713"
+        }
+      },
+      "replication_pack": {
+        "header": {
+          "catalog_epoch": 5,
+          "collections": [
+            {
+              "generation": 2,
+              "name": "segments",
+              "schema": "{\"additional\":true,\"fields\":{\"code\":\"string\",\"region\":\"string\",\"sequence\":\"integer\",\"zone\":\"string\"},\"required\":[\"region\",\"sequence\"]}"
+            }
+          ],
+          "floor": 3,
+          "format": 1,
+          "head": 5,
+          "indexes": [
+            {
+              "collection": "segments",
+              "field": "code",
+              "name": "unique_code",
+              "unique_flag": 1
+            }
+          ],
+          "since": 3,
+          "source": "1168a063-3da3-4230-8b96-550492284b59",
+          "through": 5
+        },
+        "commit_revisions": [
+          4,
+          5
+        ]
+      },
+      "logical_export": {
+        "line_count": 4,
+        "revision": 5
+      },
+      "sqlite_integrity_check": "ok",
+      "foreign_key_check_rows": 0,
+      "backup_receipt_hash_reverified": true
+    }
+  },
+  "cross_cutting_evidence": {
+    "head_vs_catalog_epoch": {
+      "epoch_advanced_without_head_change_in_t2": true,
+      "note": "Catalog epoch counts schema/index changes independently of document revisions. Two databases at the same head can carry different schema generations, index definitions and epochs; head equality alone never makes them interchangeable.",
+      "t1_catalog": [
+        {
+          "generation": 1,
+          "name": "segments",
+          "schema": {
+            "additional": true,
+            "fields": {
+              "code": "string",
+              "region": "string",
+              "sequence": "integer"
+            },
+            "required": [
+              "region",
+              "sequence"
+            ]
+          }
+        }
+      ],
+      "t1_catalog_epoch": 1,
+      "t1_head": 2,
+      "t1_index_defs": [],
+      "t2_catalog": [
+        {
+          "generation": 2,
+          "name": "segments",
+          "schema": {
+            "additional": true,
+            "fields": {
+              "code": "string",
+              "region": "string",
+              "sequence": "integer",
+              "zone": "string"
+            },
+            "required": [
+              "region",
+              "sequence"
+            ]
+          }
+        }
+      ],
+      "t2_catalog_epoch": 4,
+      "t2_head": 3,
+      "t2_index_defs": [
+        {
+          "collection": "segments",
+          "field": "region",
+          "name": "by_region",
+          "unique_flag": 0
+        },
+        {
+          "collection": "segments",
+          "field": "code",
+          "name": "unique_code",
+          "unique_flag": 1
+        }
+      ]
+    },
+    "independent_origins": {
+      "all_file_hashes_distinct": true,
+      "all_ids_distinct": true,
+      "cursor_secrets_all_distinct": true,
+      "database_ids": {
+        "origin_a_backup_t3": "1168a063-3da3-4230-8b96-550492284b59",
+        "origin_b_restored_primary": "bea69463-abb8-4197-8797-6786bf5edd49",
+        "origin_c_transferred": "fb125c20-81f7-44cc-a1a8-a0f04c0b8919"
+      },
+      "file_sha256": {
+        "origin_a_backup_t3": "c6a9349c0d9d5325c0ae71cb42a3a817ec10d267aafaf8a625923001145996a3",
+        "origin_b_restored_primary": "5353d8cea077513031668898da9f37433e447482f91b8d08ca7330ed4fff568e",
+        "origin_c_transferred": "ad621e4bf3d2182ff09049899778e8a27b0800142c2fdf62bb73142539a15cb2"
+      },
+      "fingerprints": {
+        "a": {
+          "documents": 4,
+          "revision": 5,
+          "sha256": "2d92308cb685b1df33f7d5d5c0a86e6654c62bd3362e42d7dabbe34fc24c41ce"
+        },
+        "b": {
+          "documents": 4,
+          "revision": 5,
+          "sha256": "2d92308cb685b1df33f7d5d5c0a86e6654c62bd3362e42d7dabbe34fc24c41ce"
+        },
+        "c": {
+          "documents": 4,
+          "revision": 5,
+          "sha256": "2d92308cb685b1df33f7d5d5c0a86e6654c62bd3362e42d7dabbe34fc24c41ce"
+        }
+      },
+      "heads": {
+        "a": 5,
+        "b": 5,
+        "c": 5
+      },
+      "inspect_deep_ok": {
+        "a": true,
+        "b": true,
+        "c": true
+      },
+      "logical_fingerprints_equal": true,
+      "mode": {
+        "a": "primary",
+        "b": "primary",
+        "c": "primary"
+      },
+      "note": "Different file hashes AND different database identities, yet the public fingerprint of every current read view is equal. Identity-bound facts (cursor signatures, upstream binding, feed registration) cannot be inferred from equal fingerprints.",
+      "restored_primary_consumers": [],
+      "restored_primary_pins": []
+    },
+    "byte_copy_control": {
+      "byte_copy_sha256": "c6a9349c0d9d5325c0ae71cb42a3a817ec10d267aafaf8a625923001145996a3",
+      "equal": true,
+      "note": "A pure byte copy preserves the hash; every supported transform (restore, import, new commit) changes it.",
+      "original_sha256": "c6a9349c0d9d5325c0ae71cb42a3a817ec10d267aafaf8a625923001145996a3"
+    },
+    "retention_and_feed_boundary": {
+      "consumers": {
+        "t1": [
+          {
+            "ack": 0,
+            "name": "mirror_a"
+          },
+          {
+            "ack": 0,
+            "name": "mirror_b"
+          }
+        ],
+        "t3": [
+          {
+            "ack": 5,
+            "name": "mirror_a"
+          },
+          {
+            "ack": 3,
+            "name": "mirror_b"
+          }
+        ]
+      },
+      "note": "T3 floor advanced only after the pin was released and both consumers acknowledged. Pre-floor revisions remain readable from the T1 historical baseline, not from T3.",
+      "pins": {
+        "t1": [
+          {
+            "name": "long_reader",
+            "rev": 2
+          }
+        ],
+        "t3": []
+      },
+      "t1_commit_revisions": [
+        1,
+        2
+      ],
+      "t1_floor": 0,
+      "t3_commit_revisions": [
+        4,
+        5
+      ],
+      "t3_floor": 3,
+      "version_rows": {
+        "t1": 5,
+        "t3": 7
+      }
+    },
+    "recovery_and_floor": {
+      "cross_view_fingerprints": {
+        "t1": "7b1a32438032f2600ff33f1756062b5bbe8c0d8a26d4c769e4486bd99b31b88d",
+        "t2": "2d92308cb685b1df33f7d5d5c0a86e6654c62bd3362e42d7dabbe34fc24c41ce",
+        "t3": "2d92308cb685b1df33f7d5d5c0a86e6654c62bd3362e42d7dabbe34fc24c41ce"
+      },
+      "overwrite_existing_destination": {
+        "error": "Conflict",
+        "message": "restore requires an unused destination"
+      },
+      "restore_t1": {
+        "fingerprint": {
+          "documents": 4,
+          "revision": 2,
+          "sha256": "7b1a32438032f2600ff33f1756062b5bbe8c0d8a26d4c769e4486bd99b31b88d"
+        },
+        "head": 2,
+        "inspect_deep_ok": true,
+        "mode": "primary"
+      },
+      "restore_t2": {
+        "fingerprint": {
+          "documents": 4,
+          "revision": 3,
+          "sha256": "2d92308cb685b1df33f7d5d5c0a86e6654c62bd3362e42d7dabbe34fc24c41ce"
+        },
+        "head": 3,
+        "inspect_deep_ok": true,
+        "mode": "primary"
+      },
+      "restore_t3": {
+        "fingerprint": {
+          "documents": 4,
+          "revision": 5,
+          "sha256": "2d92308cb685b1df33f7d5d5c0a86e6654c62bd3362e42d7dabbe34fc24c41ce"
+        },
+        "head": 5,
+        "inspect_deep_ok": true,
+        "mode": "primary"
+      },
+      "t2_t3_current_view_equal_despite_different_files": true,
+      "t3_head": 5,
+      "t3_read_revision_1": {
+        "error": "SnapshotTooOld",
+        "message": "revision 1 is older than retained floor 3"
+      }
+    }
+  },
+  "build_ledger": {
+    "heads": {
+      "origin_c_replayed": 5,
+      "t1": 2,
+      "t2": 3,
+      "t3": 5
+    },
+    "origin_a_database_id": "1168a063-3da3-4230-8b96-550492284b59",
+    "source_path": "/tmp/strataleaf-handoff/root/live_source/source_primary.db",
+    "steps": [
+      {
+        "count": 4,
+        "replayed": false,
+        "request_key": "seed_segments",
+        "revision": 1,
+        "step": "t1_seed"
+      },
+      {
+        "revision": 2,
+        "step": "t1_update"
+      },
+      {
+        "head_after_catalog_only": 2,
+        "schema_generation": 2,
+        "step": "t2_catalog_only"
+      },
+      {
+        "count": 2,
+        "revision": 3,
+        "step": "t2_documents"
+      },
+      {
+        "expired": 1,
+        "revision": 5,
+        "step": "t3_sweep"
+      },
+      {
+        "blocked": true,
+        "floor": 3,
+        "removed_commits": 3,
+        "removed_versions": 2,
+        "requested": 5,
+        "step": "t3_compact"
+      }
+    ]
+  },
+  "file_checksums": {
+    "build_ledger.json": "d7e255174de642e4d08e758144ce2df509e93140ed682bcf64b6a1a5aca6eb42",
+    "evidence/observations.json": "91e509ad0fcfc83c09e4174f5b43b30de8b12e8a1081b24213b8f4936bc9e976",
+    "evidence/restore_and_floor_checks.json": "5a67011d2e881c972e1630150f6f69a54238e2bd0a51572ee415f061050a8101",
+    "independent_origins/restored_primary/origin_b.db": "5353d8cea077513031668898da9f37433e447482f91b8d08ca7330ed4fff568e",
+    "independent_origins/restored_primary/restore_receipt_origin_b.json": "6df8af42dd140b363b56137939d5223b439a82a131233c87646dd4bdacf5a487",
+    "independent_origins/transferred_origin/import_receipt_origin_c.json": "10619c2bac4af8d4b7bd96c180519914329ac9e527725dc05f76914f20c74b0f",
+    "independent_origins/transferred_origin/origin_c.db": "ad621e4bf3d2182ff09049899778e8a27b0800142c2fdf62bb73142539a15cb2",
+    "live_source/source_primary.db": "0e225cc180836ade233e37c1a14370fecca2fb254423a5cfc4b419d9e6b88075",
+    "materials/t1/backup_receipt_t1.json": "e540820c3d210263e613c4be7c37dbbc91d72466766bc483d213609a0e879e15",
+    "materials/t1/backup_t1.db": "9889ff1609a8bc000024bd722565840beb6294e134e3829ea5856239aeedfad8",
+    "materials/t1/logical_export_segments_t1.json": "b92455962c808fddafdf25991c58c6720c1297da5bef09782e6a468947e7c629",
+    "materials/t1/replication_pack_t1.json": "b794cdb15ac25dfb094f9a97d0346f9f02849be356aee3adcb63a27a13bc6db8",
+    "materials/t2/backup_receipt_t2.json": "1fefcfe232fd80fbc2fc310e518315159828704c957444772512a1a430a013ea",
+    "materials/t2/backup_t2.db": "9dac0195979a0401c6dab7355380ddd77e905e841b8b87e62b1bc24f221259c1",
+    "materials/t2/logical_export_segments_t2.json": "bd9fd63e884e4d1ff8f009e6dc3671278a599873b6a769710765a12245b205e0",
+    "materials/t2/replication_pack_t2.json": "88dfc8ae61eb363d848ada2f059a3effb10dfc87c8c192494e1c37ef6f3ac5c5",
+    "materials/t3/backup_receipt_t3.json": "28e0c2bdf5fe97d7c228dc55a3df9da907008e9dbb8fd62a9ea0a6c67ee1c723",
+    "materials/t3/backup_t3.db": "c6a9349c0d9d5325c0ae71cb42a3a817ec10d267aafaf8a625923001145996a3",
+    "materials/t3/logical_export_segments_t3.json": "ec43de42ac62dba528d77e519c763905e7d429716ac9a0f534492e23596e4fb4",
+    "materials/t3/replication_pack_t3.json": "1c8c36cb0eff06e67597623180a153ebf08d8998ed43f2583d49a244f3d22713",
+    "scratch_control/t3_byte_copy_control.db": "c6a9349c0d9d5325c0ae71cb42a3a817ec10d267aafaf8a625923001145996a3",
+    "sidecar_cleanup.json": "b3baf55ab2a2be616945b3381499a75a40e9b05270924460983931f1b16a5921"
+  }
+}
