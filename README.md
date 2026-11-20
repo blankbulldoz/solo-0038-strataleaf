@@ -4,7 +4,7 @@ StrataLeaf 是供 Python 服务嵌入的版本化文档数据库。主要入口�
 
 ## 开始使用
 
-需要 Python 3.11+，运行时只用标准库 `sqlite3`。从源码根目录可直接导入；也可运行 `python3 -m pip install .` 安装为包。调用方负责创建数据库文件的父目录。
+需要 Python 3.11+，运行时依赖 [APSW](https://rogerbinns.github.io/apsw/) 3.54.1.0（随 `pip install .` 自动安装，内置 SQLite 3.54.1），不再使用标准库 `sqlite3`。从源码根目录可直接导入（需自行提供 APSW）；也可运行 `python3 -m pip install .` 安装为包。调用方负责创建数据库文件的父目录。磁盘格式标识仍为 1，旧库文件无需迁移即可打开。
 
 ```python
 from strataleaf import Database
@@ -44,7 +44,7 @@ with Database("strataleaf.db") as db:
 - 变更流一次交付完整提交，消费方负责成功处理后确认；确认可前进到当前 head，系统不替消费方证明处理成功。释放消费者即放弃它的历史保护。
 - 备份使用 SQLite 在线备份 API，发布到未占用目标；校验摘要后恢复到新文件，禁止覆盖现有文件。恢复为新主库会生成新的数据库标识及游标签名密钥，保留文档版本；恢复为副本则绑定原主库。进程间不得直接复制活动 WAL 主文件代替备份。
 - 副本只能接收同一上游、连续的提交包。重复范围不重复写入；校验错误和缺口整包失败。分段追赶时使用版本扫描，追到导出端 head 才安装最新索引。目录 epoch 防止过时的同版本包倒退目录。副本不接收主库写入；基线不提供提升接口、双向复制或网络传输。导出校验和检测意外损坏，不代替对端身份认证。
-- SQLite 保证进程间单写者；同一句柄的锁协调线程操作，多个句柄通过 SQLite 锁协调。长读可能延缓 WAL checkpoint；忙超时由连接 timeout 控制，调用方处理 `sqlite3.OperationalError`。
+- SQLite 保证进程间单写者；同一句柄的锁协调线程操作，多个句柄通过 SQLite 锁协调。长读可能延缓 WAL checkpoint；忙超时由连接 timeout 控制（APSW 内部换算为毫秒级 `busy_timeout`），调用方处理 `apsw.BusyError`（可经 `strataleaf.driver.BusyError` 引用）。异常兼容边界见 [存储语义文档](docs/storage-semantics.md)。
 - 当前实现适合本地中小型嵌入式数据集，版本扫描、分组和逻辑导出会物化输入；不承诺常数内存。单文档上限 1 MiB、深度 32；筛选按键排序。磁盘加密、租户鉴权、分布式共识均不在现有承诺内。
 
 见 [完整规格](PROJECT_SPEC.md)、[数据与兼容边界](docs/storage-semantics.md)、[恢复与观测](docs/operations.md)。

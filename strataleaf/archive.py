@@ -1,11 +1,11 @@
 import hashlib
 import os
-import sqlite3
 import tempfile
 import secrets
 import uuid
 from pathlib import Path
-from .errors import Conflict, DatabaseError, InvalidDocument
+from . import driver
+from .errors import Conflict, DatabaseError
 
 
 def file_digest(path):
@@ -16,8 +16,12 @@ def file_digest(path):
     return result.hexdigest()
 
 
+def readonly_uri(path):
+    return Path(path).resolve().as_uri() + "?mode=ro"
+
+
 def inspect_archive(path):
-    connection = sqlite3.connect(Path(path).resolve().as_uri() + "?mode=ro", uri=True)
+    connection = driver.connect(readonly_uri(path), readonly=True)
     try:
         result = connection.execute("PRAGMA integrity_check").fetchone()[0]
         values = dict(connection.execute("SELECT key,value FROM meta"))
@@ -28,7 +32,9 @@ def inspect_archive(path):
             raise DatabaseError("archive has broken references")
         return {"revision": int(values["head"]), "floor": int(values["floor"]),
                 "database_id": values["database_id"], "sha256": file_digest(path)}
-    except (sqlite3.DatabaseError, KeyError, ValueError) as exc:
+    except driver.DriverError as exc:
+        raise DatabaseError("invalid database archive") from exc
+    except (KeyError, ValueError) as exc:
         raise DatabaseError("invalid database archive") from exc
     finally:
         connection.close()
@@ -49,9 +55,9 @@ class Archives:
             with self.store.lock:
                 if self.store.closed:
                     raise DatabaseError("database handle is closed")
-                target = sqlite3.connect(temporary)
+                target = driver.connect(temporary)
                 try:
-                    self.store.connection.backup(target)
+                    driver.online_backup(target, self.store.connection)
                 finally:
                     target.close()
             receipt = inspect_archive(temporary)
@@ -76,9 +82,11 @@ class Archives:
         original = None
         target = None
         try:
-            original = sqlite3.connect(source.as_uri() + "?mode=ro", uri=True)
-            target = sqlite3.connect(temporary)
-            original.backup(target)
+            original = driver.connect(readonly_uri(source), readonly=True)
+            target = driver.connect(temporary)
+            driver.online_backup(target, original)
+            # APSW stays in autocommit; these statements commit individually,
+            # as they did with the standard library connection.
             target.execute("UPDATE meta SET value=? WHERE key='mode'", ("replica" if follower else "primary",))
             target.execute("UPDATE meta SET value=? WHERE key='upstream'", (receipt["database_id"] if follower else "",))
             if not follower:
@@ -86,7 +94,6 @@ class Archives:
                 target.execute("UPDATE meta SET value=? WHERE key='cursor_secret'", (secrets.token_hex(32),))
             target.execute("DELETE FROM pins")
             target.execute("DELETE FROM consumers")
-            target.commit()
             target.close()
             target = None
             os.link(temporary, destination)

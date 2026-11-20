@@ -1,3 +1,4 @@
+from . import driver
 from .codec import loads, name
 from .errors import Conflict, InvalidDocument, NotFound
 from .mvcc import checked_revision
@@ -43,5 +44,6 @@ class ChangeFeed:
 
     def release(self, consumer):
         with self.store.atomic() as connection:
-            if not connection.execute("DELETE FROM consumers WHERE name=?", (consumer,)).rowcount:
+            connection.execute("DELETE FROM consumers WHERE name=?", (consumer,))
+            if not driver.changes(connection):
                 raise NotFound("unknown consumer")

@@ -1,9 +1,9 @@
 import contextlib
 import secrets
-import sqlite3
 import threading
 import uuid
 from pathlib import Path
+from . import driver
 from .errors import DatabaseError, ReadOnly
 
 DDL = """
@@ -32,12 +32,13 @@ class Storage:
         self.path = str(path)
         self.lock = threading.RLock()
         self.closed = False
-        self.connection = sqlite3.connect(self.path, timeout=timeout, isolation_level=None, check_same_thread=False)
-        self.connection.row_factory = sqlite3.Row
+        # APSW is always in autocommit mode until an explicit BEGIN, matching
+        # the previous sqlite3 isolation_level=None behaviour.
+        self.connection = driver.connect(self.path, timeout=timeout)
         self.connection.execute("PRAGMA foreign_keys=ON")
         self.connection.execute("PRAGMA journal_mode=WAL")
         self.connection.execute("PRAGMA synchronous=FULL")
-        self.connection.executescript(DDL)
+        driver.run_script(self.connection, DDL)
         with self.atomic():
             initial = {"format": "1", "head": "0", "floor": "0", "database_id": str(uuid.uuid4()),
                        "cursor_secret": secrets.token_hex(32), "mode": "primary", "upstream": "", "catalog_epoch": "0"}
@@ -65,9 +66,9 @@ class Storage:
                 if writable and self.get("mode") != "primary":
                     raise ReadOnly("replica rejects primary writes")
                 yield self.connection
-                self.connection.commit()
+                self.connection.execute("COMMIT")
             except BaseException:
-                self.connection.rollback()
+                self.connection.execute("ROLLBACK")
                 raise
 
     @contextlib.contextmanager
@@ -79,7 +80,7 @@ class Storage:
             try:
                 yield self.connection
             finally:
-                self.connection.rollback()
+                self.connection.execute("ROLLBACK")
 
     def checkpoint(self):
         with self.lock:

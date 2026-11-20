@@ -1,30 +1,30 @@
 """Reproduce operational boundaries through real temporary database operations."""
 import json
-import sqlite3
 import sys
 import tempfile
 import time
 from pathlib import Path
 from strataleaf import Database
+from strataleaf import driver
 from .workflows import seed
 
 
 def contention(folder):
     with Database(folder / 'observe.db', timeout=0.03) as db:
         seed(db)
-        holder = sqlite3.connect(folder / 'observe.db', isolation_level=None)
+        holder = driver.connect(folder / 'observe.db')
         try:
             holder.execute('BEGIN IMMEDIATE')
             started = time.monotonic()
             try:
                 db.batch().delete('segments', 'seg_00').commit()
-            except sqlite3.OperationalError as exc:
+            except driver.BusyError as exc:
                 blocked = {'exception': type(exc).__name__, 'message': str(exc),
                            'elapsed_ms': round((time.monotonic() - started) * 1000, 2)}
             else:
                 raise RuntimeError('expected SQLite writer contention was not observed')
         finally:
-            holder.rollback()
+            holder.execute('ROLLBACK')
             holder.close()
         result = db.batch().delete('segments', 'seg_00').commit()
         return {'blocked_write': blocked, 'after_release': result.__dict__, 'inspection': db.diagnostics.inspect(True)}

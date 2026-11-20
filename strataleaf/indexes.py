@@ -1,3 +1,4 @@
+from . import driver
 from .codec import MISSING, field, loads, name, scalar_token
 from .errors import Conflict, InvalidDocument, NotFound
 from .mvcc import visible_rows
@@ -48,7 +49,8 @@ class Indexes:
 
     def drop(self, collection, index_name):
         with self.store.atomic(writable=True) as connection:
-            changed = connection.execute("DELETE FROM index_defs WHERE collection=? AND name=?", (collection, index_name)).rowcount
+            connection.execute("DELETE FROM index_defs WHERE collection=? AND name=?", (collection, index_name))
+            changed = driver.changes(connection)
             if not changed:
                 raise NotFound("unknown index")
             self.store.set("catalog_epoch", int(self.store.get("catalog_epoch")) + 1)

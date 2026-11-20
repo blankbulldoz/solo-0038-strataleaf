@@ -1,4 +1,5 @@
 import math
+from . import driver
 from .codec import name
 from .errors import Conflict, InvalidDocument, NotFound
 from .mvcc import checked_revision
@@ -20,7 +21,8 @@ class Retention:
 
     def unpin(self, pin_name):
         with self.store.atomic() as connection:
-            if not connection.execute("DELETE FROM pins WHERE name=?", (pin_name,)).rowcount:
+            connection.execute("DELETE FROM pins WHERE name=?", (pin_name,))
+            if not driver.changes(connection):
                 raise NotFound("unknown read pin")
 
     def compact(self, target):
@@ -31,10 +33,12 @@ class Retention:
             prior = int(self.store.get("floor"))
             if boundary < prior:
                 raise Conflict("retention metadata violates current floor")
-            removed = connection.execute("""DELETE FROM versions WHERE rev<? AND EXISTS
+            connection.execute("""DELETE FROM versions WHERE rev<? AND EXISTS
               (SELECT 1 FROM versions newer WHERE newer.collection=versions.collection
-               AND newer.key=versions.key AND newer.rev>versions.rev AND newer.rev<=?)""", (boundary, boundary)).rowcount
-            logs = connection.execute("DELETE FROM commits WHERE rev<=?", (boundary,)).rowcount
+               AND newer.key=versions.key AND newer.rev>versions.rev AND newer.rev<=?)""", (boundary, boundary))
+            removed = driver.changes(connection)
+            connection.execute("DELETE FROM commits WHERE rev<=?", (boundary,))
+            logs = driver.changes(connection)
             self.store.set("floor", boundary)
             return {"requested": target, "floor": boundary, "removed_versions": removed,
                     "removed_commits": logs, "blocked": boundary < target}
