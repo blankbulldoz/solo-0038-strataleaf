@@ -33,6 +33,17 @@ with Database("strataleaf.db") as db:
 
 每个示例约一秒以内，不需要联网。它们是生产 API 的有限工作流演示；自动化测试仍为 **deferred**，仓库不含测试套件，也不声明测试命令。`examples.observations` 另外提供写锁竞争与保留水位的可复现观测。
 
+## 灾备运维
+
+仓库另含单机灾备工具 `ops.dr`（不修改本库实现，只调用公开 API）：主库持续写入期间取在线备份、在隔离目录恢复并核对文档/索引/目录身份、再把后续提交接收进副本。详见 [环境说明](docs/disaster-recovery-environment.md) 与 [运维手册](docs/disaster-recovery-runbook.md)；[演练证据](evidence/README.md) 可独立复核。
+
+```bash
+python3 -m ops.dr drill      --root /tmp/strataleaf-drill   # 完整演练
+python3 -m ops.dr selfcheck                                  # 工具自检
+python3 -m ops.dr verify-evidence --root evidence/drill-run  # 复核已存证据
+```
+
+
 ## 语义边界
 
 - 一个批次 1–10000 个操作，每个集合/键只能出现一次，多集合版本与索引、变更日志一同原子提交。唯一索引逐操作立即约束，交换两个已占用唯一值需先释放；基线不提供延迟唯一约束。

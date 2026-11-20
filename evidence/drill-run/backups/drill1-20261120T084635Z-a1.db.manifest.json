@@ -1,0 +1,48 @@
+{
+  "archive": {
+    "database_id": "bec2fcc9-850c-4db0-af07-4afb2336e254",
+    "file_bytes": 106496,
+    "floor": 0,
+    "name": "drill1-20261120T084635Z-a1.db",
+    "path": "/workspace/evidence/drill-run/backups/drill1-20261120T084635Z-a1.db",
+    "revision": 9,
+    "sha256": "957950c7d4f117fd39b5b8180b29e99c40bf53db892a04e678e6f0a7fd029b28"
+  },
+  "attempts": [
+    {
+      "attempt": 1,
+      "name": "drill1-20261120T084635Z-a1.db",
+      "result": "published",
+      "seconds": 0.011
+    }
+  ],
+  "created_at": "2026-11-20T08:46:35+00:00",
+  "facts": {
+    "catalog_epoch": 3,
+    "commit_contiguity": true,
+    "documents_count": 55,
+    "documents_sha256": "dca3689247403d80210a33d2f9f3a3597d45f2c04895f2d6a9674809540acc38",
+    "floor": 0,
+    "head": 9,
+    "index_definition_sha256": "ac215bec2824acd527f27363890b681cff5cac0c712a917e3d8478fa70c9f4f3",
+    "index_projection_ok": true,
+    "schema_sha256": "fb1515c4180edab9c3ce00e8ee24e9e8ffc6f11b8251db6c5df2a05023a52e0b"
+  },
+  "label": "drill1",
+  "method": "strataleaf.archives.backup (SQLite online backup API)",
+  "source": {
+    "catalog_epoch": 3,
+    "database_id": "bec2fcc9-850c-4db0-af07-4afb2336e254",
+    "floor": 0,
+    "head_after": 10,
+    "head_before": 9,
+    "path": "/workspace/evidence/drill-run/primary/service.db",
+    "verified_against_source_at": 9
+  },
+  "stale_temporaries_observed": [
+    "/workspace/evidence/drill-run/backups/.strataleaf-4e1w97ai-shm",
+    "/workspace/evidence/drill-run/backups/.strataleaf-4e1w97ai-wal"
+  ],
+  "tool": "strataleaf-dr",
+  "version": "1.0"
+}

@@ -1,0 +1,1129 @@
+# StrataLeaf 单机灾备演练报告
+
+- 工具: strataleaf-dr 1.0
+- 开始: 2026-11-20T08:46:35+00:00
+- 结束: 2026-11-20T08:46:37+00:00
+- 用时: 1.843 秒
+- 结论: **success**
+
+## 恢复点与可用性
+
+| 项 | 值 |
+| --- | --- |
+| 归档修订 | 9 |
+| 归档摘要 | `957950c7d4f117fd39b5b8180b29e99c40bf53db892a04e678e6f0a7fd029b28` |
+| 备份时源 head | 10 |
+| 备份时未覆盖提交 | 1 |
+| 最终恢复修订 | 151 |
+| 恢复时源 head | 151 |
+| 追平后滞后提交 | 0 |
+| 结束时源 head | 155 |
+| 结束时源 floor | 155 |
+| 之后新增源提交 | 4 |
+| 重新引导副本 | /workspace/evidence/drill-run/replica/rebootstrapped.db |
+
+> Catch-up closed the gap to zero commits; later phases intentionally advance and compact the source, so the final source head is ahead again.
+
+## 场景
+
+### environment
+
+```json
+{
+  "at": "2026-11-20T08:46:35+00:00",
+  "cwd": "/workspace",
+  "pid": 9577,
+  "platform": "Linux-7.2.12-orbstack-00394-gbecdd6130068-aarch64-with-glibc2.36",
+  "python": "3.11.2",
+  "scenario": "environment",
+  "sqlite": "3.40.1",
+  "strataleaf": "0.1.0"
+}
+```
+
+### backup_under_write
+
+```json
+{
+  "archived_revision": 9,
+  "at": "2026-11-20T08:46:37+00:00",
+  "backup": {
+    "attempts": [
+      {
+        "attempt": 1,
+        "name": "drill1-20261120T084635Z-a1.db",
+        "result": "published",
+        "seconds": 0.011
+      }
+    ],
+    "file_bytes": 106496,
+    "sha256": "957950c7d4f117fd39b5b8180b29e99c40bf53db892a04e678e6f0a7fd029b28"
+  },
+  "backups_under_write": [
+    {
+      "archive": "drill1-20261120T084635Z-a1.db",
+      "archived_revision": 9,
+      "attempt": 1,
+      "head_at_backup_end": 11,
+      "head_at_backup_start": 8,
+      "rpo_commits_when_published": 2,
+      "verified": true,
+      "writer_commit_count": 11,
+      "writes_crossed_during_backup": 3
+    }
+  ],
+  "bare_copy_comparison": {
+    "accepted_as_backup": false,
+    "copied_head": null,
+    "copy": "/workspace/evidence/drill-run/backups/raw-copy-suspect.db",
+    "copy_facts": {
+      "error": "not a StrataLeaf database: no such table: meta"
+    },
+    "copy_readable": false,
+    "source": "/workspace/evidence/drill-run/primary/service.db",
+    "source_head": 11,
+    "source_wal_bytes": 634512,
+    "why_rejected": [
+      "a main-file copy taken while the WAL has uncheckpointed frames can omit committed data",
+      "the copy has no manifest, so its revision, schema, index and content facts are unverified",
+      "the library refuses to treat an existing file as a backup target"
+    ]
+  },
+  "bare_copy_rejection": {
+    "accepted": false,
+    "detail": "not a StrataLeaf database: no such table: meta",
+    "reason": "not a readable StrataLeaf database",
+    "sidecars": {
+      "-shm": {
+        "bytes": 32768,
+        "path": "/workspace/evidence/drill-run/backups/raw-copy-suspect.db-shm"
+      },
+      "-wal": {
+        "bytes": 0,
+        "path": "/workspace/evidence/drill-run/backups/raw-copy-suspect.db-wal"
+      }
+    }
+  },
+  "scenario": "backup_under_write",
+  "source_head_after": 151,
+  "source_head_before": 8,
+  "source_wal_bytes": {
+    "after_backup": {
+      "shm_bytes": 32768,
+      "wal_bytes": 634512
+    },
+    "before_backup": {
+      "shm_bytes": 32768,
+      "wal_bytes": 510912
+    }
+  },
+  "stale_temporaries": [
+    "/workspace/evidence/drill-run/backups/.strataleaf-4e1w97ai-shm",
+    "/workspace/evidence/drill-run/backups/.strataleaf-4e1w97ai-wal"
+  ],
+  "verification": {
+    "checks": [
+      {
+        "actual": "957950c7d4f117fd39b5b8180b29e99c40bf53db892a04e678e6f0a7fd029b28",
+        "check": "archive_sha256",
+        "expected": "957950c7d4f117fd39b5b8180b29e99c40bf53db892a04e678e6f0a7fd029b28",
+        "ok": true
+      },
+      {
+        "actual": 9,
+        "check": "head",
+        "expected": 9,
+        "ok": true
+      },
+      {
+        "actual": 0,
+        "check": "floor",
+        "expected": 0,
+        "ok": true
+      },
+      {
+        "actual": 3,
+        "check": "catalog_epoch",
+        "expected": 3,
+        "ok": true
+      },
+      {
+        "actual": 55,
+        "check": "documents_count",
+        "expected": 55,
+        "ok": true
+      },
+      {
+        "actual": "dca3689247403d80210a33d2f9f3a3597d45f2c04895f2d6a9674809540acc38",
+        "check": "documents_sha256",
+        "expected": "dca3689247403d80210a33d2f9f3a3597d45f2c04895f2d6a9674809540acc38",
+        "ok": true
+      },
+      {
+        "actual": "fb1515c4180edab9c3ce00e8ee24e9e8ffc6f11b8251db6c5df2a05023a52e0b",
+        "check": "schema_sha256",
+        "expected": "fb1515c4180edab9c3ce00e8ee24e9e8ffc6f11b8251db6c5df2a05023a52e0b",
+        "ok": true
+      },
+      {
+        "actual": "ac215bec2824acd527f27363890b681cff5cac0c712a917e3d8478fa70c9f4f3",
+        "check": "index_definition_sha256",
+        "expected": "ac215bec2824acd527f27363890b681cff5cac0c712a917e3d8478fa70c9f4f3",
+        "ok": true
+      },
+      {
+        "actual": true,
+        "check": "index_projection_ok",
+        "expected": true,
+        "ok": true
+      },
+      {
+        "actual": true,
+        "check": "commit_contiguity",
+        "expected": true,
+        "ok": true
+      },
+      {
+        "actual": "bec2fcc9-850c-4db0-af07-4afb2336e254",
+        "check": "database_id",
+        "expected": "bec2fcc9-850c-4db0-af07-4afb2336e254",
+        "ok": true
+      },
+      {
+        "actual": [
+          "ok"
+        ],
+        "check": "sqlite_integrity",
+        "expected": [
+          "ok"
+        ],
+        "ok": true
+      },
+      {
+        "actual": [],
+        "check": "foreign_keys",
+        "expected": [],
+        "ok": true
+      }
+    ],
+    "ok": true
+  },
+  "writer": {
+    "catalog_changes": 6,
+    "commits": 151,
+    "errors": [],
+    "operations": 340,
+    "reported_head": 151
+  },
+  "writer_active_during_backup": true,
+  "writes_after_archive": 142,
+  "writes_during_backup": 143
+}
+```
+
+### restore_isolated_primary
+
+```json
+{
+  "archive": "/workspace/evidence/drill-run/backups/drill1-20261120T084635Z-a1.db",
+  "at": "2026-11-20T08:46:37+00:00",
+  "checks": [
+    {
+      "actual": 9,
+      "check": "head_matches_backup",
+      "detail": "",
+      "expected": 9,
+      "ok": true
+    },
+    {
+      "actual": 0,
+      "check": "floor_matches_backup",
+      "detail": "",
+      "expected": 0,
+      "ok": true
+    },
+    {
+      "actual": 3,
+      "check": "catalog_epoch_matches",
+      "detail": "",
+      "expected": 3,
+      "ok": true
+    },
+    {
+      "actual": "fb1515c4180edab9c3ce00e8ee24e9e8ffc6f11b8251db6c5df2a05023a52e0b",
+      "check": "collections_match",
+      "detail": "collection names, schemas and generations",
+      "expected": "fb1515c4180edab9c3ce00e8ee24e9e8ffc6f11b8251db6c5df2a05023a52e0b",
+      "ok": true
+    },
+    {
+      "actual": "ac215bec2824acd527f27363890b681cff5cac0c712a917e3d8478fa70c9f4f3",
+      "check": "index_definitions_match",
+      "detail": "",
+      "expected": "ac215bec2824acd527f27363890b681cff5cac0c712a917e3d8478fa70c9f4f3",
+      "ok": true
+    },
+    {
+      "actual": "dca3689247403d80210a33d2f9f3a3597d45f2c04895f2d6a9674809540acc38",
+      "check": "documents_match",
+      "detail": "55 documents at revision 9",
+      "expected": "dca3689247403d80210a33d2f9f3a3597d45f2c04895f2d6a9674809540acc38",
+      "ok": true
+    },
+    {
+      "actual": 55,
+      "check": "document_count_matches",
+      "detail": "",
+      "expected": 55,
+      "ok": true
+    },
+    {
+      "actual": {
+        "actual_count": 27,
+        "evaluated": true,
+        "expected_count": 27,
+        "issues": [],
+        "missing": [],
+        "ok": true,
+        "sha256": "f39d7abc23e5411a12f67c6c396df0402ce5c5c513d3183761c23d4e5999ea12",
+        "unexpected": []
+      },
+      "check": "index_projection_recomputed",
+      "detail": "",
+      "expected": "materialised projection equals visible documents",
+      "ok": true
+    },
+    {
+      "actual": [
+        "ok"
+      ],
+      "check": "sqlite_integrity",
+      "detail": "",
+      "expected": [
+        "ok"
+      ],
+      "ok": true
+    },
+    {
+      "actual": [],
+      "check": "foreign_keys",
+      "detail": "",
+      "expected": [],
+      "ok": true
+    },
+    {
+      "actual": {
+        "count": 9,
+        "first_missing": null,
+        "ok": true,
+        "retained_from": 1,
+        "retained_to": 9
+      },
+      "check": "commit_continuity",
+      "detail": "",
+      "expected": true,
+      "ok": true
+    },
+    {
+      "actual": [],
+      "check": "no_reported_issues",
+      "detail": "",
+      "expected": [],
+      "ok": true
+    },
+    {
+      "actual": "841a8811-3bf7-4c1b-ad7d-d3a80924c2cc",
+      "check": "identity_rotated",
+      "detail": "restored primary must not reuse the source identity",
+      "expected": "database_id != bec2fcc9-850c-4db0-af07-4afb2336e254",
+      "ok": true
+    },
+    {
+      "actual": "primary",
+      "check": "mode_is_primary",
+      "detail": "",
+      "expected": "primary",
+      "ok": true
+    },
+    {
+      "actual": "",
+      "check": "upstream_cleared",
+      "detail": "",
+      "expected": "",
+      "ok": true
+    },
+    {
+      "actual": "957950c7d4f117fd39b5b8180b29e99c40bf53db892a04e678e6f0a7fd029b28",
+      "check": "archive_checksum_verified_by_library",
+      "detail": "restored file digest differs by design (new identity); archive digest is 957950c7d4f117fd39b5b8180b29e99c40bf53db892a04e678e6f0a7fd029b28",
+      "expected": "957950c7d4f117fd39b5b8180b29e99c40bf53db892a04e678e6f0a7fd029b28",
+      "ok": true
+    }
+  ],
+  "destination": "/workspace/evidence/drill-run/restore/primary-restored.db",
+  "elapsed_seconds": 0.018,
+  "facts": {
+    "catalog_epoch": 3,
+    "commit_contiguity": true,
+    "documents": {
+      "count": 55,
+      "revision": 9,
+      "sha256": "dca3689247403d80210a33d2f9f3a3597d45f2c04895f2d6a9674809540acc38"
+    },
+    "file_bytes": 106496,
+    "floor": 0,
+    "head": 9,
+    "identity": {
+      "database_id": "841a8811-3bf7-4c1b-ad7d-d3a80924c2cc",
+      "format": "1",
+      "mode": "primary",
+      "upstream": ""
+    },
+    "index_definition_sha256": "ac215bec2824acd527f27363890b681cff5cac0c712a917e3d8478fa70c9f4f3",
+    "index_projection_ok": true,
+    "issues": [],
+    "path": "/workspace/evidence/drill-run/restore/primary-restored.db",
+    "revision": 9,
+    "schema_sha256": "fb1515c4180edab9c3ce00e8ee24e9e8ffc6f11b8251db6c5df2a05023a52e0b",
+    "sqlite_integrity": [
+      "ok"
+    ]
+  },
+  "isolated": true,
+  "ok": true,
+  "scenario": "restore_isolated_primary"
+}
+```
+
+### catch_up_replica
+
+```json
+{
+  "at": "2026-11-20T08:46:37+00:00",
+  "bootstrap": {
+    "database_id": "bec2fcc9-850c-4db0-af07-4afb2336e254",
+    "mode": "replica",
+    "path": "/workspace/evidence/drill-run/replica/service-replica.db",
+    "revision": 9
+  },
+  "corrupt_probe": {
+    "error": "replication envelope checksum/format mismatch",
+    "result": "rejected",
+    "revision_unchanged": true
+  },
+  "duplicate": {
+    "first": {
+      "applied": 0,
+      "revision": 151
+    },
+    "repeat": {
+      "applied": 0,
+      "revision": 151
+    }
+  },
+  "interrupted": {
+    "events": [
+      {
+        "applied": 7,
+        "replica_revision": 16,
+        "since": 9,
+        "source_head": 151,
+        "step": "apply",
+        "through": 16
+      },
+      {
+        "applied": 7,
+        "replica_revision": 23,
+        "since": 16,
+        "source_head": 151,
+        "step": "apply",
+        "through": 23
+      },
+      {
+        "applied": 7,
+        "replica_revision": 30,
+        "since": 23,
+        "source_head": 151,
+        "step": "apply",
+        "through": 30
+      },
+      {
+        "after_packets": 3,
+        "replica_revision": 30,
+        "step": "interrupted",
+        "target_head": 151
+      }
+    ],
+    "replica_revision": 30,
+    "target_head": 151
+  },
+  "primary_head_at_end": 151,
+  "recovered_revision": 151,
+  "resume": {
+    "checks": [
+      {
+        "actual": 9,
+        "check": "catalog_epoch_matches",
+        "detail": "",
+        "expected": 9,
+        "ok": true
+      },
+      {
+        "actual": "fb1515c4180edab9c3ce00e8ee24e9e8ffc6f11b8251db6c5df2a05023a52e0b",
+        "check": "collections_match",
+        "detail": "collection names, schemas and generations",
+        "expected": "fb1515c4180edab9c3ce00e8ee24e9e8ffc6f11b8251db6c5df2a05023a52e0b",
+        "ok": true
+      },
+      {
+        "actual": "2223758ca0625e3f036f73ad690f59eba548a35cc8f355a4d03d0694252a97a6",
+        "check": "index_definitions_match",
+        "detail": "",
+        "expected": "2223758ca0625e3f036f73ad690f59eba548a35cc8f355a4d03d0694252a97a6",
+        "ok": true
+      },
+      {
+        "actual": "01d7dbe46159ed690fad04355f472d251e4e0449ab2019f1d05c4f52f8ed61a2",
+        "check": "documents_match",
+        "detail": "292 documents at revision 151",
+        "expected": "01d7dbe46159ed690fad04355f472d251e4e0449ab2019f1d05c4f52f8ed61a2",
+        "ok": true
+      },
+      {
+        "actual": 292,
+        "check": "document_count_matches",
+        "detail": "",
+        "expected": 292,
+        "ok": true
+      },
+      {
+        "actual": {
+          "actual_count": 1142,
+          "evaluated": true,
+          "expected_count": 1142,
+          "issues": [],
+          "missing": [],
+          "ok": true,
+          "sha256": "1faa06147437fcc0e1f5ed3f69c28709943f83885eefc5620ab89cfa421087a2",
+          "unexpected": []
+        },
+        "check": "index_projection_recomputed",
+        "detail": "",
+        "expected": "materialised projection equals visible documents",
+        "ok": true
+      },
+      {
+        "actual": [
+          "ok"
+        ],
+        "check": "sqlite_integrity",
+        "detail": "",
+        "expected": [
+          "ok"
+        ],
+        "ok": true
+      },
+      {
+        "actual": [],
+        "check": "foreign_keys",
+        "detail": "",
+        "expected": [],
+        "ok": true
+      },
+      {
+        "actual": {
+          "count": 151,
+          "first_missing": null,
+          "ok": true,
+          "retained_from": 1,
+          "retained_to": 151
+        },
+        "check": "commit_continuity",
+        "detail": "",
+        "expected": true,
+        "ok": true
+      },
+      {
+        "actual": [],
+        "check": "no_reported_issues",
+        "detail": "",
+        "expected": [],
+        "ok": true
+      },
+      {
+        "actual": "bec2fcc9-850c-4db0-af07-4afb2336e254",
+        "check": "identity_preserved",
+        "detail": "follower keeps the upstream identity",
+        "expected": "bec2fcc9-850c-4db0-af07-4afb2336e254",
+        "ok": true
+      },
+      {
+        "actual": "replica",
+        "check": "mode_is_replica",
+        "detail": "",
+        "expected": "replica",
+        "ok": true
+      },
+      {
+        "actual": "bec2fcc9-850c-4db0-af07-4afb2336e254",
+        "check": "upstream_bound",
+        "detail": "",
+        "expected": "bec2fcc9-850c-4db0-af07-4afb2336e254",
+        "ok": true
+      },
+      {
+        "actual": "unpinned",
+        "check": "archive_checksum_verified_by_library",
+        "detail": "restored file digest differs by design (new identity); archive digest is None",
+        "expected": "unpinned",
+        "ok": true
+      }
+    ],
+    "elapsed_seconds": 0.131,
+    "events": [
+      {
+        "error": "replication envelope checksum/format mismatch",
+        "result": "rejected",
+        "revision_unchanged": true,
+        "since": 30,
+        "step": "corrupt_probe"
+      },
+      {
+        "applied": 7,
+        "replica_revision": 37,
+        "since": 30,
+        "source_head": 151,
+        "step": "apply",
+        "through": 37
+      },
+      {
+        "applied": 7,
+        "replica_revision": 44,
+        "since": 37,
+        "source_head": 151,
+        "step": "apply",
+        "through": 44
+      },
+      {
+        "applied": 7,
+        "replica_revision": 51,
+        "since": 44,
+        "source_head": 151,
+        "step": "apply",
+        "through": 51
+      },
+      {
+        "applied": 7,
+        "replica_revision": 58,
+        "since": 51,
+        "source_head": 151,
+        "step": "apply",
+        "through": 58
+      },
+      {
+        "applied": 7,
+        "replica_revision": 65,
+        "since": 58,
+        "source_head": 151,
+        "step": "apply",
+        "through": 65
+      },
+      {
+        "applied": 7,
+        "replica_revision": 72,
+        "since": 65,
+        "source_head": 151,
+        "step": "apply",
+        "through": 72
+      },
+      {
+        "applied": 7,
+        "replica_revision": 79,
+        "since": 72,
+        "source_head": 151,
+        "step": "apply",
+        "through": 79
+      },
+      {
+        "applied": 7,
+        "replica_revision": 86,
+        "since": 79,
+        "source_head": 151,
+        "step": "apply",
+        "through": 86
+      },
+      {
+        "applied": 7,
+        "replica_revision": 93,
+        "since": 86,
+        "source_head": 151,
+        "step": "apply",
+        "through": 93
+      },
+      {
+        "applied": 7,
+        "replica_revision": 100,
+        "since": 93,
+        "source_head": 151,
+        "step": "apply",
+        "through": 100
+      },
+      {
+        "applied": 7,
+        "replica_revision": 107,
+        "since": 100,
+        "source_head": 151,
+        "step": "apply",
+        "through": 107
+      },
+      {
+        "applied": 7,
+        "replica_revision": 114,
+        "since": 107,
+        "source_head": 151,
+        "step": "apply",
+        "through": 114
+      },
+      {
+        "applied": 7,
+        "replica_revision": 121,
+        "since": 114,
+        "source_head": 151,
+        "step": "apply",
+        "through": 121
+      },
+      {
+        "applied": 7,
+        "replica_revision": 128,
+        "since": 121,
+        "source_head": 151,
+        "step": "apply",
+        "through": 128
+      },
+      {
+        "applied": 7,
+        "replica_revision": 135,
+        "since": 128,
+        "source_head": 151,
+        "step": "apply",
+        "through": 135
+      },
+      {
+        "applied": 7,
+        "replica_revision": 142,
+        "since": 135,
+        "source_head": 151,
+        "step": "apply",
+        "through": 142
+      },
+      {
+        "applied": 7,
+        "replica_revision": 149,
+        "since": 142,
+        "source_head": 151,
+        "step": "apply",
+        "through": 149
+      },
+      {
+        "applied": 2,
+        "replica_revision": 151,
+        "since": 149,
+        "source_head": 151,
+        "step": "apply",
+        "through": 151
+      }
+    ],
+    "replica_revision": 151,
+    "status": "caught_up",
+    "target_head": 151
+  },
+  "scenario": "catch_up_replica"
+}
+```
+
+### backup_failure_handling
+
+```json
+{
+  "at": "2026-11-20T08:46:37+00:00",
+  "note": "a failed backup never publishes an archive; retries use fresh names; an existing destination is never overwritten",
+  "occupied_destination": {
+    "bytes": 39,
+    "digest": "3f53ac20c6420024bbdf3a461c40fb8110179b903ef48914a114228a0ab245c9",
+    "path": "/workspace/evidence/drill-run/backups/occupied-store/keep-me-a1.db",
+    "rejected_as_backup": {
+      "accepted": false,
+      "detail": "not a StrataLeaf database: file is not a database",
+      "reason": "not a readable StrataLeaf database",
+      "sidecars": {}
+    },
+    "unchanged": true
+  },
+  "retry_after_occupied": {
+    "attempts": [
+      {
+        "attempt": 1,
+        "name": "keep-me-a1.db",
+        "result": "skipped-existing"
+      },
+      {
+        "attempt": 1,
+        "name": "keep-me-retry1-3f426b.db",
+        "result": "published",
+        "seconds": 0.026
+      }
+    ],
+    "chosen_archive": "keep-me-retry1-3f426b.db",
+    "skipped_occupied": [
+      {
+        "attempt": 1,
+        "name": "keep-me-a1.db",
+        "result": "skipped-existing"
+      }
+    ],
+    "verified": true
+  },
+  "scenario": "backup_failure_handling",
+  "stale_temporary_cleanup": {
+    "applied": false,
+    "directory": "/workspace/evidence/drill-run/backups",
+    "kept": [],
+    "orphans": [
+      "/workspace/evidence/drill-run/backups/.strataleaf-4e1w97ai-shm",
+      "/workspace/evidence/drill-run/backups/.strataleaf-4e1w97ai-wal"
+    ],
+    "removed": []
+  },
+  "unwritable_store": {
+    "attempts": [
+      {
+        "attempt": 1,
+        "error": "PermissionError",
+        "message": "[Errno 13] Permission denied: '/workspace/evidence/drill-run/backups/blocked-store/.strataleaf-5075y3v7'",
+        "name": "blocked-20261120T084637Z-a1.db",
+        "result": "failed",
+        "seconds": 0.001
+      },
+      {
+        "attempt": 2,
+        "error": "PermissionError",
+        "message": "[Errno 13] Permission denied: '/workspace/evidence/drill-run/backups/blocked-store/.strataleaf-bsbgp669'",
+        "name": "blocked-20261120T084637Z-a2.db",
+        "result": "failed",
+        "seconds": 0.002
+      }
+    ],
+    "error": "PermissionError: [Errno 13] Permission denied: '/workspace/evidence/drill-run/backups/blocked-store/.strataleaf-bsbgp669'",
+    "path": "/workspace/evidence/drill-run/backups/blocked-store"
+  }
+}
+```
+
+### reclaimed_source_history
+
+```json
+{
+  "at": "2026-11-20T08:46:37+00:00",
+  "catch_up": {
+    "events": [
+      {
+        "detail": "revision 9 is older than retained floor 155",
+        "result": "reclaimed",
+        "since": 9,
+        "step": "export"
+      }
+    ],
+    "reason": "source history reclaimed before replica revision: revision 9 is older than retained floor 155",
+    "status": "requires_rebootstrap"
+  },
+  "compaction": {
+    "blocked": false,
+    "floor": 155,
+    "removed_commits": 155,
+    "removed_versions": 34,
+    "requested": 155
+  },
+  "export_below_floor": {
+    "error": "SnapshotTooOld",
+    "message": "revision 9 is older than retained floor 155"
+  },
+  "remediation": "re-bootstrap the replica from a fresh verified backup; incremental catch-up is impossible once the source floor passes the replica revision",
+  "scenario": "reclaimed_source_history",
+  "source_floor": 155,
+  "stale_replica_revision": 9
+}
+```
+
+### rebootstrap_after_reclaim
+
+```json
+{
+  "at": "2026-11-20T08:46:37+00:00",
+  "backup": {
+    "revision": 155,
+    "sha256": "4d1c08fb29945b45445917274461d77d131fc21eeb3dab9e4d5fc0a2f28c39db",
+    "verified": true
+  },
+  "bootstrap": {
+    "mode": "replica",
+    "revision": 155
+  },
+  "catch_up": {
+    "events": [],
+    "replica_revision": 155,
+    "status": "caught_up",
+    "target_head": 155
+  },
+  "ok": true,
+  "replica_facts": {
+    "catalog_epoch": 9,
+    "commit_contiguity": true,
+    "documents": {
+      "count": 296,
+      "revision": 155,
+      "sha256": "982b86f2b5198b72dfd9cca258c3df2c07aab2c2efec3700250f13e3efb3d468"
+    },
+    "file_bytes": 348160,
+    "floor": 155,
+    "head": 155,
+    "identity": {
+      "database_id": "bec2fcc9-850c-4db0-af07-4afb2336e254",
+      "format": "1",
+      "mode": "replica",
+      "upstream": "bec2fcc9-850c-4db0-af07-4afb2336e254"
+    },
+    "index_definition_sha256": "2223758ca0625e3f036f73ad690f59eba548a35cc8f355a4d03d0694252a97a6",
+    "index_projection_ok": true,
+    "issues": [],
+    "path": "/workspace/evidence/drill-run/replica/rebootstrapped.db",
+    "revision": 155,
+    "schema_sha256": "fb1515c4180edab9c3ce00e8ee24e9e8ffc6f11b8251db6c5df2a05023a52e0b",
+    "sqlite_integrity": [
+      "ok"
+    ]
+  },
+  "scenario": "rebootstrap_after_reclaim"
+}
+```
+
+### final_fact_comparison
+
+```json
+{
+  "at": "2026-11-20T08:46:37+00:00",
+  "checks": [
+    {
+      "actual": 9,
+      "check": "catalog_epoch_matches",
+      "detail": "",
+      "expected": 9,
+      "ok": true
+    },
+    {
+      "actual": "fb1515c4180edab9c3ce00e8ee24e9e8ffc6f11b8251db6c5df2a05023a52e0b",
+      "check": "collections_match",
+      "detail": "collection names, schemas and generations",
+      "expected": "fb1515c4180edab9c3ce00e8ee24e9e8ffc6f11b8251db6c5df2a05023a52e0b",
+      "ok": true
+    },
+    {
+      "actual": "2223758ca0625e3f036f73ad690f59eba548a35cc8f355a4d03d0694252a97a6",
+      "check": "index_definitions_match",
+      "detail": "",
+      "expected": "2223758ca0625e3f036f73ad690f59eba548a35cc8f355a4d03d0694252a97a6",
+      "ok": true
+    },
+    {
+      "actual": "01d7dbe46159ed690fad04355f472d251e4e0449ab2019f1d05c4f52f8ed61a2",
+      "check": "documents_match",
+      "detail": "292 documents at revision 151",
+      "expected": "01d7dbe46159ed690fad04355f472d251e4e0449ab2019f1d05c4f52f8ed61a2",
+      "ok": true
+    },
+    {
+      "actual": 292,
+      "check": "document_count_matches",
+      "detail": "",
+      "expected": 292,
+      "ok": true
+    },
+    {
+      "actual": {
+        "actual_count": 1142,
+        "evaluated": true,
+        "expected_count": 1142,
+        "issues": [],
+        "missing": [],
+        "ok": true,
+        "sha256": "1faa06147437fcc0e1f5ed3f69c28709943f83885eefc5620ab89cfa421087a2",
+        "unexpected": []
+      },
+      "check": "index_projection_recomputed",
+      "detail": "",
+      "expected": "materialised projection equals visible documents",
+      "ok": true
+    },
+    {
+      "actual": [
+        "ok"
+      ],
+      "check": "sqlite_integrity",
+      "detail": "",
+      "expected": [
+        "ok"
+      ],
+      "ok": true
+    },
+    {
+      "actual": [],
+      "check": "foreign_keys",
+      "detail": "",
+      "expected": [],
+      "ok": true
+    },
+    {
+      "actual": {
+        "count": 151,
+        "first_missing": null,
+        "ok": true,
+        "retained_from": 1,
+        "retained_to": 151
+      },
+      "check": "commit_continuity",
+      "detail": "",
+      "expected": true,
+      "ok": true
+    },
+    {
+      "actual": [],
+      "check": "no_reported_issues",
+      "detail": "",
+      "expected": [],
+      "ok": true
+    },
+    {
+      "actual": "bec2fcc9-850c-4db0-af07-4afb2336e254",
+      "check": "identity_preserved",
+      "detail": "follower keeps the upstream identity",
+      "expected": "bec2fcc9-850c-4db0-af07-4afb2336e254",
+      "ok": true
+    },
+    {
+      "actual": "replica",
+      "check": "mode_is_replica",
+      "detail": "",
+      "expected": "replica",
+      "ok": true
+    },
+    {
+      "actual": "bec2fcc9-850c-4db0-af07-4afb2336e254",
+      "check": "upstream_bound",
+      "detail": "",
+      "expected": "bec2fcc9-850c-4db0-af07-4afb2336e254",
+      "ok": true
+    },
+    {
+      "actual": 151,
+      "check": "replica_head_equals_recovered_revision",
+      "expected": 151,
+      "ok": true
+    }
+  ],
+  "current_source": {
+    "catalog_epoch": 9,
+    "commit_contiguity": true,
+    "documents": {
+      "count": 296,
+      "revision": 155,
+      "sha256": "982b86f2b5198b72dfd9cca258c3df2c07aab2c2efec3700250f13e3efb3d468"
+    },
+    "file_bytes": 348160,
+    "floor": 155,
+    "head": 155,
+    "identity": {
+      "database_id": "bec2fcc9-850c-4db0-af07-4afb2336e254",
+      "format": "1",
+      "mode": "primary",
+      "upstream": ""
+    },
+    "index_definition_sha256": "2223758ca0625e3f036f73ad690f59eba548a35cc8f355a4d03d0694252a97a6",
+    "index_projection_ok": true,
+    "issues": [],
+    "path": "/workspace/evidence/drill-run/primary/service.db",
+    "revision": 155,
+    "schema_sha256": "fb1515c4180edab9c3ce00e8ee24e9e8ffc6f11b8251db6c5df2a05023a52e0b",
+    "sqlite_integrity": [
+      "ok"
+    ]
+  },
+  "ok": true,
+  "post_recovery_source_commits": 4,
+  "recovered_source": {
+    "catalog_epoch": 9,
+    "commit_contiguity": true,
+    "documents": {
+      "count": 292,
+      "revision": 151,
+      "sha256": "01d7dbe46159ed690fad04355f472d251e4e0449ab2019f1d05c4f52f8ed61a2"
+    },
+    "file_bytes": 344064,
+    "floor": 0,
+    "head": 151,
+    "identity": {
+      "database_id": "bec2fcc9-850c-4db0-af07-4afb2336e254",
+      "format": "1",
+      "mode": "primary",
+      "upstream": ""
+    },
+    "index_definition_sha256": "2223758ca0625e3f036f73ad690f59eba548a35cc8f355a4d03d0694252a97a6",
+    "index_projection_ok": true,
+    "issues": [],
+    "path": "/workspace/evidence/drill-run/primary/service.db",
+    "revision": 151,
+    "schema_sha256": "fb1515c4180edab9c3ce00e8ee24e9e8ffc6f11b8251db6c5df2a05023a52e0b",
+    "sqlite_integrity": [
+      "ok"
+    ]
+  },
+  "replica": {
+    "catalog_epoch": 9,
+    "commit_contiguity": true,
+    "documents": {
+      "count": 292,
+      "revision": 151,
+      "sha256": "01d7dbe46159ed690fad04355f472d251e4e0449ab2019f1d05c4f52f8ed61a2"
+    },
+    "file_bytes": 331776,
+    "floor": 0,
+    "head": 151,
+    "identity": {
+      "database_id": "bec2fcc9-850c-4db0-af07-4afb2336e254",
+      "format": "1",
+      "mode": "replica",
+      "upstream": "bec2fcc9-850c-4db0-af07-4afb2336e254"
+    },
+    "index_definition_sha256": "2223758ca0625e3f036f73ad690f59eba548a35cc8f355a4d03d0694252a97a6",
+    "index_projection_ok": true,
+    "issues": [],
+    "path": "/workspace/evidence/drill-run/replica/service-replica.db",
+    "revision": 151,
+    "schema_sha256": "fb1515c4180edab9c3ce00e8ee24e9e8ffc6f11b8251db6c5df2a05023a52e0b",
+    "sqlite_integrity": [
+      "ok"
+    ]
+  },
+  "scenario": "final_fact_comparison"
+}
+```
+
+## 可用性边界
+
+- **topology**: single host; primary and recovery directories on local filesystem
+- **source_of_truth**: the live primary SQLite WAL database
+- **backup_mechanism**: SQLite online backup API invoked by Database.archives.backup
+- **recovery_point**: the archived revision; writes committed after it are only recovered through replication packets retained above the source floor
+- **rpo**: bounded by backup cadence plus retained replication range; not zero
+- **rto**: restore + verification time; the drill measures it
+- **not_covered**: ['多主机 / 共享网络盘', '主库磁盘整体损毁而备份介质同时丢失', '源 floor 已越过副本修订且无新备份时的时间点恢复', '提升副本为主库的双向切换（基线不提供提升接口）']
+- **preconditions**: ['恢复目录与主库目录物理隔离且可写', '恢复使用新的未占用路径，禁止覆盖', '接收方必须绑定同一 upstream 且包连续']
+

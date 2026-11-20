@@ -7,3 +7,10 @@ __pycache__/
 *.egg-info/
 build/
 dist/
+
+# Drill evidence deliberately keeps the .db archives and manifests so a
+# reviewer can re-verify recorded digests; volatile sidecars stay ignored.
+!evidence/
+!evidence/**
+*.db-wal
+*.db-shm
