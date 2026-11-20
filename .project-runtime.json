@@ -21,6 +21,10 @@
       "command": "python3 -m examples.workflows commit"
     },
     {
+      "workflow_id": "adjudicate",
+      "command": "python3 -m examples.workflows adjudicate"
+    },
+    {
       "workflow_id": "snapshot",
       "command": "python3 -m examples.workflows snapshot"
     },

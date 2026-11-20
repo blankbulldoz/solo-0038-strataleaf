@@ -23,14 +23,16 @@ def normalize_schema(schema):
     return {"fields": fields, "required": sorted(required), "additional": additional}
 
 
-def validate_document(document, schema):
+def document_problems(document, schema):
+    """Collect every schema violation of a document in validation order."""
     if not isinstance(document, dict):
-        raise InvalidDocument("a document must be a JSON object")
+        return ["a document must be a JSON object"]
     if len(dumps(document).encode()) > 1024 * 1024:
-        raise InvalidDocument("document exceeds 1 MiB")
+        return ["document exceeds 1 MiB"]
+    problems = []
     for path in schema["required"]:
         if field(document, path) is MISSING:
-            raise InvalidDocument("missing required field: " + path)
+            problems.append("missing required field: " + path)
     for path, kind in schema["fields"].items():
         value = field(document, path)
         if value is MISSING:
@@ -39,9 +41,17 @@ def validate_document(document, schema):
         if kind in {"integer", "number"} and isinstance(value, bool):
             accepted = False
         if not accepted:
-            raise InvalidDocument("field " + path + " must be " + kind)
+            problems.append("field " + path + " must be " + kind)
     if not schema["additional"]:
         roots = {path.split(".")[0] for path in schema["fields"]}
-        if set(document) - roots:
-            raise InvalidDocument("undeclared top-level fields: " + ",".join(sorted(set(document) - roots)))
+        extra = sorted(set(document) - roots)
+        if extra:
+            problems.append("undeclared top-level fields: " + ",".join(extra))
+    return problems
+
+
+def validate_document(document, schema):
+    problems = document_problems(document, schema)
+    if problems:
+        raise InvalidDocument(problems[0])
     return document

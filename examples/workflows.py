@@ -43,6 +43,68 @@ def run(flow):
                 if db.get("marks", "discard") is not None or not replay.replayed:
                     raise RuntimeError("atomicity or replay observation failed")
                 output = {"commit": result.__dict__, "replay": replay.__dict__, "conflict": conflict}
+            elif flow == "adjudicate":
+                db.indexes.create("segments", "unique_code", "code", unique=True)
+
+                def corrected(expected):
+                    return (db.batch("adjudicate_demo")
+                            .put("segments", "seg_00", {"region": "east", "sequence": 100, "code": "c9"}, expected=expected)
+                            .put("ghosts", "g1", {"region": "x", "sequence": 1})
+                            .put("segments", "seg_02", {"region": "west", "sequence": 2, "code": "c2"}, expected=first)
+                            .put("segments", "seg_06", {"region": "north", "sequence": 6, "code": "c0"}, expected=0)
+                            .put("segments", "seg_07", {"region": "south", "sequence": 7, "code": "c7"}, expected=0)
+                            .put("segments", "seg_08", {"region": "east", "sequence": 8, "code": "c8"}, expected=0)
+                            .put("segments", "seg_09", {"region": "west", "sequence": 9, "code": "c10"}, expected=0))
+
+                draft = (db.batch("adjudicate_demo")
+                         .put("segments", "seg_00", {"region": "east", "sequence": 100, "code": "c9"}, expected=0)
+                         .put("ghosts", "g1", {"region": "x", "sequence": 1})
+                         .put("segments", "seg_02", {"region": "west", "sequence": "two", "code": "c2"}, expected=first)
+                         .put("segments", "seg_06", {"region": "north", "sequence": 6, "code": "c0"}, expected=0)
+                         .put("segments", "seg_07", {"region": "south", "sequence": 7, "code": "c1"}, expected=0)
+                         .put("segments", "seg_08", {"region": "east", "sequence": 8, "code": "c8"}, expected=0)
+                         .put("segments", "seg_09", {"region": "west", "sequence": 9, "code": "c8"}, expected=0))
+                first_report = draft.adjudicate()
+                statuses = [verdict.status for verdict in first_report.verdicts]
+                if first_report.status != "rejected" or statuses != ["invalid", "invalid", "invalid", "undetermined",
+                                                                     "conflict", "clear", "conflict"]:
+                    raise RuntimeError("adjudication did not judge every operation in one pass")
+                problems = [problem for verdict in first_report.verdicts for problem in verdict.problems]
+                if any("body" in problem or "document" in problem for problem in problems):
+                    raise RuntimeError("occupant document leaked into adjudication")
+                if first_report.verdicts[4].problems[0]["holder"] != {"collection": "segments", "key": "seg_01"}:
+                    raise RuntimeError("proven conflict did not identify the outside occupant")
+                if first_report.verdicts[3].problems[0]["depends_on"] != [0]:
+                    raise RuntimeError("undetermined relation did not name its prerequisite operation")
+                first_exception = rejected(lambda: draft.commit(), Conflict)
+                if db.revision != first or len(db.feed.read(0)) != 1:
+                    raise RuntimeError("rejected attempt entered logs or subscriptions")
+                db.catalog.create("ghosts", SCHEMA)
+                second_report = corrected(first).adjudicate()
+                if second_report.status != "clear" or second_report.verdicts[3].status != "clear":
+                    raise RuntimeError("corrected batch was not re-adjudicated clear")
+                with Database(folder / "source.db") as concurrent:
+                    concurrent_result = concurrent.batch().put(
+                        "segments", "seg_00", {"region": "east", "sequence": 101, "code": "c9"}, expected=first).commit()
+                stale_exception = rejected(lambda: corrected(first).commit(), Conflict)
+                retry_report = corrected(first).adjudicate()
+                if retry_report.verdicts[0].status != "invalid":
+                    raise RuntimeError("concurrent commit was not detected on re-adjudication")
+                final = corrected(concurrent_result.revision)
+                if final.adjudicate().status != "clear":
+                    raise RuntimeError("retry batch was not adjudicated clear")
+                committed = final.commit()
+                replay = corrected(concurrent_result.revision).commit()
+                revisions = [entry["revision"] for entry in db.feed.read(0)]
+                if committed.replayed or not replay.replayed or replay.revision != committed.revision:
+                    raise RuntimeError("receipt did not come from the successful commit alone")
+                if revisions != [first, concurrent_result.revision, committed.revision] or db.revision != committed.revision:
+                    raise RuntimeError("failed attempts entered logs, receipts or subscriptions")
+                output = {"first_report": first_report.as_dict(), "first_exception": first_exception,
+                          "corrected_statuses": [verdict.status for verdict in second_report.verdicts],
+                          "concurrent_revision": concurrent_result.revision, "stale_exception": stale_exception,
+                          "retry_conflict": retry_report.verdicts[0].problems[0],
+                          "committed": committed.__dict__, "replay": replay.__dict__, "feed_revisions": revisions}
             elif flow == "snapshot":
                 db.batch().delete("segments", "seg_00", expected=first).commit()
                 output = {"past": db.get("segments", "seg_00", first).__dict__, "present": db.get("segments", "seg_00"),
