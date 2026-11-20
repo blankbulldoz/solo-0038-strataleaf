@@ -1,0 +1,24 @@
+{
+  "collection": "segments",
+  "commit_revision": 1,
+  "database_id": "1baf0b6b-4829-4861-9aa1-8fa507b2b2ea",
+  "database_path": "/tmp/strataleaf-merge-run/work/source_b/source.db",
+  "document_count": 6,
+  "export_revision": 1,
+  "export_sha256": "c00803622f4fc6a91d1081526cf3c9355cc2cebeb565c22363a64835a3a623ae",
+  "fingerprint": {
+    "documents": 6,
+    "revision": 1,
+    "sha256": "8d9ebc604e9a94a96ec7e66314a59b19ec268c1a8bde7586af7262e2712d6cf6"
+  },
+  "schema_generation": 1,
+  "seed_keys": [
+    "block_a",
+    "seg_01",
+    "seg_02",
+    "shared_note",
+    "seg_05",
+    "remote_probe"
+  ],
+  "source_id": "b"
+}

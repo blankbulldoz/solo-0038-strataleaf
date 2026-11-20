@@ -1,0 +1,138 @@
+{
+  "checks": [
+    {
+      "check": "no duplicate keys on disk",
+      "detail": {
+        "count": 12
+      },
+      "ok": true
+    },
+    {
+      "check": "disk document count equals JSONL",
+      "detail": {
+        "disk": 12,
+        "jsonl": 12
+      },
+      "ok": true
+    },
+    {
+      "check": "disk keys equal JSONL keys",
+      "ok": true
+    },
+    {
+      "check": "import revision is the frozen export revision",
+      "detail": {
+        "head": 1
+      },
+      "ok": true
+    },
+    {
+      "check": "stored documents equal merged JSONL",
+      "ok": true
+    },
+    {
+      "check": "source_map covers each source document exactly once",
+      "detail": {
+        "rows": 12,
+        "source_documents": 12
+      },
+      "ok": true
+    },
+    {
+      "check": "source_map key naming is reversible",
+      "ok": true
+    },
+    {
+      "check": "removing declared rewrites restores original documents",
+      "ok": true
+    },
+    {
+      "check": "no reference crosses source namespaces",
+      "detail": {
+        "leakage": []
+      },
+      "ok": true
+    },
+    {
+      "check": "all rewritten references resolve inside the merged database",
+      "detail": {
+        "dangling": []
+      },
+      "ok": true
+    },
+    {
+      "check": "unresolved references match the conflict list exactly",
+      "detail": {
+        "listed": {
+          "a__a_only|links.peer": "seg_05",
+          "a__missing_probe|links.parent": "ghost_key",
+          "b__remote_probe|links.parent": "a_only"
+        },
+        "observed": {
+          "a__a_only|links.peer": "seg_05",
+          "a__missing_probe|links.parent": "ghost_key",
+          "b__remote_probe|links.parent": "a_only"
+        }
+      },
+      "ok": true
+    },
+    {
+      "check": "ambiguous references left untouched even though the other source has the name",
+      "detail": {
+        "cases": [
+          {
+            "field": "links.peer",
+            "merged_key": "a__a_only",
+            "other_source_has_same_name": true,
+            "target": "seg_05",
+            "untouched": true,
+            "value_on_disk": "seg_05"
+          },
+          {
+            "field": "links.parent",
+            "merged_key": "b__remote_probe",
+            "other_source_has_same_name": true,
+            "target": "a_only",
+            "untouched": true,
+            "value_on_disk": "a_only"
+          }
+        ]
+      },
+      "ok": true
+    },
+    {
+      "check": "import created exactly one commit",
+      "detail": {
+        "commits": 1
+      },
+      "ok": true
+    },
+    {
+      "check": "historical read at import revision equals head read",
+      "ok": true
+    },
+    {
+      "check": "diagnostics inspection passes",
+      "detail": [],
+      "ok": true
+    },
+    {
+      "check": "logical fingerprint matches import report",
+      "ok": true
+    },
+    {
+      "check": "every shared key survives as two distinct documents",
+      "detail": {
+        "shared_keys": [
+          "block_a",
+          "seg_01",
+          "seg_02",
+          "shared_note"
+        ]
+      },
+      "ok": true
+    }
+  ],
+  "failures": [],
+  "ok": true
+}

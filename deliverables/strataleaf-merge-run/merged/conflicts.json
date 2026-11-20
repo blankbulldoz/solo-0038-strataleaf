@@ -1,0 +1,235 @@
+{
+  "ambiguous_references": [
+    {
+      "decision": "left as original dangling text; not retargeted to another source",
+      "field": "links.peer",
+      "merged_key": "a__a_only",
+      "reason": "target_absent_in_own_source_but_same_name_exists_in_other_source",
+      "source_id": "a",
+      "source_key": "a_only",
+      "target": "seg_05"
+    },
+    {
+      "decision": "left as original dangling text; not retargeted to another source",
+      "field": "links.parent",
+      "merged_key": "b__remote_probe",
+      "reason": "target_absent_in_own_source_but_same_name_exists_in_other_source",
+      "source_id": "b",
+      "source_key": "remote_probe",
+      "target": "a_only"
+    }
+  ],
+  "conflicts": [
+    {
+      "decision": "keep both under source-prefixed keys; no overwrite, no cross-source merge",
+      "kept_as": [
+        "a__block_a",
+        "b__block_a"
+      ],
+      "kind": "same_key_in_both_sources",
+      "source_key": "block_a"
+    },
+    {
+      "decision": "keep both under source-prefixed keys; no overwrite, no cross-source merge",
+      "kept_as": [
+        "a__seg_01",
+        "b__seg_01"
+      ],
+      "kind": "same_key_in_both_sources",
+      "source_key": "seg_01"
+    },
+    {
+      "decision": "keep both under source-prefixed keys; no overwrite, no cross-source merge",
+      "kept_as": [
+        "a__seg_02",
+        "b__seg_02"
+      ],
+      "kind": "same_key_in_both_sources",
+      "source_key": "seg_02"
+    },
+    {
+      "decision": "keep both under source-prefixed keys; no overwrite, no cross-source merge",
+      "kept_as": [
+        "a__shared_note",
+        "b__shared_note"
+      ],
+      "kind": "same_key_in_both_sources",
+      "source_key": "shared_note"
+    }
+  ],
+  "key_space": {
+    "merged_key_count": 12,
+    "rule": "merged key = source prefix ('a__' or 'b__') + original key",
+    "shared_key_count": 4,
+    "shared_keys": [
+      "block_a",
+      "seg_01",
+      "seg_02",
+      "shared_note"
+    ],
+    "source_only_keys": {
+      "a": [
+        "a_only",
+        "missing_probe"
+      ],
+      "b": [
+        "remote_probe",
+        "seg_05"
+      ]
+    }
+  },
+  "reference_edits": [
+    {
+      "edits": [
+        {
+          "field": "links.parent",
+          "from": "seg_01",
+          "resolution": "resolved_within_source",
+          "to": "a__seg_01"
+        },
+        {
+          "field": "links.peer",
+          "from": "shared_note",
+          "resolution": "resolved_within_source",
+          "to": "a__shared_note"
+        }
+      ],
+      "merged_key": "a__block_a",
+      "source_id": "a",
+      "source_key": "block_a"
+    },
+    {
+      "edits": [
+        {
+          "field": "links.parent",
+          "from": "seg_02",
+          "resolution": "resolved_within_source",
+          "to": "a__seg_02"
+        }
+      ],
+      "merged_key": "a__seg_01",
+      "source_id": "a",
+      "source_key": "seg_01"
+    },
+    {
+      "edits": [
+        {
+          "field": "links.peer",
+          "from": "block_a",
+          "resolution": "resolved_within_source",
+          "to": "a__block_a"
+        }
+      ],
+      "merged_key": "a__shared_note",
+      "source_id": "a",
+      "source_key": "shared_note"
+    },
+    {
+      "edits": [
+        {
+          "field": "links.parent",
+          "from": "seg_01",
+          "resolution": "resolved_within_source",
+          "to": "b__seg_01"
+        },
+        {
+          "field": "links.peer",
+          "from": "shared_note",
+          "resolution": "resolved_within_source",
+          "to": "b__shared_note"
+        }
+      ],
+      "merged_key": "b__block_a",
+      "source_id": "b",
+      "source_key": "block_a"
+    },
+    {
+      "edits": [
+        {
+          "field": "links.parent",
+          "from": "shared_note",
+          "resolution": "resolved_within_source",
+          "to": "b__shared_note"
+        }
+      ],
+      "merged_key": "b__seg_01",
+      "source_id": "b",
+      "source_key": "seg_01"
+    },
+    {
+      "edits": [
+        {
+          "field": "links.peer",
+          "from": "seg_01",
+          "resolution": "resolved_within_source",
+          "to": "b__seg_01"
+        }
+      ],
+      "merged_key": "b__seg_05",
+      "source_id": "b",
+      "source_key": "seg_05"
+    }
+  ],
+  "sources": {
+    "a": {
+      "collection": "segments",
+      "database_id": "a82eb47b-ef5f-40b3-a595-7e2bf7ae9b70",
+      "document_count": 6,
+      "export_revision": 1,
+      "export_sha256": "630384fdf96ea4c0fa6be22ed7c51ea699ff03902f556e7bdd97a65091b7f450",
+      "source_keys": [
+        "a_only",
+        "block_a",
+        "missing_probe",
+        "seg_01",
+        "seg_02",
+        "shared_note"
+      ]
+    },
+    "b": {
+      "collection": "segments",
+      "database_id": "1baf0b6b-4829-4861-9aa1-8fa507b2b2ea",
+      "document_count": 6,
+      "export_revision": 1,
+      "export_sha256": "c00803622f4fc6a91d1081526cf3c9355cc2cebeb565c22363a64835a3a623ae",
+      "source_keys": [
+        "block_a",
+        "remote_probe",
+        "seg_01",
+        "seg_02",
+        "seg_05",
+        "shared_note"
+      ]
+    }
+  },
+  "unresolved_count": 3,
+  "unresolved_references": [
+    {
+      "decision": "left as original dangling text; not retargeted to another source",
+      "field": "links.peer",
+      "merged_key": "a__a_only",
+      "reason": "target_absent_in_own_source_but_same_name_exists_in_other_source",
+      "source_id": "a",
+      "source_key": "a_only",
+      "target": "seg_05"
+    },
+    {
+      "decision": "left as original dangling text; not retargeted to another source",
+      "field": "links.parent",
+      "merged_key": "a__missing_probe",
+      "reason": "target_absent_in_own_source",
+      "source_id": "a",
+      "source_key": "missing_probe",
+      "target": "ghost_key"
+    },
+    {
+      "decision": "left as original dangling text; not retargeted to another source",
+      "field": "links.parent",
+      "merged_key": "b__remote_probe",
+      "reason": "target_absent_in_own_source_but_same_name_exists_in_other_source",
+      "source_id": "b",
+      "source_key": "remote_probe",
+      "target": "a_only"
+    }
+  ]
+}

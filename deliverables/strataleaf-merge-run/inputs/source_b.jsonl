@@ -1,0 +1,6 @@
+{"document":{"label":"B-root","links":{"parent":"seg_01","peer":"shared_note"},"region":"west","sequence":11},"expires_at":null,"key":"block_a"}
+{"document":{"label":"B-remote","links":{"parent":"a_only"},"region":"west","sequence":16},"expires_at":null,"key":"remote_probe"}
+{"document":{"label":"B-seg01","links":{"parent":"shared_note"},"region":"west","sequence":12},"expires_at":null,"key":"seg_01"}
+{"document":{"label":"B-seg02","links":{},"region":"west","sequence":13},"expires_at":null,"key":"seg_02"}
+{"document":{"label":"B-seg05","links":{"peer":"seg_01"},"region":"west","sequence":15},"expires_at":null,"key":"seg_05"}
+{"document":{"label":"B-note","links":{},"region":"west","sequence":14},"expires_at":null,"key":"shared_note"}

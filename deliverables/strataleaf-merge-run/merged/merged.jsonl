@@ -1,0 +1,12 @@
+{"document":{"label":"A-only","links":{"peer":"seg_05"},"region":"east","sequence":5},"expires_at":null,"key":"a__a_only"}
+{"document":{"label":"A-root","links":{"parent":"a__seg_01","peer":"a__shared_note"},"region":"east","sequence":1},"expires_at":null,"key":"a__block_a"}
+{"document":{"label":"A-dangling","links":{"parent":"ghost_key"},"region":"east","sequence":6},"expires_at":null,"key":"a__missing_probe"}
+{"document":{"label":"A-seg01","links":{"parent":"a__seg_02"},"region":"east","sequence":2},"expires_at":null,"key":"a__seg_01"}
+{"document":{"label":"A-seg02","links":{},"region":"east","sequence":3},"expires_at":null,"key":"a__seg_02"}
+{"document":{"label":"A-note","links":{"peer":"a__block_a"},"region":"east","sequence":4},"expires_at":null,"key":"a__shared_note"}
+{"document":{"label":"B-root","links":{"parent":"b__seg_01","peer":"b__shared_note"},"region":"west","sequence":11},"expires_at":null,"key":"b__block_a"}
+{"document":{"label":"B-remote","links":{"parent":"a_only"},"region":"west","sequence":16},"expires_at":null,"key":"b__remote_probe"}
+{"document":{"label":"B-seg01","links":{"parent":"b__shared_note"},"region":"west","sequence":12},"expires_at":null,"key":"b__seg_01"}
+{"document":{"label":"B-seg02","links":{},"region":"west","sequence":13},"expires_at":null,"key":"b__seg_02"}
+{"document":{"label":"B-seg05","links":{"peer":"b__seg_01"},"region":"west","sequence":15},"expires_at":null,"key":"b__seg_05"}
+{"document":{"label":"B-note","links":{},"region":"west","sequence":14},"expires_at":null,"key":"b__shared_note"}

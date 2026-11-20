@@ -1,0 +1,6 @@
+{"document":{"label":"A-only","links":{"peer":"seg_05"},"region":"east","sequence":5},"expires_at":null,"key":"a_only"}
+{"document":{"label":"A-root","links":{"parent":"seg_01","peer":"shared_note"},"region":"east","sequence":1},"expires_at":null,"key":"block_a"}
+{"document":{"label":"A-dangling","links":{"parent":"ghost_key"},"region":"east","sequence":6},"expires_at":null,"key":"missing_probe"}
+{"document":{"label":"A-seg01","links":{"parent":"seg_02"},"region":"east","sequence":2},"expires_at":null,"key":"seg_01"}
+{"document":{"label":"A-seg02","links":{},"region":"east","sequence":3},"expires_at":null,"key":"seg_02"}
+{"document":{"label":"A-note","links":{"peer":"block_a"},"region":"east","sequence":4},"expires_at":null,"key":"shared_note"}

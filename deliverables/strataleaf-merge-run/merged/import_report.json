@@ -1,0 +1,36 @@
+{
+  "document_count": 12,
+  "fingerprint": {
+    "documents": 12,
+    "revision": 1,
+    "sha256": "e5b0a8261ae8e668af4f03aaf22a3391c11e63a2ae522073324b13d9c22a7e90"
+  },
+  "head_after_import": 1,
+  "import_count": 12,
+  "import_revision": 1,
+  "inspection": {
+    "counts": {
+      "collections": 1,
+      "commits": 1,
+      "consumers": 0,
+      "index_defs": 0,
+      "index_values": 0,
+      "pins": 0,
+      "versions": 12
+    },
+    "database_id": "fd76d9ca-9d40-4b92-b0aa-b6d20b046f60",
+    "floor": 0,
+    "foreign_keys": [],
+    "head": 1,
+    "issues": [],
+    "mode": "primary",
+    "ok": true,
+    "sqlite": [
+      "ok"
+    ]
+  },
+  "merged_database": "/tmp/strataleaf-merge-run/merged/merged.db",
+  "merged_database_id": "fd76d9ca-9d40-4b92-b0aa-b6d20b046f60",
+  "merged_jsonl_sha256": "a693db26867e9fcf5e03d1e4b9b3b16ab196a6b817c486124e5db76af31ed419",
+  "target_collection": "merged_segments"
+}
