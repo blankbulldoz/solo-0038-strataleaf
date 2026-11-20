@@ -88,17 +88,25 @@ class UniqueOccupation:
 
     def __init__(self, occupancy=None):
         self.holders = {claim: set(keys) for claim, keys in (occupancy or {}).items()}
+        self.claims_by_document = {}
+        for claim, keys in self.holders.items():
+            for key in keys:
+                self.claims_by_document.setdefault((claim[0], key), set()).add(claim)
 
     def release(self, collection, key):
-        for claim, keys in self.holders.items():
-            if claim[0] == collection:
-                keys.discard(key)
+        for claim in self.claims_by_document.pop((collection, key), ()):
+            holders = self.holders[claim]
+            holders.remove(key)
+            if not holders:
+                del self.holders[claim]
 
     def claim(self, collection, key, index, token):
-        holders = self.holders.setdefault((collection, index, token), set())
-        if holders - {key}:
+        claim = (collection, index, token)
+        holders = self.holders.setdefault(claim, set())
+        if holders and (len(holders) != 1 or key not in holders):
             raise Conflict("unique index conflict: " + index)
         holders.add(key)
+        self.claims_by_document.setdefault((collection, key), set()).add(claim)
 
 
 def decide(facts, operations, request_key, request_hash):
@@ -121,22 +129,25 @@ def decide(facts, operations, request_key, request_hash):
     unique_names = {collection: frozenset(d.name for d in definitions if d.unique)
                     for collection, definitions in facts.indexes.items()}
     occupation = UniqueOccupation(facts.occupancy)
+    versions = []
     projections = []
     for operation in operations:
         collection, key = operation["collection"], operation["key"]
+        document, expires_at = operation["document"], operation["expires_at"]
+        # The old write path bound the version row before checking index conflicts.
+        if isinstance(expires_at, int) and not -(1 << 63) <= int.__index__(expires_at) < (1 << 63):
+            raise OverflowError("Python int too large to convert to SQLite INTEGER")
+        versions.append(VersionRow(collection, key,
+                                   dumps(document) if document is not None else None,
+                                   expires_at))
         definitions = facts.indexes[collection]
-        entries = projection_entries(operation["document"],
-                                     [(d.name, d.field) for d in definitions])
+        entries = projection_entries(document, [(d.name, d.field) for d in definitions])
         occupation.release(collection, key)
         for name, token in entries:
             if name in unique_names[collection]:
                 occupation.claim(collection, key, name, token)
         projections.append(IndexProjection(collection, key, entries))
     revision = facts.head + 1
-    versions = tuple(VersionRow(op["collection"], op["key"],
-                                dumps(op["document"]) if op["document"] is not None else None,
-                                op["expires_at"])
-                     for op in operations)
     payload = dumps({"revision": revision, "operations": operations})
     return CommitPlan(revision, payload, request_key, request_hash, len(operations),
-                      versions, tuple(projections))
+                      tuple(versions), tuple(projections))
