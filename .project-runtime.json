@@ -41,6 +41,10 @@
       "command": "python3 -m examples.workflows backup"
     },
     {
+      "workflow_id": "vault",
+      "command": "python3 -m examples.workflows vault"
+    },
+    {
       "workflow_id": "replica",
       "command": "python3 -m examples.workflows replica"
     },

@@ -52,8 +52,14 @@ class Archives:
                 target = sqlite3.connect(temporary)
                 try:
                     self.store.connection.backup(target)
+                    # The backup API copies the source WAL mode; switch the
+                    # snapshot back to a rollback journal so it stays one
+                    # self-contained file with no -wal/-shm sidecars.
+                    target.execute("PRAGMA journal_mode=DELETE")
                 finally:
                     target.close()
+            for suffix in ("-wal", "-shm"):
+                Path(temporary + suffix).unlink(missing_ok=True)
             receipt = inspect_archive(temporary)
             os.link(temporary, destination)
             return {**receipt, "path": str(destination)}
@@ -87,8 +93,13 @@ class Archives:
             target.execute("DELETE FROM pins")
             target.execute("DELETE FROM consumers")
             target.commit()
+            # Drop WAL inherited from the source so the restored database is a
+            # single file with no -wal/-shm sidecars.
+            target.execute("PRAGMA journal_mode=DELETE")
             target.close()
             target = None
+            for suffix in ("-wal", "-shm"):
+                Path(temporary + suffix).unlink(missing_ok=True)
             os.link(temporary, destination)
         except FileExistsError as exc:
             raise Conflict("restore destination appeared concurrently") from exc

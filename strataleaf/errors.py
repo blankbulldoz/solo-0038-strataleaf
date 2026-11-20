@@ -21,3 +21,6 @@ class ReadOnly(DatabaseError):
 
 class ReplicationError(DatabaseError):
     pass
+
+class VaultError(DatabaseError):
+    pass

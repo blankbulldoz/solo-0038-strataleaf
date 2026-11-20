@@ -2,7 +2,8 @@ import json
 import sys
 import tempfile
 from pathlib import Path
-from strataleaf import Database, Archives, Conflict, InvalidDocument, InvalidCursor, ReadOnly, SnapshotTooOld, ReplicationError
+from strataleaf import (Database, Archives, BackupVault, Conflict, InvalidDocument, InvalidCursor,
+                        ReadOnly, SnapshotTooOld, ReplicationError, VaultError)
 
 SCHEMA = {"fields": {"region": "string", "sequence": "integer", "code": "string"}, "required": ["region", "sequence"]}
 
@@ -21,6 +22,93 @@ def rejected(call, error):
     except error as exc:
         return {"error": type(exc).__name__, "message": str(exc)}
     raise RuntimeError("operation unexpectedly succeeded")
+
+
+def _compact_view(entry):
+    return {"id": entry["id"], "state": entry["state"], "revision": entry["revision"],
+            "file": entry.get("file"), "lease_holder": entry.get("lease_holder")}
+
+
+def _vault_flow(db, folder, first):
+    vault_dir = folder / "vault"
+    vault = BackupVault(vault_dir)
+    # Two normal captures establish verified backups at different revisions.
+    first_backup = vault.capture(db)
+    db.batch().put("segments", "seg_00", {"region": "south", "sequence": 71}, expected=first).commit()
+    second_backup = vault.capture(db)
+    # Two captures of the same revision are both valid; retention must choose one.
+    duplicate_one = vault.capture(db)
+    duplicate_two = vault.capture(db)
+    # An interrupted prepare: a staged file plus a pending registry entry.
+    interrupted = vault.prepare(db)
+    # A second process dying before the registry entry becomes durable leaves
+    # an orphan staged file with no registry record at all.
+    other_vault = BackupVault(vault_dir)
+    orphan = other_vault.forget_pending(other_vault.prepare(db)["id"])
+    orphan_path = vault_dir / orphan["file"]
+    # Reconciliation reopens the interrupted pending entry and adopts the orphan.
+    reopen = vault.reconcile()
+    reopened_ids = {item["id"] for item in reopen["reopened"]}
+    if interrupted["id"] not in reopened_ids or orphan_path.name not in [item["file"] for item in reopen["reopened"]]:
+        raise RuntimeError("reconcile did not reopen both interrupted artifacts")
+    adopted_orphan = next(item for item in vault.list_backups("pending") if item["file"] == orphan_path.name)
+    vault.publish(interrupted["id"])
+    vault.publish(adopted_orphan["id"])
+    # Bit rot on a published backup: verification failure must quarantine it,
+    # and it must no longer count toward the recoverable set.
+    corrupt_path = vault_dir / duplicate_one["file"]
+    with open(corrupt_path, "r+b") as damaged:
+        damaged.seek(64)
+        damaged.write(b"\xff" * 16)
+    check_reopen = vault.reconcile()
+    corrupt_entry = next(item for item in vault.list_backups("quarantined") if item["id"] == duplicate_one["id"])
+    discarded = vault.discard(corrupt_entry["id"], "checksum failure confirmed by operator")
+    # A restore lease protects an in-use backup from every prune plan.
+    leased = next(item for item in vault.list_backups("published") if item["id"] == second_backup["id"])
+    blocked_prune = None
+    with vault.lease(leased["id"], "incident-restore"):
+        blocked_prune = rejected(lambda: vault.prune(2), Conflict)
+        restored = vault.restore_verified(leased["id"], folder / "restored-from-lease.db", "incident-restore")
+    prune = vault.prune(2)
+    # Foreign-source files and compacted history must not change retention facts.
+    foreign = Database(folder / "other-source.db")
+    foreign.catalog.create("segments", SCHEMA)
+    foreign.archives.backup(vault_dir / "foreign-unregistered.db")
+    foreign.close()
+    compact_receipt = db.retention.compact(db.revision)
+    final_reconcile = vault.reconcile()
+    final_listing = vault.list_backups("published")
+    if len(final_listing) != 2:
+        raise RuntimeError("vault did not keep the agreed number of verified backups")
+    if any(item["source_id"] != first_backup["source_id"] for item in final_listing):
+        raise RuntimeError("vault retained a backup from another source")
+    for item in final_listing:
+        vault.verify(item["id"])
+    return {
+        "captured": [_compact_view(first_backup), _compact_view(second_backup),
+                     _compact_view(duplicate_one), _compact_view(duplicate_two)],
+        "interrupted_pending": _compact_view(interrupted),
+        "orphan_staged_file": orphan_path.name,
+        "reopen_report": {key: [_compact_view(item) if isinstance(item, dict) and "state" in item else item
+                                for item in value] for key, value in reopen.items()},
+        "checksum_failure": {
+            "quarantined": [_compact_view(item) for item in check_reopen["quarantined"]],
+            "operator_discard": _compact_view(discarded),
+            "file_moved_away": not corrupt_path.exists(),
+        },
+        "same_revision_pair": {"revision": duplicate_one["revision"],
+                               "duplicate_ids": [duplicate_one["id"], duplicate_two["id"]]},
+        "lease_protection": {"blocked_prune": blocked_prune,
+                             "restored_receipt": {"revision": restored["revision"], "mode": restored["mode"]}},
+        "prune": {"deleted_ids": [item["id"] for item in prune["deleted"]],
+                  "survivors": [_compact_view(item) for item in prune["survivors"]],
+                  "duplicate_revisions_removed": prune["duplicate_revisions_removed"],
+                  "age_pruned": prune["age_pruned"]},
+        "foreign_file_left_untouched": "foreign-unregistered.db" in final_reconcile["foreign_files"],
+        "history_compact_is_separate": compact_receipt,
+        "final_verified_count": len(final_listing),
+        "registry_file": (vault_dir / "vault-registry.json").name,
+    }
 
 
 def run(flow):
@@ -145,6 +233,8 @@ def run(flow):
                           "duplicate": rejected(lambda: db.transfer.import_lines("copy_segments", exported["lines"]), Conflict)}
                 if len(db.query("copy_segments").records) != 6:
                     raise RuntimeError("logical import differs")
+            elif flow == "vault":
+                output = _vault_flow(db, folder, first)
             else:
                 raise ValueError("unknown example workflow: " + flow)
             print(json.dumps({"workflow": flow, "result": output}, ensure_ascii=False, sort_keys=True, default=str))
