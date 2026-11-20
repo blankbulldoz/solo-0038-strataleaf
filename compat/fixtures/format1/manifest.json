@@ -1,0 +1,1409 @@
+{
+  "environment": {
+    "python": "3.11.2",
+    "sqlite": "3.40.1",
+    "strataleaf_version": "0.1.0"
+  },
+  "fixture": "strataleaf-format-1",
+  "generated_by": "python3 -m compat.sample --write",
+  "identity": {
+    "cursor_secret": "5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a",
+    "database_id": "00000000-0000-4000-8000-000000000001",
+    "note": "Sample-only fixed identity so the cursor and packet digests reproduce."
+  },
+  "observations": [
+    {
+      "claim": "head is a document-commit revision, not a catalog counter",
+      "evidence": "primary.meta.head=11 while catalog_epoch=12; catalog-only changes left commits at [8,9,10,11]",
+      "id": "O1"
+    },
+    {
+      "claim": "floor is independent of head and catalog_epoch",
+      "evidence": "primary.meta.floor=7 with head=11 and catalog_epoch=12",
+      "id": "O2"
+    },
+    {
+      "claim": "tombstones are SQL NULL bodies, not JSON null",
+      "evidence": "chains segments/b rev4 body=null and segments/t rev7 body=null; metrics/m5 body contains JSON null",
+      "id": "O3"
+    },
+    {
+      "claim": "compaction keeps the baseline version below the floor for every key",
+      "evidence": "segments/a rev2 and segments/c rev5 remain with floor=7",
+      "id": "O4"
+    },
+    {
+      "claim": "receipts survive compaction while commits at or below the floor do not",
+      "evidence": "receipts include seed rev1 while commits are only [8,9,10,11]",
+      "id": "O5"
+    },
+    {
+      "claim": "index tokens merge numeric 1 and 1.0 while keeping true separate",
+      "evidence": "metrics by_rank has n:1 for m2 and m3, b:1 for m1, and no row for m7/m8/m9",
+      "id": "O6"
+    },
+    {
+      "claim": "replication packets carry head, floor and catalog_epoch separately",
+      "evidence": "catalog-only packet has through=head=9, no commits, catalog_epoch=12",
+      "id": "O7"
+    },
+    {
+      "claim": "replica keeps source identity but cannot write",
+      "evidence": "replica meta mode=replica/upstream=<source id>; Database.batch commit raises ReadOnly",
+      "id": "O8"
+    },
+    {
+      "claim": "replication does not copy receipts or request keys on applied commits",
+      "evidence": "replica receipts=7 versus primary 9; replicated commits 9-11 carry NULL request_key/request_hash, while the restored baseline keeps its original rev8 row",
+      "id": "O9"
+    },
+    {
+      "claim": "a cursor is an HMAC-signed payload bound to database_id",
+      "evidence": "cursor payload has database/query/revision/after; same token continues on the replica fixture",
+      "id": "O10"
+    },
+    {
+      "claim": "backup and restore are byte receipts, not logical fingerprints",
+      "evidence": "verified dynamically: receipt sha equals the backup file, a restored file has a different sha",
+      "id": "O11"
+    }
+  ],
+  "observed": {
+    "backup": {
+      "database_id": "00000000-0000-4000-8000-000000000001",
+      "floor": 7,
+      "path": "<tmp>/backup.db",
+      "revision": 8,
+      "sha256": "9f1a40d327fd08d65f487bf70b3e0b7ba48f3c383ce74c6113f76d38edbd4202"
+    },
+    "compaction": {
+      "advanced": {
+        "blocked": false,
+        "floor": 7,
+        "removed_commits": 3,
+        "removed_versions": 2,
+        "requested": 7
+      },
+      "blocked_by_pin_and_consumer": {
+        "blocked": true,
+        "floor": 4,
+        "removed_commits": 4,
+        "removed_versions": 3,
+        "requested": 7
+      },
+      "repeated_blocked": {
+        "blocked": true,
+        "floor": 4,
+        "removed_commits": 0,
+        "removed_versions": 0,
+        "requested": 7
+      }
+    },
+    "cursor": {
+      "first_page_keys": [
+        "c"
+      ],
+      "predicate": {
+        "field": "region",
+        "op": "eq",
+        "value": "east"
+      },
+      "replica_second_page_keys": [
+        "d"
+      ],
+      "second_page_keys": [
+        "d"
+      ],
+      "token": "b7FsbYLa2M0n196wCQki8lLZDxV96G4uo3MWMxsJoMZ7ImFmdGVyIjoiYyIsImRhdGFiYXNlIjoiMDAwMDAwMDAtMDAwMC00MDAwLTgwMDAtMDAwMDAwMDAwMDAxIiwicXVlcnkiOiJkNTkwYTA5NGQxMmZjZTdkZjhlMDczNjU3YzE5YTBkOWM2MGViYjg0ZWYwNTZhOGMwZDZkZTZiYWUwNjNjMmQ1IiwicmV2aXNpb24iOjExfQ"
+    },
+    "fingerprints": {
+      "11": {
+        "documents": 16,
+        "revision": 11,
+        "sha256": "48dce69f31fad7994c527453bad407e5f34a09e488f0ce96fda84720b43a26cb"
+      },
+      "7": {
+        "documents": 13,
+        "revision": 7,
+        "sha256": "257a18387e8058edadc8f1d9a3321d90153f0e4f205156227678ffe53d253f9d"
+      },
+      "8": {
+        "documents": 15,
+        "revision": 8,
+        "sha256": "8788a4e0c58214e84b933dd8a62b5d03288f3d928cdcb1e0c58621f7b21637ad"
+      }
+    },
+    "packets": {
+      "catalog-only": {
+        "catalog_epoch": 12,
+        "collection_names": [
+          "audit",
+          "marks",
+          "metrics",
+          "regions",
+          "segments"
+        ],
+        "commit_revisions": [],
+        "floor": 7,
+        "format": 1,
+        "head": 9,
+        "index_names": [
+          "metrics/by_rank",
+          "segments/by_code",
+          "segments/by_region",
+          "segments/by_seq",
+          "segments/unique_code"
+        ],
+        "sha256": "1036c13311e83f76e1331728db99eec3e87ef2faeefede6e4c635b3672ff97fb",
+        "since": 9,
+        "through": 9
+      },
+      "document": {
+        "catalog_epoch": 12,
+        "collection_names": [
+          "audit",
+          "marks",
+          "metrics",
+          "regions",
+          "segments"
+        ],
+        "commit_revisions": [
+          10
+        ],
+        "floor": 7,
+        "format": 1,
+        "head": 10,
+        "index_names": [
+          "metrics/by_rank",
+          "segments/by_code",
+          "segments/by_region",
+          "segments/by_seq",
+          "segments/unique_code"
+        ],
+        "sha256": "5a3d2e82753d82dffd7d545f23bcaddede4cb6ab0922b405722068fe6d7742e4",
+        "since": 9,
+        "through": 10
+      },
+      "document-and-catalog": {
+        "catalog_epoch": 11,
+        "collection_names": [
+          "audit",
+          "marks",
+          "metrics",
+          "regions",
+          "segments"
+        ],
+        "commit_revisions": [
+          9
+        ],
+        "floor": 7,
+        "format": 1,
+        "head": 9,
+        "index_names": [
+          "metrics/by_rank",
+          "segments/by_code",
+          "segments/by_region",
+          "segments/unique_code"
+        ],
+        "sha256": "5ff0f2dc250de81bdd8b6f2ccc4d99fd00f44a2382765a3d88fd85bb8c928f6c",
+        "since": 8,
+        "through": 9
+      },
+      "expiry-delete": {
+        "catalog_epoch": 12,
+        "collection_names": [
+          "audit",
+          "marks",
+          "metrics",
+          "regions",
+          "segments"
+        ],
+        "commit_revisions": [
+          11
+        ],
+        "floor": 7,
+        "format": 1,
+        "head": 11,
+        "index_names": [
+          "metrics/by_rank",
+          "segments/by_code",
+          "segments/by_region",
+          "segments/by_seq",
+          "segments/unique_code"
+        ],
+        "sha256": "140f49dc83f980bc23892732c78881b910a2ede871344af7cede8d34c6784acc",
+        "since": 10,
+        "through": 11
+      }
+    },
+    "primary_reads": {
+      "a@7": {
+        "collection": "segments",
+        "document": {
+          "code": "c0",
+          "region": "north",
+          "sequence": 10
+        },
+        "expires_at": null,
+        "key": "a",
+        "revision": 2
+      },
+      "b@7": null,
+      "c@7": {
+        "collection": "segments",
+        "document": {
+          "code": "c9",
+          "region": "east",
+          "sequence": 20
+        },
+        "expires_at": null,
+        "key": "c",
+        "revision": 5
+      },
+      "t@7": null,
+      "ttl@10": {
+        "collection": "segments",
+        "document": {
+          "code": "c70",
+          "region": "south",
+          "sequence": 70
+        },
+        "expires_at": 200.0,
+        "key": "ttl",
+        "revision": 8
+      },
+      "ttl@11": null
+    }
+  },
+  "packets": {
+    "catalog-only": "catalog-only-packet.json",
+    "document": "document-packet.json",
+    "document-and-catalog": "document-and-catalog-packet.json",
+    "expiry-delete": "expiry-delete-packet.json"
+  },
+  "primary": {
+    "chains": {
+      "marks/m0": [
+        {
+          "body": {
+            "segment": "a"
+          },
+          "expires": null,
+          "rev": 1
+        }
+      ],
+      "metrics/m1": [
+        {
+          "body": {
+            "rank": true
+          },
+          "expires": null,
+          "rev": 1
+        }
+      ],
+      "metrics/m2": [
+        {
+          "body": {
+            "rank": 1
+          },
+          "expires": null,
+          "rev": 1
+        }
+      ],
+      "metrics/m3": [
+        {
+          "body": {
+            "rank": 1.0
+          },
+          "expires": null,
+          "rev": 1
+        }
+      ],
+      "metrics/m4": [
+        {
+          "body": {
+            "rank": 1.5
+          },
+          "expires": null,
+          "rev": 1
+        }
+      ],
+      "metrics/m5": [
+        {
+          "body": {
+            "rank": null
+          },
+          "expires": null,
+          "rev": 1
+        }
+      ],
+      "metrics/m6": [
+        {
+          "body": {
+            "rank": "x"
+          },
+          "expires": null,
+          "rev": 1
+        }
+      ],
+      "metrics/m7": [
+        {
+          "body": {},
+          "expires": null,
+          "rev": 1
+        }
+      ],
+      "metrics/m8": [
+        {
+          "body": {
+            "rank": []
+          },
+          "expires": null,
+          "rev": 1
+        }
+      ],
+      "metrics/m9": [
+        {
+          "body": {
+            "rank": {}
+          },
+          "expires": null,
+          "rev": 1
+        }
+      ],
+      "segments/a": [
+        {
+          "body": {
+            "code": "c0",
+            "region": "north",
+            "sequence": 10
+          },
+          "expires": null,
+          "rev": 2
+        }
+      ],
+      "segments/b": [
+        {
+          "body": null,
+          "expires": null,
+          "rev": 4
+        }
+      ],
+      "segments/c": [
+        {
+          "body": {
+            "code": "c9",
+            "region": "east",
+            "sequence": 20
+          },
+          "expires": null,
+          "rev": 5
+        }
+      ],
+      "segments/d": [
+        {
+          "body": {
+            "code": "c40",
+            "region": "east",
+            "sequence": 40
+          },
+          "expires": null,
+          "rev": 8
+        }
+      ],
+      "segments/e": [
+        {
+          "body": {
+            "code": "c60",
+            "region": "west",
+            "sequence": 60
+          },
+          "expires": null,
+          "rev": 9
+        }
+      ],
+      "segments/f": [
+        {
+          "body": {
+            "code": "c80",
+            "region": "north",
+            "sequence": 80
+          },
+          "expires": null,
+          "rev": 10
+        }
+      ],
+      "segments/t": [
+        {
+          "body": null,
+          "expires": null,
+          "rev": 7
+        }
+      ],
+      "segments/ttl": [
+        {
+          "body": {
+            "code": "c70",
+            "region": "south",
+            "sequence": 70
+          },
+          "expires": 200.0,
+          "rev": 8
+        },
+        {
+          "body": null,
+          "expires": null,
+          "rev": 11
+        }
+      ],
+      "segments/u": [
+        {
+          "body": {
+            "code": "c50",
+            "region": "东",
+            "sequence": 50
+          },
+          "expires": null,
+          "rev": 1
+        }
+      ]
+    },
+    "collections": {
+      "audit": {
+        "generation": 1,
+        "schema": {
+          "additional": true,
+          "fields": {},
+          "required": []
+        }
+      },
+      "marks": {
+        "generation": 1,
+        "schema": {
+          "additional": true,
+          "fields": {
+            "segment": "string"
+          },
+          "required": [
+            "segment"
+          ]
+        }
+      },
+      "metrics": {
+        "generation": 1,
+        "schema": {
+          "additional": true,
+          "fields": {},
+          "required": []
+        }
+      },
+      "regions": {
+        "generation": 2,
+        "schema": {
+          "additional": true,
+          "fields": {
+            "code": "string",
+            "note": "string"
+          },
+          "required": []
+        }
+      },
+      "segments": {
+        "generation": 2,
+        "schema": {
+          "additional": true,
+          "fields": {
+            "code": "string",
+            "note": "string",
+            "region": "string",
+            "sequence": "integer"
+          },
+          "required": [
+            "region",
+            "sequence"
+          ]
+        }
+      }
+    },
+    "commits": [
+      {
+        "payload": "{\"operations\":[{\"collection\":\"segments\",\"document\":{\"code\":\"c40\",\"region\":\"east\",\"sequence\":40},\"expected\":0,\"expires_at\":null,\"key\":\"d\"},{\"collection\":\"segments\",\"document\":{\"code\":\"c70\",\"region\":\"south\",\"sequence\":70},\"expected\":0,\"expires_at\":200,\"key\":\"ttl\"}],\"revision\":8}",
+        "request_hash": "bb311786710d1440096c429aee48a4501f0d1b768fbdc3b8f12528a0f8d7909e",
+        "request_key": "after_floor",
+        "rev": 8
+      },
+      {
+        "payload": "{\"operations\":[{\"collection\":\"segments\",\"document\":{\"code\":\"c60\",\"region\":\"west\",\"sequence\":60},\"expected\":0,\"expires_at\":null,\"key\":\"e\"}],\"revision\":9}",
+        "request_hash": "6568907473bda55bc24adfcab0251cdd51c5934293be17f41a919418cefc8f0a",
+        "request_key": "post_e",
+        "rev": 9
+      },
+      {
+        "payload": "{\"operations\":[{\"collection\":\"segments\",\"document\":{\"code\":\"c80\",\"region\":\"north\",\"sequence\":80},\"expected\":0,\"expires_at\":null,\"key\":\"f\"}],\"revision\":10}",
+        "request_hash": "1b89ca947c992ed6f45cc3b1eeb9dc887a79ecad09d629f0cbe99400ed06b814",
+        "request_key": "post_audit",
+        "rev": 10
+      },
+      {
+        "payload": "{\"operations\":[{\"collection\":\"segments\",\"document\":null,\"expected\":8,\"expires_at\":null,\"key\":\"ttl\"}],\"revision\":11}",
+        "request_hash": "744fceb2def780cf1902bae1a7d80ae70963426af3a4b740e310d8581e4f79f7",
+        "request_key": null,
+        "rev": 11
+      }
+    ],
+    "consumers": [
+      {
+        "ack": 7,
+        "name": "mirror"
+      }
+    ],
+    "index_defs": [
+      {
+        "collection": "metrics",
+        "field": "rank",
+        "name": "by_rank",
+        "unique_flag": 0
+      },
+      {
+        "collection": "segments",
+        "field": "code",
+        "name": "by_code",
+        "unique_flag": 0
+      },
+      {
+        "collection": "segments",
+        "field": "region",
+        "name": "by_region",
+        "unique_flag": 0
+      },
+      {
+        "collection": "segments",
+        "field": "sequence",
+        "name": "by_seq",
+        "unique_flag": 0
+      },
+      {
+        "collection": "segments",
+        "field": "code",
+        "name": "unique_code",
+        "unique_flag": 1
+      }
+    ],
+    "index_values": [
+      {
+        "collection": "metrics",
+        "key": "m1",
+        "name": "by_rank",
+        "token": "b:1"
+      },
+      {
+        "collection": "metrics",
+        "key": "m2",
+        "name": "by_rank",
+        "token": "n:1"
+      },
+      {
+        "collection": "metrics",
+        "key": "m3",
+        "name": "by_rank",
+        "token": "n:1"
+      },
+      {
+        "collection": "metrics",
+        "key": "m4",
+        "name": "by_rank",
+        "token": "n:1.5"
+      },
+      {
+        "collection": "metrics",
+        "key": "m6",
+        "name": "by_rank",
+        "token": "v:\"x\""
+      },
+      {
+        "collection": "metrics",
+        "key": "m5",
+        "name": "by_rank",
+        "token": "v:null"
+      },
+      {
+        "collection": "segments",
+        "key": "a",
+        "name": "by_code",
+        "token": "v:\"c0\""
+      },
+      {
+        "collection": "segments",
+        "key": "d",
+        "name": "by_code",
+        "token": "v:\"c40\""
+      },
+      {
+        "collection": "segments",
+        "key": "u",
+        "name": "by_code",
+        "token": "v:\"c50\""
+      },
+      {
+        "collection": "segments",
+        "key": "e",
+        "name": "by_code",
+        "token": "v:\"c60\""
+      },
+      {
+        "collection": "segments",
+        "key": "f",
+        "name": "by_code",
+        "token": "v:\"c80\""
+      },
+      {
+        "collection": "segments",
+        "key": "c",
+        "name": "by_code",
+        "token": "v:\"c9\""
+      },
+      {
+        "collection": "segments",
+        "key": "c",
+        "name": "by_region",
+        "token": "v:\"east\""
+      },
+      {
+        "collection": "segments",
+        "key": "d",
+        "name": "by_region",
+        "token": "v:\"east\""
+      },
+      {
+        "collection": "segments",
+        "key": "a",
+        "name": "by_region",
+        "token": "v:\"north\""
+      },
+      {
+        "collection": "segments",
+        "key": "f",
+        "name": "by_region",
+        "token": "v:\"north\""
+      },
+      {
+        "collection": "segments",
+        "key": "e",
+        "name": "by_region",
+        "token": "v:\"west\""
+      },
+      {
+        "collection": "segments",
+        "key": "u",
+        "name": "by_region",
+        "token": "v:\"东\""
+      },
+      {
+        "collection": "segments",
+        "key": "a",
+        "name": "by_seq",
+        "token": "n:10"
+      },
+      {
+        "collection": "segments",
+        "key": "c",
+        "name": "by_seq",
+        "token": "n:20"
+      },
+      {
+        "collection": "segments",
+        "key": "d",
+        "name": "by_seq",
+        "token": "n:40"
+      },
+      {
+        "collection": "segments",
+        "key": "u",
+        "name": "by_seq",
+        "token": "n:50"
+      },
+      {
+        "collection": "segments",
+        "key": "e",
+        "name": "by_seq",
+        "token": "n:60"
+      },
+      {
+        "collection": "segments",
+        "key": "f",
+        "name": "by_seq",
+        "token": "n:80"
+      },
+      {
+        "collection": "segments",
+        "key": "a",
+        "name": "unique_code",
+        "token": "v:\"c0\""
+      },
+      {
+        "collection": "segments",
+        "key": "d",
+        "name": "unique_code",
+        "token": "v:\"c40\""
+      },
+      {
+        "collection": "segments",
+        "key": "u",
+        "name": "unique_code",
+        "token": "v:\"c50\""
+      },
+      {
+        "collection": "segments",
+        "key": "e",
+        "name": "unique_code",
+        "token": "v:\"c60\""
+      },
+      {
+        "collection": "segments",
+        "key": "f",
+        "name": "unique_code",
+        "token": "v:\"c80\""
+      },
+      {
+        "collection": "segments",
+        "key": "c",
+        "name": "unique_code",
+        "token": "v:\"c9\""
+      }
+    ],
+    "meta": {
+      "catalog_epoch": "12",
+      "cursor_secret": "5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a",
+      "database_id": "00000000-0000-4000-8000-000000000001",
+      "floor": "7",
+      "format": "1",
+      "head": "11",
+      "mode": "primary",
+      "upstream": ""
+    },
+    "pins": [
+      {
+        "name": "reader_b",
+        "rev": 7
+      }
+    ],
+    "receipts": [
+      {
+        "count": 2,
+        "request_hash": "bb311786710d1440096c429aee48a4501f0d1b768fbdc3b8f12528a0f8d7909e",
+        "request_key": "after_floor",
+        "rev": 8
+      },
+      {
+        "count": 1,
+        "request_hash": "47be7a0feb229fcdc7eafe8771f32d2a6e3567f2a587e919d9a7b8fc161aaed2",
+        "request_key": "delete_b",
+        "rev": 4
+      },
+      {
+        "count": 1,
+        "request_hash": "8826488fa98d93062dc428c02a1ee0ffa102f378f2e8044b19e3e2503410323e",
+        "request_key": "delete_c",
+        "rev": 3
+      },
+      {
+        "count": 1,
+        "request_hash": "1b89ca947c992ed6f45cc3b1eeb9dc887a79ecad09d629f0cbe99400ed06b814",
+        "request_key": "post_audit",
+        "rev": 10
+      },
+      {
+        "count": 1,
+        "request_hash": "6568907473bda55bc24adfcab0251cdd51c5934293be17f41a919418cefc8f0a",
+        "request_key": "post_e",
+        "rev": 9
+      },
+      {
+        "count": 1,
+        "request_hash": "df3976e5328dc1aa884fe59710e8a406712504de54a7e4f2cb5e326d5177c190",
+        "request_key": "recreate_c",
+        "rev": 5
+      },
+      {
+        "count": 14,
+        "request_hash": "904a0aadea7007ca924f5fab14da4262d07387320ca629cc70d5403f00fe071e",
+        "request_key": "seed",
+        "rev": 1
+      },
+      {
+        "count": 1,
+        "request_hash": "0f09cd192b1d0ca29c1fa91790a85499cd1af195e7ff3096285607e98d7ac322",
+        "request_key": "timed",
+        "rev": 6
+      },
+      {
+        "count": 1,
+        "request_hash": "7878368d48efabcf5a36500f8678e5916c35a310ee57a3d8266c68e0a990559b",
+        "request_key": "update_a",
+        "rev": 2
+      }
+    ],
+    "table_counts": {
+      "collections": 5,
+      "commits": 4,
+      "consumers": 1,
+      "index_defs": 5,
+      "index_values": 30,
+      "pins": 1,
+      "receipts": 9,
+      "versions": 20
+    }
+  },
+  "purpose": "Executable format and compatibility sample; see docs/storage-format.md.",
+  "replica": {
+    "chains": {
+      "marks/m0": [
+        {
+          "body": {
+            "segment": "a"
+          },
+          "expires": null,
+          "rev": 1
+        }
+      ],
+      "metrics/m1": [
+        {
+          "body": {
+            "rank": true
+          },
+          "expires": null,
+          "rev": 1
+        }
+      ],
+      "metrics/m2": [
+        {
+          "body": {
+            "rank": 1
+          },
+          "expires": null,
+          "rev": 1
+        }
+      ],
+      "metrics/m3": [
+        {
+          "body": {
+            "rank": 1.0
+          },
+          "expires": null,
+          "rev": 1
+        }
+      ],
+      "metrics/m4": [
+        {
+          "body": {
+            "rank": 1.5
+          },
+          "expires": null,
+          "rev": 1
+        }
+      ],
+      "metrics/m5": [
+        {
+          "body": {
+            "rank": null
+          },
+          "expires": null,
+          "rev": 1
+        }
+      ],
+      "metrics/m6": [
+        {
+          "body": {
+            "rank": "x"
+          },
+          "expires": null,
+          "rev": 1
+        }
+      ],
+      "metrics/m7": [
+        {
+          "body": {},
+          "expires": null,
+          "rev": 1
+        }
+      ],
+      "metrics/m8": [
+        {
+          "body": {
+            "rank": []
+          },
+          "expires": null,
+          "rev": 1
+        }
+      ],
+      "metrics/m9": [
+        {
+          "body": {
+            "rank": {}
+          },
+          "expires": null,
+          "rev": 1
+        }
+      ],
+      "segments/a": [
+        {
+          "body": {
+            "code": "c0",
+            "region": "north",
+            "sequence": 10
+          },
+          "expires": null,
+          "rev": 2
+        }
+      ],
+      "segments/b": [
+        {
+          "body": null,
+          "expires": null,
+          "rev": 4
+        }
+      ],
+      "segments/c": [
+        {
+          "body": {
+            "code": "c9",
+            "region": "east",
+            "sequence": 20
+          },
+          "expires": null,
+          "rev": 5
+        }
+      ],
+      "segments/d": [
+        {
+          "body": {
+            "code": "c40",
+            "region": "east",
+            "sequence": 40
+          },
+          "expires": null,
+          "rev": 8
+        }
+      ],
+      "segments/e": [
+        {
+          "body": {
+            "code": "c60",
+            "region": "west",
+            "sequence": 60
+          },
+          "expires": null,
+          "rev": 9
+        }
+      ],
+      "segments/f": [
+        {
+          "body": {
+            "code": "c80",
+            "region": "north",
+            "sequence": 80
+          },
+          "expires": null,
+          "rev": 10
+        }
+      ],
+      "segments/t": [
+        {
+          "body": null,
+          "expires": null,
+          "rev": 7
+        }
+      ],
+      "segments/ttl": [
+        {
+          "body": {
+            "code": "c70",
+            "region": "south",
+            "sequence": 70
+          },
+          "expires": 200.0,
+          "rev": 8
+        },
+        {
+          "body": null,
+          "expires": null,
+          "rev": 11
+        }
+      ],
+      "segments/u": [
+        {
+          "body": {
+            "code": "c50",
+            "region": "东",
+            "sequence": 50
+          },
+          "expires": null,
+          "rev": 1
+        }
+      ]
+    },
+    "collections": {
+      "audit": {
+        "generation": 1,
+        "schema": {
+          "additional": true,
+          "fields": {},
+          "required": []
+        }
+      },
+      "marks": {
+        "generation": 1,
+        "schema": {
+          "additional": true,
+          "fields": {
+            "segment": "string"
+          },
+          "required": [
+            "segment"
+          ]
+        }
+      },
+      "metrics": {
+        "generation": 1,
+        "schema": {
+          "additional": true,
+          "fields": {},
+          "required": []
+        }
+      },
+      "regions": {
+        "generation": 2,
+        "schema": {
+          "additional": true,
+          "fields": {
+            "code": "string",
+            "note": "string"
+          },
+          "required": []
+        }
+      },
+      "segments": {
+        "generation": 2,
+        "schema": {
+          "additional": true,
+          "fields": {
+            "code": "string",
+            "note": "string",
+            "region": "string",
+            "sequence": "integer"
+          },
+          "required": [
+            "region",
+            "sequence"
+          ]
+        }
+      }
+    },
+    "commits": [
+      {
+        "payload": "{\"operations\":[{\"collection\":\"segments\",\"document\":{\"code\":\"c40\",\"region\":\"east\",\"sequence\":40},\"expected\":0,\"expires_at\":null,\"key\":\"d\"},{\"collection\":\"segments\",\"document\":{\"code\":\"c70\",\"region\":\"south\",\"sequence\":70},\"expected\":0,\"expires_at\":200,\"key\":\"ttl\"}],\"revision\":8}",
+        "request_hash": "bb311786710d1440096c429aee48a4501f0d1b768fbdc3b8f12528a0f8d7909e",
+        "request_key": "after_floor",
+        "rev": 8
+      },
+      {
+        "payload": "{\"operations\":[{\"collection\":\"segments\",\"document\":{\"code\":\"c60\",\"region\":\"west\",\"sequence\":60},\"expected\":0,\"expires_at\":null,\"key\":\"e\"}],\"revision\":9}",
+        "request_hash": null,
+        "request_key": null,
+        "rev": 9
+      },
+      {
+        "payload": "{\"operations\":[{\"collection\":\"segments\",\"document\":{\"code\":\"c80\",\"region\":\"north\",\"sequence\":80},\"expected\":0,\"expires_at\":null,\"key\":\"f\"}],\"revision\":10}",
+        "request_hash": null,
+        "request_key": null,
+        "rev": 10
+      },
+      {
+        "payload": "{\"operations\":[{\"collection\":\"segments\",\"document\":null,\"expected\":8,\"expires_at\":null,\"key\":\"ttl\"}],\"revision\":11}",
+        "request_hash": null,
+        "request_key": null,
+        "rev": 11
+      }
+    ],
+    "consumers": [],
+    "index_defs": [
+      {
+        "collection": "metrics",
+        "field": "rank",
+        "name": "by_rank",
+        "unique_flag": 0
+      },
+      {
+        "collection": "segments",
+        "field": "code",
+        "name": "by_code",
+        "unique_flag": 0
+      },
+      {
+        "collection": "segments",
+        "field": "region",
+        "name": "by_region",
+        "unique_flag": 0
+      },
+      {
+        "collection": "segments",
+        "field": "sequence",
+        "name": "by_seq",
+        "unique_flag": 0
+      },
+      {
+        "collection": "segments",
+        "field": "code",
+        "name": "unique_code",
+        "unique_flag": 1
+      }
+    ],
+    "index_values": [
+      {
+        "collection": "metrics",
+        "key": "m1",
+        "name": "by_rank",
+        "token": "b:1"
+      },
+      {
+        "collection": "metrics",
+        "key": "m2",
+        "name": "by_rank",
+        "token": "n:1"
+      },
+      {
+        "collection": "metrics",
+        "key": "m3",
+        "name": "by_rank",
+        "token": "n:1"
+      },
+      {
+        "collection": "metrics",
+        "key": "m4",
+        "name": "by_rank",
+        "token": "n:1.5"
+      },
+      {
+        "collection": "metrics",
+        "key": "m6",
+        "name": "by_rank",
+        "token": "v:\"x\""
+      },
+      {
+        "collection": "metrics",
+        "key": "m5",
+        "name": "by_rank",
+        "token": "v:null"
+      },
+      {
+        "collection": "segments",
+        "key": "a",
+        "name": "by_code",
+        "token": "v:\"c0\""
+      },
+      {
+        "collection": "segments",
+        "key": "d",
+        "name": "by_code",
+        "token": "v:\"c40\""
+      },
+      {
+        "collection": "segments",
+        "key": "u",
+        "name": "by_code",
+        "token": "v:\"c50\""
+      },
+      {
+        "collection": "segments",
+        "key": "e",
+        "name": "by_code",
+        "token": "v:\"c60\""
+      },
+      {
+        "collection": "segments",
+        "key": "f",
+        "name": "by_code",
+        "token": "v:\"c80\""
+      },
+      {
+        "collection": "segments",
+        "key": "c",
+        "name": "by_code",
+        "token": "v:\"c9\""
+      },
+      {
+        "collection": "segments",
+        "key": "c",
+        "name": "by_region",
+        "token": "v:\"east\""
+      },
+      {
+        "collection": "segments",
+        "key": "d",
+        "name": "by_region",
+        "token": "v:\"east\""
+      },
+      {
+        "collection": "segments",
+        "key": "a",
+        "name": "by_region",
+        "token": "v:\"north\""
+      },
+      {
+        "collection": "segments",
+        "key": "f",
+        "name": "by_region",
+        "token": "v:\"north\""
+      },
+      {
+        "collection": "segments",
+        "key": "e",
+        "name": "by_region",
+        "token": "v:\"west\""
+      },
+      {
+        "collection": "segments",
+        "key": "u",
+        "name": "by_region",
+        "token": "v:\"东\""
+      },
+      {
+        "collection": "segments",
+        "key": "a",
+        "name": "by_seq",
+        "token": "n:10"
+      },
+      {
+        "collection": "segments",
+        "key": "c",
+        "name": "by_seq",
+        "token": "n:20"
+      },
+      {
+        "collection": "segments",
+        "key": "d",
+        "name": "by_seq",
+        "token": "n:40"
+      },
+      {
+        "collection": "segments",
+        "key": "u",
+        "name": "by_seq",
+        "token": "n:50"
+      },
+      {
+        "collection": "segments",
+        "key": "e",
+        "name": "by_seq",
+        "token": "n:60"
+      },
+      {
+        "collection": "segments",
+        "key": "f",
+        "name": "by_seq",
+        "token": "n:80"
+      },
+      {
+        "collection": "segments",
+        "key": "a",
+        "name": "unique_code",
+        "token": "v:\"c0\""
+      },
+      {
+        "collection": "segments",
+        "key": "d",
+        "name": "unique_code",
+        "token": "v:\"c40\""
+      },
+      {
+        "collection": "segments",
+        "key": "u",
+        "name": "unique_code",
+        "token": "v:\"c50\""
+      },
+      {
+        "collection": "segments",
+        "key": "e",
+        "name": "unique_code",
+        "token": "v:\"c60\""
+      },
+      {
+        "collection": "segments",
+        "key": "f",
+        "name": "unique_code",
+        "token": "v:\"c80\""
+      },
+      {
+        "collection": "segments",
+        "key": "c",
+        "name": "unique_code",
+        "token": "v:\"c9\""
+      }
+    ],
+    "meta": {
+      "catalog_epoch": "12",
+      "cursor_secret": "5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a",
+      "database_id": "00000000-0000-4000-8000-000000000001",
+      "floor": "7",
+      "format": "1",
+      "head": "11",
+      "mode": "replica",
+      "upstream": "00000000-0000-4000-8000-000000000001"
+    },
+    "pins": [],
+    "receipts": [
+      {
+        "count": 2,
+        "request_hash": "bb311786710d1440096c429aee48a4501f0d1b768fbdc3b8f12528a0f8d7909e",
+        "request_key": "after_floor",
+        "rev": 8
+      },
+      {
+        "count": 1,
+        "request_hash": "47be7a0feb229fcdc7eafe8771f32d2a6e3567f2a587e919d9a7b8fc161aaed2",
+        "request_key": "delete_b",
+        "rev": 4
+      },
+      {
+        "count": 1,
+        "request_hash": "8826488fa98d93062dc428c02a1ee0ffa102f378f2e8044b19e3e2503410323e",
+        "request_key": "delete_c",
+        "rev": 3
+      },
+      {
+        "count": 1,
+        "request_hash": "df3976e5328dc1aa884fe59710e8a406712504de54a7e4f2cb5e326d5177c190",
+        "request_key": "recreate_c",
+        "rev": 5
+      },
+      {
+        "count": 14,
+        "request_hash": "904a0aadea7007ca924f5fab14da4262d07387320ca629cc70d5403f00fe071e",
+        "request_key": "seed",
+        "rev": 1
+      },
+      {
+        "count": 1,
+        "request_hash": "0f09cd192b1d0ca29c1fa91790a85499cd1af195e7ff3096285607e98d7ac322",
+        "request_key": "timed",
+        "rev": 6
+      },
+      {
+        "count": 1,
+        "request_hash": "7878368d48efabcf5a36500f8678e5916c35a310ee57a3d8266c68e0a990559b",
+        "request_key": "update_a",
+        "rev": 2
+      }
+    ],
+    "table_counts": {
+      "collections": 5,
+      "commits": 4,
+      "consumers": 0,
+      "index_defs": 5,
+      "index_values": 30,
+      "pins": 0,
+      "receipts": 7,
+      "versions": 20
+    }
+  }
+}

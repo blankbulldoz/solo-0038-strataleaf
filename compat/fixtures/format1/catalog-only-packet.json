@@ -1,0 +1,72 @@
+{
+  "body": {
+    "catalog_epoch": 12,
+    "collections": [
+      {
+        "generation": 1,
+        "name": "audit",
+        "schema": "{\"additional\":true,\"fields\":{},\"required\":[]}"
+      },
+      {
+        "generation": 1,
+        "name": "marks",
+        "schema": "{\"additional\":true,\"fields\":{\"segment\":\"string\"},\"required\":[\"segment\"]}"
+      },
+      {
+        "generation": 1,
+        "name": "metrics",
+        "schema": "{\"additional\":true,\"fields\":{},\"required\":[]}"
+      },
+      {
+        "generation": 2,
+        "name": "regions",
+        "schema": "{\"additional\":true,\"fields\":{\"code\":\"string\",\"note\":\"string\"},\"required\":[]}"
+      },
+      {
+        "generation": 2,
+        "name": "segments",
+        "schema": "{\"additional\":true,\"fields\":{\"code\":\"string\",\"note\":\"string\",\"region\":\"string\",\"sequence\":\"integer\"},\"required\":[\"region\",\"sequence\"]}"
+      }
+    ],
+    "commits": [],
+    "floor": 7,
+    "format": 1,
+    "head": 9,
+    "indexes": [
+      {
+        "collection": "metrics",
+        "field": "rank",
+        "name": "by_rank",
+        "unique_flag": 0
+      },
+      {
+        "collection": "segments",
+        "field": "code",
+        "name": "by_code",
+        "unique_flag": 0
+      },
+      {
+        "collection": "segments",
+        "field": "region",
+        "name": "by_region",
+        "unique_flag": 0
+      },
+      {
+        "collection": "segments",
+        "field": "sequence",
+        "name": "by_seq",
+        "unique_flag": 0
+      },
+      {
+        "collection": "segments",
+        "field": "code",
+        "name": "unique_code",
+        "unique_flag": 1
+      }
+    ],
+    "since": 9,
+    "source": "00000000-0000-4000-8000-000000000001",
+    "through": 9
+  },
+  "sha256": "1036c13311e83f76e1331728db99eec3e87ef2faeefede6e4c635b3672ff97fb"
+}

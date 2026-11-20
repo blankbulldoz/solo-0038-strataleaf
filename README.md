@@ -47,4 +47,8 @@ with Database("strataleaf.db") as db:
 - SQLite 保证进程间单写者；同一句柄的锁协调线程操作，多个句柄通过 SQLite 锁协调。长读可能延缓 WAL checkpoint；忙超时由连接 timeout 控制，调用方处理 `sqlite3.OperationalError`。
 - 当前实现适合本地中小型嵌入式数据集，版本扫描、分组和逻辑导出会物化输入；不承诺常数内存。单文档上限 1 MiB、深度 32；筛选按键排序。磁盘加密、租户鉴权、分布式共识均不在现有承诺内。
 
-见 [完整规格](PROJECT_SPEC.md)、[数据与兼容边界](docs/storage-semantics.md)、[恢复与观测](docs/operations.md)。
+见 [完整规格](PROJECT_SPEC.md)、[数据与兼容边界](docs/storage-semantics.md)、[数据格式与兼容核对](docs/storage-format.md)、[恢复与观测](docs/operations.md)。
+
+## 格式维护
+
+磁盘格式标识为 1。`docs/storage-format.md` 固定了物理表、meta 键、`head`/`floor`/`catalog_epoch` 的独立语义、墓碑与索引编码，以及样本观察。改动持久层前后可执行 `python3 -m compat.sample --write` 与 `python3 -m compat.verify`：后者从 `compat/fixtures/format1/` 的 SQL 样本重建数据库，核对结构、读取、备份、副本重放与逐字节再生成。该工具只读样本并使用公开 API，不属于运行时包，也不改变生产行为。
