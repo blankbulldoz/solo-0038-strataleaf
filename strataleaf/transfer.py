@@ -1,4 +1,4 @@
-from .codec import dumps, loads
+from .codec import render, loads
 from .errors import InvalidDocument, NotFound
 from .mvcc import checked_revision, record, visible_rows
 from .transaction import WriteBatch
@@ -16,7 +16,7 @@ class Transfer:
             output = []
             for row in visible_rows(connection, collection, revision):
                 item = record(row)
-                output.append(dumps({"key": item.key, "document": item.document, "expires_at": item.expires_at}))
+                output.append(render({"key": item.key, "document": item.document, "expires_at": item.expires_at}))
             return {"revision": revision, "lines": output}
 
     def import_lines(self, collection, lines, replace=False, request_key=None):

@@ -178,8 +178,8 @@
     {
       "id": "storage",
       "path": "strataleaf/storage.py",
-      "responsibility": "WAL 连接与读写边界",
-      "owned_facts": "WAL 连接与读写边界",
+      "responsibility": "WAL 连接、格式声明与读写边界",
+      "owned_facts": "WAL 连接与读写边界、meta 格式声明、迁移日志表",
       "consumers": [
         "catalog",
         "schema",
@@ -199,8 +199,8 @@
     {
       "id": "codec",
       "path": "strataleaf/codec.py",
-      "responsibility": "JSON 表示、路径与标量编码",
-      "owned_facts": "JSON 表示、路径与标量编码",
+      "responsibility": "逻辑 JSON 模型、规范文本与 MessagePack 载荷编码",
+      "owned_facts": "逻辑值模型、规范文本、MessagePack 确定性子集与格式识别",
       "consumers": [
         "snapshot",
         "index",
@@ -225,6 +225,18 @@
       "owned_facts": "游标签名与数据库绑定",
       "consumers": [
         "query"
+      ]
+    },
+    {
+      "id": "migration",
+      "path": "strataleaf/migration.py",
+      "responsibility": "格式识别、预检与可继续的载荷迁移",
+      "owned_facts": "格式识别、逻辑摘要核对、迁移日志与发布边界",
+      "consumers": [
+        "storage",
+        "snapshot",
+        "commit",
+        "inspect"
       ]
     }
   ],
@@ -513,6 +525,27 @@
       "success": "外部文档流验证后整批导入",
       "failure": "重复键整体拒绝",
       "verification": "python3 -m examples.workflows transfer"
+    },
+    {
+      "id": "migrate",
+      "name": "载荷格式迁移",
+      "entry": "strataleaf.migrate",
+      "module_ids": [
+        "storage",
+        "snapshot",
+        "commit",
+        "index",
+        "inspect"
+      ],
+      "steps": [
+        "识别声明格式与逐行物理表示",
+        "只读预检逻辑摘要、回执与索引",
+        "分批改写并为中断保留可继续标记",
+        "发布前重新核对完整摘要"
+      ],
+      "success": "旧 JSON 文本库无损转换为 MessagePack 且身份事实不变",
+      "failure": "预检或不一致时拒绝且不留下无法辨认的混合文件",
+      "verification": "python3 -m examples.workflows migrate"
     }
   ],
   "complexity": {

@@ -5,7 +5,8 @@ import tempfile
 import secrets
 import uuid
 from pathlib import Path
-from .errors import Conflict, DatabaseError, InvalidDocument
+from .codec import FORMAT_NAMES, JSON_FORMAT, PACK_FORMAT
+from .errors import Conflict, DatabaseError
 
 
 def file_digest(path):
@@ -16,18 +17,32 @@ def file_digest(path):
     return result.hexdigest()
 
 
+def _connect(path):
+    return sqlite3.connect(Path(path).resolve().as_uri() + "?mode=ro", uri=True)
+
+
 def inspect_archive(path):
-    connection = sqlite3.connect(Path(path).resolve().as_uri() + "?mode=ro", uri=True)
+    """Verify and describe an archive without opening it as a live database.
+
+    Returns the payload ``format`` and its ``format_name`` so an operator can
+    tell a legacy JSON-text archive from a MessagePack one before choosing a
+    restore path.  Legacy archives restored as a primary database keep format 1
+    and are migrated on the next open through :func:`strataleaf.migrate`.
+    """
+    connection = _connect(path)
     try:
         result = connection.execute("PRAGMA integrity_check").fetchone()[0]
         values = dict(connection.execute("SELECT key,value FROM meta"))
         required = {"head", "floor", "format", "database_id", "cursor_secret", "mode", "upstream"}
-        if result != "ok" or not required.issubset(values) or values["format"] != "1":
+        if result != "ok" or not required.issubset(values):
             raise DatabaseError("archive is not a supported intact database")
+        if values["format"] not in {str(JSON_FORMAT), str(PACK_FORMAT)}:
+            raise DatabaseError("archive carries an unsupported payload format")
         if connection.execute("PRAGMA foreign_key_check").fetchone() is not None:
             raise DatabaseError("archive has broken references")
         return {"revision": int(values["head"]), "floor": int(values["floor"]),
-                "database_id": values["database_id"], "sha256": file_digest(path)}
+                "database_id": values["database_id"], "format": int(values["format"]),
+                "format_name": FORMAT_NAMES[int(values["format"])], "sha256": file_digest(path)}
     except (sqlite3.DatabaseError, KeyError, ValueError) as exc:
         raise DatabaseError("invalid database archive") from exc
     finally:
@@ -55,6 +70,8 @@ class Archives:
                 finally:
                     target.close()
             receipt = inspect_archive(temporary)
+            if receipt["format"] != self.store.payload_format:
+                raise DatabaseError("backup payload format does not match the live database")
             os.link(temporary, destination)
             return {**receipt, "path": str(destination)}
         except FileExistsError as exc:
@@ -76,7 +93,7 @@ class Archives:
         original = None
         target = None
         try:
-            original = sqlite3.connect(source.as_uri() + "?mode=ro", uri=True)
+            original = _connect(source)
             target = sqlite3.connect(temporary)
             original.backup(target)
             target.execute("UPDATE meta SET value=? WHERE key='mode'", ("replica" if follower else "primary",))
@@ -98,4 +115,6 @@ class Archives:
             if target:
                 target.close()
             Path(temporary).unlink(missing_ok=True)
-        return {**receipt, "path": str(destination), "mode": "replica" if follower else "primary"}
+        return {**receipt, "path": str(destination), "mode": "replica" if follower else "primary",
+                "migration": "required" if receipt["format"] == JSON_FORMAT and not follower else
+                             "legacy-archive-follows-upstream" if receipt["format"] == JSON_FORMAT else "none"}

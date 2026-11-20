@@ -1,12 +1,13 @@
 import base64
 import hashlib
 import hmac
-from .codec import dumps, loads
+import json
+from .codec import render
 from .errors import InvalidCursor
 
 
 def encode_cursor(store, payload):
-    raw = dumps(payload).encode()
+    raw = render(payload).encode()
     signature = hmac.new(bytes.fromhex(store.get("cursor_secret")), raw, hashlib.sha256).digest()
     return base64.urlsafe_b64encode(signature + raw).decode().rstrip("=")
 
@@ -20,7 +21,7 @@ def decode_cursor(store, token):
         expected = hmac.new(bytes.fromhex(store.get("cursor_secret")), raw, hashlib.sha256).digest()
         if not hmac.compare_digest(signature, expected):
             raise ValueError("signature mismatch")
-        payload = loads(raw)
+        payload = json.loads(raw)
         if not isinstance(payload, dict) or payload.get("database") != store.get("database_id"):
             raise ValueError("wrong database")
         return payload

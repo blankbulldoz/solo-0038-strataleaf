@@ -21,3 +21,9 @@ class ReadOnly(DatabaseError):
 
 class ReplicationError(DatabaseError):
     pass
+
+class FormatMigrationRequired(DatabaseError):
+    """The on-disk payload format is older than this build and needs migration."""
+
+class MigrationError(DatabaseError):
+    """A payload migration cannot continue without operator action."""

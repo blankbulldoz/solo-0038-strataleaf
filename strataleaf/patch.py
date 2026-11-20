@@ -1,4 +1,4 @@
-from .codec import dumps, loads
+from .codec import copy_value
 from .errors import Conflict, InvalidDocument, NotFound
 from .mvcc import read_record
 from .transaction import WriteBatch
@@ -6,7 +6,7 @@ from .transaction import WriteBatch
 
 def merge_patch(document, patch):
     if not isinstance(patch, dict):
-        return loads(dumps(patch))
+        return copy_value(patch)
     result = dict(document) if isinstance(document, dict) else {}
     for key, value in patch.items():
         if value is None:

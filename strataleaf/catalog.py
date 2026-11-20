@@ -1,4 +1,4 @@
-from .codec import dumps, loads, name
+from .codec import loads, name
 from .errors import Conflict, NotFound
 from .mvcc import visible_rows
 from .schema import normalize_schema, validate_document
@@ -14,7 +14,7 @@ class Catalog:
         with self.store.atomic(writable=True) as connection:
             if connection.execute("SELECT 1 FROM collections WHERE name=?", (collection,)).fetchone():
                 raise Conflict("collection already exists: " + collection)
-            connection.execute("INSERT INTO collections VALUES (?,?,1)", (collection, dumps(normalized)))
+            connection.execute("INSERT INTO collections VALUES (?,?,1)", (collection, self.store.encode(normalized)))
             self.store.set("catalog_epoch", int(self.store.get("catalog_epoch")) + 1)
         return self.describe(collection)
 
@@ -42,6 +42,6 @@ class Catalog:
                 validate_document(loads(document["body"]), normalized)
             generation = expected_generation + 1
             connection.execute("UPDATE collections SET schema=?,generation=? WHERE name=?",
-                               (dumps(normalized), generation, collection))
+                               (self.store.encode(normalized), generation, collection))
             self.store.set("catalog_epoch", int(self.store.get("catalog_epoch")) + 1)
         return generation

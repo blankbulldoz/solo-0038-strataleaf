@@ -1,6 +1,6 @@
 import math
 from dataclasses import dataclass
-from .codec import digest, dumps, key as checked_key, loads, name
+from .codec import copy_value, digest, key as checked_key, loads, name
 from .errors import Conflict, InvalidDocument, NotFound
 from .indexes import refresh_document
 from .mvcc import latest_row
@@ -40,7 +40,7 @@ class WriteBatch:
             raise InvalidDocument("document must be an object")
         if expires_at is not None and (isinstance(expires_at, bool) or not isinstance(expires_at, (int, float)) or not math.isfinite(expires_at)):
             raise InvalidDocument("expires_at must be a finite timestamp")
-        return self._append({"collection": collection, "key": key, "document": loads(dumps(document)),
+        return self._append({"collection": collection, "key": key, "document": copy_value(document),
                              "expected": expected, "expires_at": expires_at})
 
     def delete(self, collection, key, expected=None):
@@ -81,13 +81,13 @@ class WriteBatch:
                         validate_document(op["document"], loads(schema[0]))
                 revision = head + 1
                 for op in self.operations:
-                    body = dumps(op["document"]) if op["document"] is not None else None
+                    body = self.store.encode(op["document"]) if op["document"] is not None else None
                     connection.execute("INSERT INTO versions VALUES (?,?,?,?,?)",
                                        (op["collection"], op["key"], revision, body, op["expires_at"]))
                     refresh_document(connection, op["collection"], op["key"], op["document"])
                 payload = {"revision": revision, "operations": self.operations}
                 connection.execute("INSERT INTO commits VALUES (?,?,?,?)",
-                                   (revision, dumps(payload), self.request_key, fingerprint))
+                                   (revision, self.store.encode(payload), self.request_key, fingerprint))
                 if self.request_key is not None:
                     connection.execute("INSERT INTO receipts VALUES (?,?,?,?)", (self.request_key, revision, fingerprint, len(self.operations)))
                 self.store.set("head", revision)

@@ -1,4 +1,4 @@
-from .codec import MISSING, dumps, field
+from .codec import MISSING, field, render
 from .errors import InvalidDocument
 
 OPS = {"eq", "ne", "lt", "le", "gt", "ge", "in", "exists", "contains"}
@@ -22,7 +22,7 @@ def validate_predicate(expression, depth=0):
     if set(expression) != {"field", "op", "value"} or not isinstance(expression["op"], str) or expression["op"] not in OPS:
         raise InvalidDocument("predicate must have field, op and value")
     field({}, expression["field"])
-    dumps(expression["value"])
+    render(expression["value"])
     if expression["op"] == "in" and not isinstance(expression["value"], list):
         raise InvalidDocument("in requires an array")
     if expression["op"] == "exists" and not isinstance(expression["value"], bool):

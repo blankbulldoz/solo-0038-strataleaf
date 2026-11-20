@@ -1,4 +1,4 @@
-from .codec import MISSING, dumps, field, loads
+from .codec import MISSING, field, loads, render
 from .errors import InvalidDocument, NotFound
 from .mvcc import checked_revision, visible_rows
 from .predicates import matches, validate_predicate
@@ -25,7 +25,7 @@ class Aggregates:
                 value = field(document, by)
                 if value is MISSING:
                     continue
-                token = dumps(value)
+                token = render(value)
                 item = groups.setdefault(token, {"key": value, "count": 0, "numeric_count": 0, "sum": 0, "min": None, "max": None})
                 item["count"] += 1
                 number = field(document, measure) if measure is not None else MISSING

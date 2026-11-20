@@ -15,7 +15,12 @@ from .transfer import Transfer
 
 
 class Database:
-    """An embedded, single-file, revisioned JSON document database."""
+    """An embedded, single-file, revisioned JSON document database.
+
+    New databases store documents as format-2 MessagePack payloads.  A database
+    written by the format-1 (JSON text) build opens only after it has been
+    migrated with :func:`strataleaf.migrate`; reads never silently mix formats.
+    """
     def __init__(self, path, timeout=5.0):
         self._store = Storage(path, timeout)
         self.catalog = Catalog(self._store)
@@ -33,6 +38,15 @@ class Database:
     def revision(self):
         with self._store.read():
             return int(self._store.get("head"))
+
+    @property
+    def format(self):
+        """The payload format this handle was opened with: 1 (JSON) or 2 (MessagePack)."""
+        return self._store.payload_format
+
+    @property
+    def format_name(self):
+        return self._store.format_name
 
     def batch(self, request_key=None):
         return WriteBatch(self._store, request_key)

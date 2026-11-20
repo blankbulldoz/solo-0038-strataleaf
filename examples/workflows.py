@@ -2,7 +2,15 @@ import json
 import sys
 import tempfile
 from pathlib import Path
-from strataleaf import Database, Archives, Conflict, InvalidDocument, InvalidCursor, ReadOnly, SnapshotTooOld, ReplicationError
+from strataleaf import (Database, Archives, Conflict, InvalidDocument, InvalidCursor, ReadOnly,
+                        SnapshotTooOld, ReplicationError, FormatMigrationRequired, MigrationInterrupted,
+                        inspect_archive, inspect_format, migrate)
+from strataleaf.catalog import Catalog
+from strataleaf.storage import Storage
+from strataleaf.transaction import WriteBatch
+from strataleaf.codec import digest
+from strataleaf.cursors import encode_cursor
+from strataleaf.migration import fingerprint
 
 SCHEMA = {"fields": {"region": "string", "sequence": "integer", "code": "string"}, "required": ["region", "sequence"]}
 
@@ -13,6 +21,67 @@ def seed(db):
     for index in range(6):
         batch.put("segments", f"seg_{index:02}", {"region": "east" if index % 2 == 0 else "west", "sequence": index, "code": "c" + str(index)})
     return batch.commit().revision
+
+
+class _CursorStore:
+    """Minimal read-only metadata view for minting a pre-migration cursor."""
+
+    def __init__(self, path):
+        import sqlite3
+        self.connection = sqlite3.connect(Path(path).resolve().as_uri() + "?mode=ro", uri=True)
+
+    def get(self, key):
+        return self.connection.execute("SELECT value FROM meta WHERE key=?", (key,)).fetchone()[0]
+
+    def close(self):
+        self.connection.close()
+
+    def __enter__(self):
+        return self
+
+    def __exit__(self, *exception):
+        self.close()
+
+
+def seed_legacy(path):
+    """Build a format-1 database through the same write path an older build used."""
+    store = Storage(path, create_format=1)
+    try:
+        Catalog(store).create("segments", SCHEMA)
+        batch = WriteBatch(store, "initial_segments")
+        for index in range(6):
+            batch.put("segments", f"seg_{index:02}", {"region": "east" if index % 2 == 0 else "west",
+                                                       "sequence": index, "code": "c" + str(index),
+                                                       "note": "分区" + str(index), "large": 2 ** 70 + index})
+        return batch.commit().revision
+    finally:
+        store.close()
+
+
+def index_tokens(path):
+    """Materialised index tokens read straight from SQLite, independent of the codec."""
+    import sqlite3
+    connection = sqlite3.connect(Path(path).resolve().as_uri() + "?mode=ro", uri=True)
+    try:
+        return [row[0] for row in connection.execute(
+            "SELECT token FROM index_values WHERE name='by_code' ORDER BY key")]
+    finally:
+        connection.close()
+
+
+def replication_round_trip(source):
+    """Export from the migrated primary and apply to a fresh replica; check identity."""
+    with Database(source) as primary:
+        primary.archives.backup(source.parent / "replica_base.db")
+        Archives.restore(source.parent / "replica_base.db", source.parent / "replica.db", follower=True)
+        envelope = primary.replication.export(primary.revision)
+    with Database(source) as primary, Database(source.parent / "replica.db") as replica:
+        applied = replica.replication.apply(envelope)
+        repeat = replica.replication.apply(envelope)
+        return {"package_format": envelope["body"]["format"], "applied": applied["applied"],
+                "repeat": repeat["applied"], "source_format": primary.format,
+                "replica_format": replica.format,
+                "matched": replica.diagnostics.fingerprint() == primary.diagnostics.fingerprint()}
 
 
 def rejected(call, error):
@@ -145,9 +214,69 @@ def run(flow):
                           "duplicate": rejected(lambda: db.transfer.import_lines("copy_segments", exported["lines"]), Conflict)}
                 if len(db.query("copy_segments").records) != 6:
                     raise RuntimeError("logical import differs")
+            elif flow == "migrate":
+                output = migration_flow(folder)
             else:
                 raise ValueError("unknown example workflow: " + flow)
             print(json.dumps({"workflow": flow, "result": output}, ensure_ascii=False, sort_keys=True, default=str))
+
+
+def migration_flow(folder):
+    """Identify a format-1 database, migrate it with an interruption, and compare identities."""
+    legacy = folder / "legacy.db"
+    first = seed_legacy(legacy)
+    before = inspect_format(legacy, counts=True)
+    if before["format"] != 1 or before["migration"] != "required" or before["representations"]["versions"]["pack_rows"]:
+        raise RuntimeError("legacy database was not identified as format 1")
+    refused = rejected(lambda: Database(legacy), FormatMigrationRequired)
+    # Read-only facts that must not drift across the rewrite.  ``fingerprint``
+    # works on either representation without opening a live database handle.
+    old_fingerprint = fingerprint(legacy)
+    with _CursorStore(legacy) as old:
+        old_cursor = encode_cursor(old, {"database": old.get("database_id"),
+                                         "query": digest({"collection": "segments",
+                                                          "predicate": {"field": "sequence", "op": "ge", "value": 0}}),
+                                         "revision": first, "after": "seg_01"})
+    dry = migrate(legacy, dry_run=True)
+    paused = rejected(lambda: migrate(legacy, chunk_size=2, snapshot=folder / "before.db", interrupt_after=3),
+                      MigrationInterrupted)
+    interrupted = inspect_format(legacy, counts=True)
+    resumed = migrate(legacy, chunk_size=2)
+    after = inspect_format(legacy, counts=True)
+    with Database(legacy) as db:
+        db.indexes.create("segments", "by_code", "code")
+        indexed = db.query("segments", {"field": "code", "op": "eq", "value": "c0"})
+        scanned = db.query("segments", {"field": "code", "op": "eq", "value": "c0"}, force_scan=True)
+        predicate = {"field": "sequence", "op": "ge", "value": 0}
+        tail = db.query("segments", predicate, limit=2, cursor=old_cursor)
+        tokens = index_tokens(legacy)
+        migrated = {"format": db.format, "format_name": db.format_name, "revision": db.revision,
+                    "inspection": db.diagnostics.inspect(deep=True), "fingerprint": db.diagnostics.fingerprint(),
+                    "indexed_equals_scan": indexed.records == scanned.records,
+                    "index_tokens": tokens,
+                    "old_cursor_tail": [item.key for item in tail.records]}
+        if not migrated["inspection"]["ok"] or db.get("segments", "seg_00").document["large"] != 2 ** 70:
+            raise RuntimeError("migrated database is not logically intact")
+        if fingerprint(legacy) != old_fingerprint or not migrated["indexed_equals_scan"]:
+            raise RuntimeError("logical identity drifted across the payload format change")
+        if [item.key for item in db.query("segments", predicate, limit=2).records] != ["seg_00", "seg_01"]:
+            raise RuntimeError("first page changed across the payload format change")
+    if migrated["old_cursor_tail"] != [f"seg_{index:02}" for index in range(2, 4)]:
+        raise RuntimeError("a cursor minted before migration did not continue the same read view")
+    if migrated["index_tokens"] != ['v:"c' + str(index) + '"' for index in range(6)]:
+        raise RuntimeError("index scalar tokens drifted across the payload format change")
+    package = replication_round_trip(folder / "legacy.db")
+    if not package["matched"] or package["package_format"] != 2:
+        raise RuntimeError("replica package interpretation changed after migration")
+    old_backup = inspect_archive(folder / "before.db")
+    if old_backup["format"] != 1 or migrated["revision"] != first:
+        raise RuntimeError("legacy snapshot is not an intact format-1 archive")
+    return {"identified": {k: before[k] for k in ("format", "format_name", "migration", "representations")},
+            "refused_before_migration": refused, "dry_run": {k: dry[k] for k in ("state", "pending", "manifest")},
+            "paused": paused, "interrupted": {k: interrupted[k] for k in ("format_name", "migration", "representations")},
+            "resumed": {k: resumed[k] for k in ("state", "converted", "manifest", "receipts", "indexes", "snapshot")},
+            "published": {k: after[k] for k in ("format", "format_name", "migration")},
+            "legacy_snapshot": old_backup, "migrated": migrated, "replication": package}
 
 
 if __name__ == "__main__":

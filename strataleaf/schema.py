@@ -1,4 +1,4 @@
-from .codec import MISSING, dumps, field, loads
+from .codec import MISSING, field, render
 from .errors import InvalidDocument
 
 TYPES = {"string": str, "integer": int, "number": (int, float), "boolean": bool, "object": dict, "array": list}
@@ -26,8 +26,8 @@ def normalize_schema(schema):
 def validate_document(document, schema):
     if not isinstance(document, dict):
         raise InvalidDocument("a document must be a JSON object")
-    if len(dumps(document).encode()) > 1024 * 1024:
-        raise InvalidDocument("document exceeds 1 MiB")
+    if len(render(document).encode()) > 1024 * 1024:
+        raise InvalidDocument("document exceeds 1 MiB (measured on canonical JSON text)")
     for path in schema["required"]:
         if field(document, path) is MISSING:
             raise InvalidDocument("missing required field: " + path)
