@@ -31,6 +31,8 @@ with Database("strataleaf.db") as db:
 
 `catalog schema commit snapshot query index feed backup replica compact expire aggregate patch inspect transfer`
 
+`examples.takeover` 是接管既有生产文件用的对照材料：`python3 -m examples.takeover <case>` 复现空间增长、落后消费者、历史读取失败和恢复接收中看起来相似但处置方向不同的状态（`wal` `reclaim` `watermarks` `consumer` `restore` `receipts` `layout` `entangled` `replica`，`all` 依次全部运行），说明见 [接管处置手册](docs/takeover.md)。
+
 每个示例约一秒以内，不需要联网。它们是生产 API 的有限工作流演示；自动化测试仍为 **deferred**，仓库不含测试套件，也不声明测试命令。`examples.observations` 另外提供写锁竞争与保留水位的可复现观测。
 
 ## 语义边界

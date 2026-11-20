@@ -4,6 +4,8 @@
 
 diagnostics.inspect(deep=True) 检查 SQLite 完整性、外键、提交连续性、当前索引与文档投影；fingerprint 比较指定读视图的键、文档版本、内容及到期事实。前者不能证明所有业务数据正确，后者相同也不能代替模式与索引定义比对。checkpoint 返回 SQLite 的 busy、log、checkpointed 信息，并不承诺截断 WAL。
 
-examples.observations 的 contention 会让独立连接暂持 IMMEDIATE 锁，记录第二句柄的 busy 超时及释放后的成功；retention_pressure 记录读保留点和消费者分别阻止水位推进的现象。它们用独立临时文件，不接触生产路径。观察包含真实修订和异常，适合复核运行边界。
+examples.observations 的 contention 会让独立连接暂持 IMMEDIATE 锁，记录第二句柄的 busy 超时及释放后的成功；retention_pressure 记录读保留点和消费者分别阻止水位推进的现象。它们用独立临时文件，不接触生产路径。观察包含真实修订和异常，适合复核运行边界。`examples.takeover` 另外复现“看似相同、处置方向不同”的接管状态，见 [接管处置手册](takeover.md)。
 
 关闭所有调用方句柄再移动数据目录；不支持共享网络盘或多主写入。在空间紧张时先核实 pin/消费者，推进已完成的确认后再回收；回收不自动缩小文件，物理容量由 SQLite 空闲页复用。到期清理只在显式调用时执行，不能把墙钟到期等同于读视图变动。
+
+接管既有生产文件时，见 [接管处置手册](takeover.md)：它把空间增长、落后消费者、历史读取失败与恢复接收作为同一条水位链来解释，并给出可复现的对照状态与不可逆后果。复现材料为 `python3 -m examples.takeover <case>`（`wal` `reclaim` `watermarks` `consumer` `restore` `receipts` `layout` `entangled` `replica`，或 `all`）。
