@@ -7,3 +7,5 @@ diagnostics.inspect(deep=True) 检查 SQLite 完整性、外键、提交连续�
 examples.observations 的 contention 会让独立连接暂持 IMMEDIATE 锁，记录第二句柄的 busy 超时及释放后的成功；retention_pressure 记录读保留点和消费者分别阻止水位推进的现象。它们用独立临时文件，不接触生产路径。观察包含真实修订和异常，适合复核运行边界。
 
 关闭所有调用方句柄再移动数据目录；不支持共享网络盘或多主写入。在空间紧张时先核实 pin/消费者，推进已完成的确认后再回收；回收不自动缩小文件，物理容量由 SQLite 空闲页复用。到期清理只在显式调用时执行，不能把墙钟到期等同于读视图变动。
+
+受限 Linux 容器的卷布局、非 root 身份、启动门禁、退出顺序、强制终止恢复与演练证据见 [容器运行手册](container-runbook.md)。其中的 `probe` 把"进程可推进"（liveness）与"可继续接单"（readiness）分开：长读使 checkpoint 静默滞后时前者仍健康、后者降级，二者都不以文件存在或进程存活为准。

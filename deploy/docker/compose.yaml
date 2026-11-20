@@ -1,0 +1,54 @@
+# Compose profile for a single StrataLeaf service on a local Docker volume.
+#
+#   docker compose -f deploy/docker/compose.yaml up -d
+#
+# Two named volumes, never tmpfs and never a bind mount to a network share.
+# The `local` driver is used explicitly so the volume lands on the host disk;
+# the `nfs`/`cifs` drivers are NOT interchangeable here (see the boundary note
+# at the bottom of docs/container-runbook.md).
+
+services:
+  strataleaf:
+    image: strataleaf-service:0.1.0
+    build:
+      context: ../..
+      dockerfile: deploy/container/Dockerfile
+    user: "9042:9042"
+    read_only: true
+    init: true
+    restart: unless-stopped
+    stop_grace_period: 45s
+    stop_signal: SIGTERM
+    environment:
+      STRATALEAF_CONF: /opt/strataleaf/container/service.conf
+    volumes:
+      # Named volumes inherit ownership from the image mount point (9042:9042).
+      # Do NOT back them with an nfs/cifs driver_opts; see the runbook boundary.
+      - strataleaf-data:/var/lib/strataleaf
+      - strataleaf-state:/var/run/strataleaf
+      - type: tmpfs
+        target: /tmp
+        tmpfs:
+          size: 64m
+          mode: "1777"
+    ulimits:
+      nofile:
+        soft: 4096
+        hard: 4096
+    pids_limit: 128
+    mem_limit: 512m
+    cpus: "2.0"
+    healthcheck:
+      test: ["CMD", "/opt/strataleaf/container/healthcheck.sh"]
+      interval: 15s
+      timeout: 5s
+      start_period: 30s
+      retries: 3
+    # Readiness, by contrast, uses the operator tool directly. A compose
+    # healthcheck cannot express "alive but WAL-blocked"; see the runbook.
+
+volumes:
+  strataleaf-data:
+    driver: local
+  strataleaf-state:
+    driver: local

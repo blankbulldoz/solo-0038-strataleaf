@@ -1,0 +1,134 @@
+{
+  "documents": {
+    "http-readiness": "real /healthz stays 200 while /readyz returns 503 under a long read",
+    "identity-gate": "uid/gid/root and volume permission gates",
+    "long-reader-checkpoint": "long reader blocks checkpoint without an error; only readiness catches it",
+    "network-fs-guard": "network/pseudo filesystems rejected, local filesystems accepted",
+    "normal-stop": "clean SIGTERM stop: commit durability, checkpoint, recovery",
+    "sigkill": "SIGKILL stop: WAL recovery and bounded committed head",
+    "space-pressure": "disk exhaustion analog preserves committed data and refuses low-space start",
+    "torn-commit": "SIGKILL mid-transaction: durable uncommitted frames never become visible",
+    "write-conflict": "second writer gets a bounded busy error, then succeeds"
+  },
+  "drills": [
+    {
+      "checks": {
+        "correct_identity_accepted": true,
+        "root_refused": true,
+        "uid_mismatch_refused": true,
+        "world_writable_refused": true
+      },
+      "drill": "identity-gate",
+      "ok": true
+    },
+    {
+      "checks": {
+        "data_volume_classified": true,
+        "local_fs_accepted": true,
+        "network_fs_rejected": true,
+        "state_volume_classified": true
+      },
+      "drill": "network-fs-guard",
+      "ok": true
+    },
+    {
+      "checks": {
+        "all_reported_commits_present": true,
+        "checkpoint_completed_before_close": true,
+        "clean_marker_written": true,
+        "commits_recorded": true,
+        "exit_code_zero": true,
+        "index_matches_documents_after_recovery": true,
+        "log_contiguous_after_recovery": true,
+        "marker_after_close_reports_head": true,
+        "recovery_fingerprint_matches": true,
+        "recovery_integrity_ok": true,
+        "sigterm_not_sigkill": true,
+        "wal_empty_at_rest": true
+      },
+      "drill": "normal-stop",
+      "ok": true
+    },
+    {
+      "checks": {
+        "commits_visible": true,
+        "every_reported_commit_present": true,
+        "index_matches_documents_after_recovery": true,
+        "killed_by_sigkill": true,
+        "log_contiguous_after_recovery": true,
+        "no_clean_marker": true,
+        "recovered_head_at_least_last_reported": true,
+        "recovered_head_is_bounded": true,
+        "recovery_integrity_ok": true,
+        "wal_present_at_crash": true
+      },
+      "drill": "sigkill",
+      "ok": true
+    },
+    {
+      "checks": {
+        "child_was_killed": true,
+        "confirmed_document_present": true,
+        "head_unchanged": true,
+        "index_has_no_phantom_row": true,
+        "integrity_ok": true,
+        "log_has_no_uncommitted_revision": true,
+        "phantom_document_absent": true,
+        "uncommitted_frames_were_durable": true
+      },
+      "drill": "torn-commit",
+      "ok": true
+    },
+    {
+      "checks": {
+        "document_is_new_value": true,
+        "error_is_busy": true,
+        "second_writer_blocked": true,
+        "waited_about_busy_timeout": true,
+        "wrote_after_release": true
+      },
+      "drill": "write-conflict",
+      "ok": true
+    },
+    {
+      "checks": {
+        "checkpoint_completed_after_release": true,
+        "checkpoint_did_not_raise": true,
+        "checkpoint_lagged_while_reader_held": true,
+        "liveness_still_healthy": true,
+        "naive_checks_all_passed": true,
+        "readiness_degraded_while_reader_held": true,
+        "readiness_healthy_after_release": true,
+        "wal_grew_while_blocked": true
+      },
+      "drill": "long-reader-checkpoint",
+      "ok": true
+    },
+    {
+      "checks": {
+        "data_survived_restart": true,
+        "liveness_200_while_reader_held": true,
+        "readiness_503_while_reader_held": true,
+        "readiness_reports_degraded": true,
+        "restart_is_healthy": true,
+        "service_exited_on_sigterm": true,
+        "started_healthy": true,
+        "writes_accepted_while_reader_held": true
+      },
+      "drill": "http-readiness",
+      "ok": true
+    },
+    {
+      "checks": {
+        "committed_head_survived": true,
+        "integrity_ok_after_failure": true,
+        "no_partial_commit_visible": true,
+        "start_gate_refuses_low_space": true,
+        "write_failed_with_io_error": true
+      },
+      "drill": "space-pressure",
+      "ok": true
+    }
+  ],
+  "generated_at": 1795168113.7300136
+}

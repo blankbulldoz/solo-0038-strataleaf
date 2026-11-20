@@ -1,0 +1,63 @@
+[Unit]
+Description=StrataLeaf document service (unprivileged, local volumes)
+Documentation=file:///opt/strataleaf/docs/container-runbook.md
+After=local-fs.target
+RequiresMountsFor=/var/lib/strataleaf /var/run/strataleaf
+# A network-backed mount for these paths is unsupported; the preflight gate
+# refuses it. Do not add network-online.target as a dependency and expect it
+# to work over NFS/CIFS.
+
+[Service]
+Type=exec
+User=9042
+Group=9042
+# No ambient capabilities are needed: the service only reads/writes its own
+# volumes and never binds a privileged port.
+NoNewPrivileges=yes
+CapabilityBoundingSet=
+AmbientCapabilities=
+PrivateTmp=yes
+PrivateDevices=yes
+ProtectSystem=strict
+ProtectHome=yes
+ProtectKernelTunables=yes
+ProtectKernelModules=yes
+ProtectControlGroups=yes
+RestrictAddressFamilies=AF_INET AF_INET6 AF_UNIX
+RestrictNamespaces=yes
+LockPersonality=yes
+MemoryDenyWriteExecute=yes
+SystemCallFilter=@system-service
+SystemCallErrorNumber=EPERM
+UMask=0027
+# The state dir holds the pid/revision markers the operator tool writes.
+ReadWritePaths=/var/lib/strataleaf /var/run/strataleaf
+
+Environment=PYTHONUNBUFFERED=1
+Environment=STRATALEAF_CONF=/opt/strataleaf/container/service.conf
+WorkingDirectory=/opt/strataleaf
+
+# ExecStart runs the same entrypoint the container uses, so the drill results
+# transfer. It performs preflight, then serves.
+ExecStartPre=/usr/local/bin/python3 /opt/strataleaf/container/strataleaf_ops.py preflight
+ExecStart=/opt/strataleaf/container/entrypoint.sh
+
+# Graceful stop: SIGTERM, wait for the drain budget, then SIGKILL. The
+# KillSignal is SIGKILL, not SIGTERM: if the drain overran, the process must
+# not receive a second, misleading SIGTERM. Recovery from a hard kill is
+# covered by the sigkill drill.
+KillSignal=SIGKILL
+TimeoutStopSec=50
+Restart=on-failure
+RestartSec=5s
+
+# Hard resource bounds. The service is a library in a small process; if it
+# exceeds these it is misconfigured, not merely busy.
+LimitNOFILE=4096
+LimitNPROC=128
+MemoryMax=512M
+CPUQuota=200%
+TasksMax=128
+
+[Install]
+WantedBy=multi-user.target

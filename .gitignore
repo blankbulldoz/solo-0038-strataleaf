@@ -7,3 +7,9 @@ __pycache__/
 *.egg-info/
 build/
 dist/
+# Drill scratch directories: drill workspaces hold temporary databases and
+# per-run state. Keep deploy/artifacts/ (the committed evidence), drop the rest.
+/deploy/artifacts/*/
+/deploy/artifacts/*.db
+/deploy/artifacts/*.db-wal
+/deploy/artifacts/*.db-shm

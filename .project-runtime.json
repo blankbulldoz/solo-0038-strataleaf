@@ -4,7 +4,7 @@
   "source_extensions": [
     ".py"
   ],
-  "build_command": "python3 -m compileall -q strataleaf examples",
+  "build_command": "python3 -m compileall -q strataleaf examples deploy",
   "testing": "deferred",
   "python_requires": ">=3.11",
   "workflow_checks": [
@@ -67,6 +67,18 @@
     {
       "workflow_id": "transfer",
       "command": "python3 -m examples.workflows transfer"
+    }
+  ],
+  "operational_checks": [
+    {
+      "check_id": "container-preflight",
+      "command": "python3 deploy/container/strataleaf_ops.py --config deploy/container/service.conf preflight",
+      "note": "requires a persistent local data/state volume"
+    },
+    {
+      "check_id": "container-drills",
+      "command": "STRATALEAF_DRILL_ALLOW_PSEUDO=1 python3 deploy/container/strataleaf_ops.py --config deploy/container/service.conf drill --workspace /tmp/strataleaf-drill --mode all",
+      "note": "set STRATALEAF_ALLOW_FUSE=1 on Docker Desktop/OrbStack local bind mounts; omit the pseudo waiver on a real persistent volume"
     }
   ]
 }

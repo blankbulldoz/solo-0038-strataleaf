@@ -1,0 +1,760 @@
+{
+  "identity": {
+    "configured_uid": 9042,
+    "identity_simulated": true,
+    "note": "the host could not switch to the image uid; the drill ran under the invoking uid and the identity drill proves mismatch is refused",
+    "running_gid": 1000,
+    "running_uid": 1000
+  },
+  "mode": "all",
+  "ok": true,
+  "results": [
+    {
+      "checks": {
+        "correct_identity_accepted": true,
+        "root_refused": true,
+        "uid_mismatch_refused": true,
+        "world_writable_refused": true
+      },
+      "configured_uid": 1000,
+      "drill": "identity-gate",
+      "ok": true,
+      "running_uid": 1000,
+      "uid_mismatch_reason": "process runs as 1001:1000, expected 1000:1000",
+      "world_writable_reason": "state volume /tmp/vfinal/identity/state is world-writable (777)"
+    },
+    {
+      "boundary": "NFS/CIFS/9p/SMB and FUSE shares are rejected at preflight: they cannot provide the POSIX locking and rename/fsync semantics SQLite WAL needs, and multi-master writes over a shared share are explicitly unsupported",
+      "checks": {
+        "data_volume_classified": true,
+        "local_fs_accepted": true,
+        "network_fs_rejected": true,
+        "state_volume_classified": true
+      },
+      "classification": {
+        "9p": [
+          "network",
+          "network filesystems with multi-writer semantics are not supported"
+        ],
+        "cifs": [
+          "network",
+          "network filesystems with multi-writer semantics are not supported"
+        ],
+        "ext4": [
+          "persistent-local",
+          null
+        ],
+        "nfs4": [
+          "network",
+          "network filesystems with multi-writer semantics are not supported"
+        ],
+        "overlay": [
+          "pseudo",
+          "not a persistent volume; contents are lost and/or layered"
+        ],
+        "tmpfs": [
+          "pseudo",
+          "not a persistent volume; contents are lost and/or layered"
+        ],
+        "xfs": [
+          "persistent-local",
+          null
+        ]
+      },
+      "drill": "network-fs-guard",
+      "live_mounts": {
+        "data": {
+          "device": "0:216",
+          "fstype": "overlay",
+          "mount_point": "/",
+          "options": "rw,lowerdir=/var/lib/docker/containerd/daemon/io.containerd.snapshotter.v1.overlayfs/snapshots/11623/fs:/var/lib/docker/containerd/daemon/io.containerd.snapshotter.v1.overlayfs/snapshots/6655/fs:/var/lib/docker/containerd/daemon/io.containerd.snapshotter.v1.overlayfs/snapshots/6654/fs:/var/lib/docker/containerd/daemon/io.containerd.snapshotter.v1.overlayfs/snapshots/6653/fs:/var/lib/docker/containerd/daemon/io.containerd.snapshotter.v1.overlayfs/snapshots/6652/fs:/var/lib/docker/containerd/daemon/io.containerd.snapshotter.v1.overlayfs/snapshots/6651/fs:/var/lib/docker/containerd/daemon/io.containerd.snapshotter.v1.overlayfs/snapshots/6650/fs:/var/lib/docker/containerd/daemon/io.containerd.snapshotter.v1.overlayfs/snapshots/6649/fs:/var/lib/docker/containerd/daemon/io.containerd.snapshotter.v1.overlayfs/snapshots/6648/fs:/var/lib/docker/containerd/daemon/io.containerd.snapshotter.v1.overlayfs/snapshots/6647/fs:/var/lib/docker/containerd/daemon/io.containerd.snapshotter.v1.overlayfs/snapshots/6646/fs:/var/lib/docker/containerd/daemon/io.containerd.snapshotter.v1.overlayfs/snapshots/6645/fs:/var/lib/docker/containerd/daemon/io.containerd.snapshotter.v1.overlayfs/snapshots/6644/fs:/var/lib/docker/containerd/daemon/io.containerd.snapshotter.v1.overlayfs/snapshots/6643/fs:/var/lib/docker/containerd/daemon/io.containerd.snapshotter.v1.overlayfs/snapshots/6642/fs:/var/lib/docker/containerd/daemon/io.containerd.snapshotter.v1.overlayfs/snapshots/6641/fs,upperdir=/var/lib/docker/containerd/daemon/io.containerd.snapshotter.v1.overlayfs/snapshots/11624/fs,workdir=/var/lib/docker/containerd/daemon/io.containerd.snapshotter.v1.overlayfs/snapshots/11624/work",
+          "source": "overlay"
+        },
+        "state": {
+          "device": "0:216",
+          "fstype": "overlay",
+          "mount_point": "/",
+          "options": "rw,lowerdir=/var/lib/docker/containerd/daemon/io.containerd.snapshotter.v1.overlayfs/snapshots/11623/fs:/var/lib/docker/containerd/daemon/io.containerd.snapshotter.v1.overlayfs/snapshots/6655/fs:/var/lib/docker/containerd/daemon/io.containerd.snapshotter.v1.overlayfs/snapshots/6654/fs:/var/lib/docker/containerd/daemon/io.containerd.snapshotter.v1.overlayfs/snapshots/6653/fs:/var/lib/docker/containerd/daemon/io.containerd.snapshotter.v1.overlayfs/snapshots/6652/fs:/var/lib/docker/containerd/daemon/io.containerd.snapshotter.v1.overlayfs/snapshots/6651/fs:/var/lib/docker/containerd/daemon/io.containerd.snapshotter.v1.overlayfs/snapshots/6650/fs:/var/lib/docker/containerd/daemon/io.containerd.snapshotter.v1.overlayfs/snapshots/6649/fs:/var/lib/docker/containerd/daemon/io.containerd.snapshotter.v1.overlayfs/snapshots/6648/fs:/var/lib/docker/containerd/daemon/io.containerd.snapshotter.v1.overlayfs/snapshots/6647/fs:/var/lib/docker/containerd/daemon/io.containerd.snapshotter.v1.overlayfs/snapshots/6646/fs:/var/lib/docker/containerd/daemon/io.containerd.snapshotter.v1.overlayfs/snapshots/6645/fs:/var/lib/docker/containerd/daemon/io.containerd.snapshotter.v1.overlayfs/snapshots/6644/fs:/var/lib/docker/containerd/daemon/io.containerd.snapshotter.v1.overlayfs/snapshots/6643/fs:/var/lib/docker/containerd/daemon/io.containerd.snapshotter.v1.overlayfs/snapshots/6642/fs:/var/lib/docker/containerd/daemon/io.containerd.snapshotter.v1.overlayfs/snapshots/6641/fs,upperdir=/var/lib/docker/containerd/daemon/io.containerd.snapshotter.v1.overlayfs/snapshots/11624/fs,workdir=/var/lib/docker/containerd/daemon/io.containerd.snapshotter.v1.overlayfs/snapshots/11624/work",
+          "source": "overlay"
+        }
+      },
+      "ok": true
+    },
+    {
+      "at_rest_after_verify": {
+        "files": {
+          "strataleaf.db": 86016,
+          "strataleaf.db-shm": 32768,
+          "strataleaf.db-wal": 0
+        },
+        "shm_present_after_verify": true,
+        "wal_bytes_after_verify": 0
+      },
+      "checks": {
+        "all_reported_commits_present": true,
+        "checkpoint_completed_before_close": true,
+        "clean_marker_written": true,
+        "commits_recorded": true,
+        "exit_code_zero": true,
+        "index_matches_documents_after_recovery": true,
+        "log_contiguous_after_recovery": true,
+        "marker_after_close_reports_head": true,
+        "recovery_fingerprint_matches": true,
+        "recovery_integrity_ok": true,
+        "sigterm_not_sigkill": true,
+        "wal_empty_at_rest": true
+      },
+      "clean_stop": {
+        "checkpoint": {
+          "busy": 0,
+          "checkpointed_frames": 94,
+          "complete": true,
+          "log_frames": 94,
+          "mode": "PASSIVE"
+        },
+        "closed_at": 1795168111.0033681,
+        "commits": 5,
+        "head_on_disk": 5,
+        "pid": 14974,
+        "revision_before_close": 5,
+        "signals": [
+          15
+        ],
+        "worker": "14172559255f-14974"
+      },
+      "commits_before_stop": 5,
+      "drill": "normal-stop",
+      "exit_code": 0,
+      "files_after_service_exit": {
+        "files": {
+          "strataleaf.db": 86016,
+          "strataleaf.db-shm": 32768,
+          "strataleaf.db-wal": 0
+        },
+        "shm": true,
+        "wal": 0
+      },
+      "log_events": [
+        {
+          "at": 1795168110.7751532,
+          "event": "preflight-ok",
+          "fstype": "overlay",
+          "pid": 14974
+        },
+        {
+          "at": 1795168110.8264308,
+          "db": "/tmp/vfinal/normal/data/strataleaf.db",
+          "event": "opened",
+          "head": 0,
+          "pid": 14974
+        },
+        {
+          "at": 1795168110.9999382,
+          "busy": 0,
+          "checkpointed_frames": 94,
+          "complete": true,
+          "event": "checkpoint-before-close",
+          "log_frames": 94,
+          "mode": "PASSIVE",
+          "pid": 14974
+        },
+        {
+          "at": 1795168111.003533,
+          "event": "clean-close",
+          "head": 5,
+          "pid": 14974
+        }
+      ],
+      "note": "the -wal/-shm files remain (zero-length WAL) after the service's own close because the last connection to close decides their removal; committed data is durable either way, and the post-stop verify reads the same head with or without them",
+      "ok": true,
+      "recovered_evidence": {
+        "documents": [
+          {
+            "document": {
+              "seq": 4,
+              "worker": "14172559255f-14974"
+            },
+            "key": "w14172559255f-14974",
+            "revision": 5
+          }
+        ],
+        "fingerprint": {
+          "documents": 1,
+          "revision": 5,
+          "sha256": "7a285d82e253a52855d8cdeb895ecb574ce3a4c5deb4c9a18e2aa536a8a43cd5"
+        },
+        "floor": 0,
+        "head": 5,
+        "index_defs": [
+          {
+            "collection": "events",
+            "field": "seq",
+            "name": "by_seq",
+            "unique_flag": 0
+          }
+        ],
+        "index_expected_rows": 1,
+        "index_matches_documents": true,
+        "index_rows": 1,
+        "log_contiguous": true,
+        "log_first": 1,
+        "log_last": 5,
+        "receipts": 5
+      },
+      "stop_seconds": 0.034,
+      "verification": {
+        "consumers": {},
+        "counts": {
+          "collections": 1,
+          "commits": 5,
+          "consumers": 0,
+          "index_defs": 1,
+          "index_values": 1,
+          "pins": 0,
+          "versions": 5
+        },
+        "database_id": "70f4f8cb-bfa2-4c1c-b55c-d0b720f69809",
+        "fingerprint": {
+          "documents": 1,
+          "revision": 5,
+          "sha256": "7a285d82e253a52855d8cdeb895ecb574ce3a4c5deb4c9a18e2aa536a8a43cd5"
+        },
+        "floor": 0,
+        "foreign_keys": [],
+        "head": 5,
+        "index_mismatches": 0,
+        "issues": [],
+        "mode": "primary",
+        "ok": true,
+        "pins": {},
+        "sqlite": [
+          "ok"
+        ],
+        "wal_bytes_at_verify": 0
+      }
+    },
+    {
+      "at_crash": {
+        "clean_marker": false,
+        "pid_file_state": "running",
+        "shm_exists": true,
+        "sizes": {
+          "strataleaf.db": 4096,
+          "strataleaf.db-shm": 32768,
+          "strataleaf.db-wal": 387312
+        },
+        "wal_exists": true
+      },
+      "checks": {
+        "commits_visible": true,
+        "every_reported_commit_present": true,
+        "index_matches_documents_after_recovery": true,
+        "killed_by_sigkill": true,
+        "log_contiguous_after_recovery": true,
+        "no_clean_marker": true,
+        "recovered_head_at_least_last_reported": true,
+        "recovered_head_is_bounded": true,
+        "recovery_integrity_ok": true,
+        "wal_present_at_crash": true
+      },
+      "drill": "sigkill",
+      "exit_signal": -9,
+      "last_reported_revision": 5,
+      "note": "a commit whose caller saw a success is never lost; a commit that was in flight at SIGKILL may or may not be present, and the recovered head is bounded to last_reported+1",
+      "ok": true,
+      "recovered_evidence": {
+        "documents": [
+          {
+            "document": {
+              "seq": 4,
+              "worker": "14172559255f-14975"
+            },
+            "key": "w14172559255f-14975",
+            "revision": 5
+          }
+        ],
+        "fingerprint": {
+          "documents": 1,
+          "revision": 5,
+          "sha256": "a16196f56e1cf02fb4149174dff43579ec9a3a879d55aa659bf54c2737c9974b"
+        },
+        "floor": 0,
+        "head": 5,
+        "index_defs": [
+          {
+            "collection": "events",
+            "field": "seq",
+            "name": "by_seq",
+            "unique_flag": 0
+          }
+        ],
+        "index_expected_rows": 1,
+        "index_matches_documents": true,
+        "index_rows": 1,
+        "log_contiguous": true,
+        "log_first": 1,
+        "log_last": 5,
+        "receipts": 5
+      },
+      "recovered_head": 5,
+      "verification": {
+        "consumers": {},
+        "counts": {
+          "collections": 1,
+          "commits": 5,
+          "consumers": 0,
+          "index_defs": 1,
+          "index_values": 1,
+          "pins": 0,
+          "versions": 5
+        },
+        "database_id": "8b218da4-7e4b-431e-9af9-f499a36a22c8",
+        "fingerprint": {
+          "documents": 1,
+          "revision": 5,
+          "sha256": "a16196f56e1cf02fb4149174dff43579ec9a3a879d55aa659bf54c2737c9974b"
+        },
+        "floor": 0,
+        "foreign_keys": [],
+        "head": 5,
+        "index_mismatches": 0,
+        "issues": [],
+        "mode": "primary",
+        "ok": true,
+        "pins": {},
+        "sqlite": [
+          "ok"
+        ],
+        "wal_bytes_at_verify": 387312
+      }
+    },
+    {
+      "at_crash": {
+        "exit_signal": -9,
+        "head_written_in_open_transaction": 2,
+        "wal_bytes_after_kill": 424392,
+        "wal_bytes_before_kill": 424392
+      },
+      "boundary": "a commit is confirmed only when COMMIT returns; a write interrupted before that is rolled back by WAL recovery and must never appear in reads, the feed, or the index",
+      "checks": {
+        "child_was_killed": true,
+        "confirmed_document_present": true,
+        "head_unchanged": true,
+        "index_has_no_phantom_row": true,
+        "integrity_ok": true,
+        "log_has_no_uncommitted_revision": true,
+        "phantom_document_absent": true,
+        "uncommitted_frames_were_durable": true
+      },
+      "committed_head": 1,
+      "drill": "torn-commit",
+      "evidence": {
+        "documents": [
+          {
+            "document": {
+              "seq": 1,
+              "worker": "a"
+            },
+            "key": "confirmed",
+            "revision": 1
+          }
+        ],
+        "fingerprint": {
+          "documents": 1,
+          "revision": 1,
+          "sha256": "e3bb88ad893449b78c96a8d1d27bdeab2e04635937bcde6b41a0f2fa6e22d2e5"
+        },
+        "floor": 0,
+        "head": 1,
+        "index_defs": [],
+        "index_expected_rows": 0,
+        "index_matches_documents": true,
+        "index_rows": 0,
+        "log_contiguous": true,
+        "log_first": 1,
+        "log_last": 1,
+        "receipts": 0
+      },
+      "ok": true,
+      "recovered_head": 1
+    },
+    {
+      "after_release": {
+        "count": 1,
+        "replayed": false,
+        "revision": 2
+      },
+      "blocked": {
+        "elapsed_ms": 213.42,
+        "message": "database is locked",
+        "type": "OperationalError"
+      },
+      "boundary": "SQLite gives one writer per database; callers treat OperationalError as retryable and never as a lost commit",
+      "checks": {
+        "document_is_new_value": true,
+        "error_is_busy": true,
+        "second_writer_blocked": true,
+        "waited_about_busy_timeout": true,
+        "wrote_after_release": true
+      },
+      "drill": "write-conflict",
+      "ok": true,
+      "visible": {
+        "region": "west",
+        "sequence": 1
+      }
+    },
+    {
+      "after_release": {
+        "checkpoint": {
+          "busy": 0,
+          "checkpointed_frames": 1272,
+          "complete": true,
+          "log_frames": 1272,
+          "mode": "PASSIVE"
+        },
+        "readiness_probe": {
+          "details": {
+            "checkpoint": {
+              "busy": 0,
+              "checkpointed_frames": 1272,
+              "complete": true,
+              "log_frames": 1272,
+              "mode": "PASSIVE"
+            },
+            "reason": null,
+            "wal": {
+              "bytes": 5240672,
+              "limit_percent": 25,
+              "percent_of_volume": 0.0029
+            },
+            "write_lock": "acquired"
+          },
+          "status": "healthy"
+        },
+        "wal_bytes": 5240672
+      },
+      "boundary": "file exists, pid alive, quick_check ok, and a checkpoint call that returns without raising are all true while the checkpoint is silently making no progress; only readiness distinguishes this from an idle, healthy service",
+      "checks": {
+        "checkpoint_completed_after_release": true,
+        "checkpoint_did_not_raise": true,
+        "checkpoint_lagged_while_reader_held": true,
+        "liveness_still_healthy": true,
+        "naive_checks_all_passed": true,
+        "readiness_degraded_while_reader_held": true,
+        "readiness_healthy_after_release": true,
+        "wal_grew_while_blocked": true
+      },
+      "drill": "long-reader-checkpoint",
+      "ok": true,
+      "while_read_locked": {
+        "checkpoint_lagging": true,
+        "checkpoint_reports": [
+          {
+            "busy": 0,
+            "checkpointed_frames": 42,
+            "complete": false,
+            "log_frames": 1272,
+            "mode": "PASSIVE",
+            "wal_bytes": 5240672
+          },
+          {
+            "busy": 0,
+            "checkpointed_frames": 42,
+            "complete": false,
+            "log_frames": 1272,
+            "mode": "PASSIVE",
+            "wal_bytes": 5240672
+          },
+          {
+            "busy": 0,
+            "checkpointed_frames": 42,
+            "complete": false,
+            "log_frames": 1272,
+            "mode": "PASSIVE",
+            "wal_bytes": 5240672
+          }
+        ],
+        "liveness_probe": {
+          "details": {
+            "checkpoint": {
+              "busy": 0,
+              "checkpointed_frames": 42,
+              "complete": false,
+              "log_frames": 1272,
+              "mode": "PASSIVE"
+            },
+            "reason": null,
+            "wal": {
+              "bytes": 5240672,
+              "limit_percent": 25,
+              "percent_of_volume": 0.0029
+            },
+            "write_lock": "acquired"
+          },
+          "status": "healthy"
+        },
+        "naive_signals": {
+          "checkpoint_raised": false,
+          "db_file_exists": true,
+          "pid_alive": true,
+          "quick_check": "ok",
+          "wal_file_exists": true
+        },
+        "readiness_probe": {
+          "details": {
+            "checkpoint": {
+              "busy": 0,
+              "checkpointed_frames": 42,
+              "complete": false,
+              "log_frames": 1272,
+              "mode": "PASSIVE"
+            },
+            "reason": "checkpoint incomplete: busy=0 log=1272 checkpointed=42",
+            "wal": {
+              "bytes": 5240672,
+              "limit_percent": 25,
+              "percent_of_volume": 0.0029
+            },
+            "write_lock": "acquired"
+          },
+          "status": "degraded"
+        },
+        "wal_bytes_after_writes": 5240672,
+        "wal_bytes_before_writes": 173072,
+        "wal_growth_bytes": 5067600
+      }
+    },
+    {
+      "after_restart": {
+        "healthz": [
+          200,
+          {
+            "checkpoint": {
+              "busy": 0,
+              "checkpointed_frames": 0,
+              "complete": true,
+              "log_frames": 0,
+              "mode": "PASSIVE"
+            },
+            "kind": "liveness",
+            "reason": null,
+            "status": "healthy",
+            "wal": {
+              "bytes": 0,
+              "limit_percent": 25,
+              "percent_of_volume": 0.0
+            }
+          }
+        ],
+        "readyz": [
+          200,
+          {
+            "checkpoint": {
+              "busy": 0,
+              "checkpointed_frames": 0,
+              "complete": true,
+              "log_frames": 0,
+              "mode": "PASSIVE"
+            },
+            "kind": "readiness",
+            "reason": null,
+            "status": "healthy",
+            "wal": {
+              "bytes": 0,
+              "limit_percent": 25,
+              "percent_of_volume": 0.0
+            }
+          }
+        ]
+      },
+      "boundary": "restarting the container on readiness failure would discard the reader; readiness is the signal to stop routing new work, not to kill the process",
+      "checks": {
+        "data_survived_restart": true,
+        "liveness_200_while_reader_held": true,
+        "readiness_503_while_reader_held": true,
+        "readiness_reports_degraded": true,
+        "restart_is_healthy": true,
+        "service_exited_on_sigterm": true,
+        "started_healthy": true,
+        "writes_accepted_while_reader_held": true
+      },
+      "drill": "http-readiness",
+      "initial": {
+        "healthz": [
+          200,
+          {
+            "checkpoint": {
+              "busy": 0,
+              "checkpointed_frames": 36,
+              "complete": true,
+              "log_frames": 36,
+              "mode": "PASSIVE"
+            },
+            "kind": "liveness",
+            "reason": null,
+            "status": "healthy",
+            "wal": {
+              "bytes": 148352,
+              "limit_percent": 25,
+              "percent_of_volume": 0.0001
+            }
+          }
+        ],
+        "readyz": [
+          200,
+          {
+            "checkpoint": {
+              "busy": 0,
+              "checkpointed_frames": 36,
+              "complete": true,
+              "log_frames": 36,
+              "mode": "PASSIVE"
+            },
+            "kind": "readiness",
+            "reason": null,
+            "status": "healthy",
+            "wal": {
+              "bytes": 148352,
+              "limit_percent": 25,
+              "percent_of_volume": 0.0001
+            }
+          }
+        ]
+      },
+      "ok": true,
+      "port": 37735,
+      "verification": {
+        "consumers": {},
+        "counts": {
+          "collections": 1,
+          "commits": 360,
+          "consumers": 0,
+          "index_defs": 0,
+          "index_values": 0,
+          "pins": 0,
+          "versions": 360
+        },
+        "database_id": "30a9c056-f57d-441e-8add-47aecb89a7d5",
+        "fingerprint": {
+          "documents": 360,
+          "revision": 360,
+          "sha256": "18bdc97490569a3ce22f10979612729756fff56d6f299f26243225a40cc87758"
+        },
+        "floor": 0,
+        "foreign_keys": [],
+        "head": 360,
+        "index_mismatches": 0,
+        "issues": [],
+        "mode": "primary",
+        "ok": true,
+        "pins": {},
+        "sqlite": [
+          "ok"
+        ],
+        "wal_bytes_at_verify": null
+      },
+      "while_reader_held": {
+        "healthz": [
+          200,
+          {
+            "checkpoint": {
+              "busy": 0,
+              "checkpointed_frames": 736,
+              "complete": false,
+              "log_frames": 2215,
+              "mode": "PASSIVE"
+            },
+            "kind": "liveness",
+            "reason": null,
+            "status": "healthy",
+            "wal": {
+              "bytes": 9125832,
+              "limit_percent": 25,
+              "percent_of_volume": 0.0051
+            }
+          }
+        ],
+        "readyz": [
+          503,
+          {
+            "checkpoint": {
+              "busy": 0,
+              "checkpointed_frames": 736,
+              "complete": false,
+              "log_frames": 2215,
+              "mode": "PASSIVE"
+            },
+            "kind": "readiness",
+            "reason": "checkpoint incomplete: busy=0 log=2215 checkpointed=736",
+            "status": "degraded",
+            "wal": {
+              "bytes": 9125832,
+              "limit_percent": 25,
+              "percent_of_volume": 0.0051
+            }
+          }
+        ]
+      }
+    },
+    {
+      "checks": {
+        "committed_head_survived": true,
+        "integrity_ok_after_failure": true,
+        "no_partial_commit_visible": true,
+        "start_gate_refuses_low_space": true,
+        "write_failed_with_io_error": true
+      },
+      "committed_head": 1,
+      "drill": "space-pressure",
+      "events": [
+        {
+          "event": "start",
+          "head": "1"
+        },
+        {
+          "error": "disk I/O error",
+          "event": "write-failed",
+          "index": 12,
+          "type": "OperationalError"
+        },
+        {
+          "event": "post-failure-quick-check",
+          "result": "ok"
+        }
+      ],
+      "failure": {
+        "error": "disk I/O error",
+        "event": "write-failed",
+        "index": 12,
+        "type": "OperationalError"
+      },
+      "gate": {
+        "reason": "data volume: available 122072223744 bytes below reserve 122072223745; state volume: available 122072223744 bytes below reserve 122072223745",
+        "status": "refused"
+      },
+      "head_on_disk": 1,
+      "limit_bytes": 262144,
+      "note": "RLIMIT_FSIZE is the deterministic stand-in for a full volume; the same SQLite error path applies to ENOSPC",
+      "ok": true
+    }
+  ],
+  "volumes": {
+    "live": {
+      "STRATALEAF_DATA_DIR": {
+        "fs_class": "pseudo",
+        "fstype": "overlay",
+        "mount_point": "/"
+      },
+      "STRATALEAF_STATE_DIR": {
+        "fs_class": "pseudo",
+        "fstype": "overlay",
+        "mount_point": "/"
+      }
+    },
+    "needed_waiver": true,
+    "note": "pseudo_waiver_applied means the drill's data directories are NOT on a reviewed persistent volume; checks that depend on volume durability (power loss, real ENOSPC, remount) are out of scope for this run",
+    "pseudo_waiver_applied": true
+  },
+  "workspace": "/tmp/vfinal"
+}

@@ -1,0 +1,134 @@
+# Kubernetes deployment for a single-writer StrataLeaf service.
+#
+#   kubectl apply -f deploy/docker/kubernetes.yaml
+#
+# This is a StatefulSet, not a Deployment: exactly one replica may write to a
+# given volume, and the volume must be local block storage on a *single* node.
+# Rolling updates must be serialised (OnDelete / partition) because two pods
+# must never mount the same volume. A ReadWriteMany volume shared by several
+# pods is explicitly unsupported (no multi-master).
+apiVersion: v1
+kind: Service
+metadata:
+  name: strataleaf
+  labels:
+    app: strataleaf
+spec:
+  clusterIP: None
+  selector:
+    app: strataleaf
+  ports:
+    - name: http
+      port: 8080
+      targetPort: http
+---
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: strataleaf
+spec:
+  serviceName: strataleaf
+  replicas: 1
+  # Do not start a replacement before the old pod has fully released the
+  # volume; a stuck pod must be investigated, not doubled.
+  podManagementPolicy: OrderedReady
+  updateStrategy:
+    type: RollingUpdate
+    rollingUpdate:
+      partition: 0
+  selector:
+    matchLabels:
+      app: strataleaf
+  template:
+    metadata:
+      labels:
+        app: strataleaf
+    spec:
+      automountServiceAccountToken: false
+      securityContext:
+        runAsNonRoot: true
+        runAsUser: 9042
+        runAsGroup: 9042
+        fsGroup: 9042
+        seccompProfile:
+          type: RuntimeDefault
+      terminationGracePeriodSeconds: 50
+      containers:
+        - name: strataleaf
+          image: strataleaf-service:0.1.0
+          imagePullPolicy: IfNotPresent
+          command: ["/opt/strataleaf/container/entrypoint.sh"]
+          ports:
+            - name: http
+              containerPort: 8080
+          env:
+            - name: STRATALEAF_CONF
+              value: /opt/strataleaf/container/service.conf
+            - name: STRATALEAF_COMMAND
+              value: serve
+          securityContext:
+            allowPrivilegeEscalation: false
+            readOnlyRootFilesystem: true
+            capabilities:
+              drop: ["ALL"]
+          volumeMounts:
+            - name: data
+              mountPath: /var/lib/strataleaf
+            - name: state
+              mountPath: /var/run/strataleaf
+            - name: scratch
+              mountPath: /tmp
+          # Liveness only. Restarting a WAL-blocked pod discards the reader
+          # that is holding the checkpoint back; that should be a routing
+          # decision, not a restart. Probe budgets are generous because each
+          # probe opens the database and takes the writer lock briefly.
+          livenessProbe:
+            httpGet:
+              path: /healthz
+              port: http
+            initialDelaySeconds: 15
+            periodSeconds: 20
+            timeoutSeconds: 5
+            failureThreshold: 3
+          # Readiness is 503 while a long read or slow consumer prevents the
+          # checkpoint from advancing. The endpoint is removed from the
+          # Service, so new work stops arriving without killing the process.
+          readinessProbe:
+            httpGet:
+              path: /readyz
+              port: http
+            initialDelaySeconds: 5
+            periodSeconds: 10
+            timeoutSeconds: 5
+            failureThreshold: 3
+          resources:
+            requests:
+              cpu: 100m
+              memory: 128Mi
+            limits:
+              cpu: "2"
+              memory: 512Mi
+      volumes:
+        - name: scratch
+          emptyDir:
+            medium: Memory
+            sizeLimit: 64Mi
+  volumeClaimTemplates:
+    - metadata:
+        name: data
+      spec:
+        # ReadWriteOnce on a local (or at least node-local, single-attach)
+        # class. Never use a ReadWriteMany class backed by NFS/CIFS.
+        accessModes: ["ReadWriteOnce"]
+        storageClassName: local-storage
+        resources:
+          requests:
+            storage: 10Gi
+    - metadata:
+        name: state
+      spec:
+        accessModes: ["ReadWriteOnce"]
+        storageClassName: local-storage
+        resources:
+          requests:
+            storage: 1Gi

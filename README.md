@@ -31,6 +31,8 @@ with Database("strataleaf.db") as db:
 
 `catalog schema commit snapshot query index feed backup replica compact expire aggregate patch inspect transfer`
 
+容器演练与运维命令见下节与 [受限容器运行手册](docs/container-runbook.md)。已有 9 个可复现演练（身份、网络盘、正常停止、SIGKILL、撕裂提交、写冲突、长读、HTTP 就绪、空间压力），产物写入演练工作区的 `drill-report.json`、`index.json` 与 `report.md`；仓库内 `deploy/artifacts/` 保存一次完整运行的结果。
+
 每个示例约一秒以内，不需要联网。它们是生产 API 的有限工作流演示；自动化测试仍为 **deferred**，仓库不含测试套件，也不声明测试命令。`examples.observations` 另外提供写锁竞争与保留水位的可复现观测。
 
 ## 语义边界
@@ -46,5 +48,9 @@ with Database("strataleaf.db") as db:
 - 副本只能接收同一上游、连续的提交包。重复范围不重复写入；校验错误和缺口整包失败。分段追赶时使用版本扫描，追到导出端 head 才安装最新索引。目录 epoch 防止过时的同版本包倒退目录。副本不接收主库写入；基线不提供提升接口、双向复制或网络传输。导出校验和检测意外损坏，不代替对端身份认证。
 - SQLite 保证进程间单写者；同一句柄的锁协调线程操作，多个句柄通过 SQLite 锁协调。长读可能延缓 WAL checkpoint；忙超时由连接 timeout 控制，调用方处理 `sqlite3.OperationalError`。
 - 当前实现适合本地中小型嵌入式数据集，版本扫描、分组和逻辑导出会物化输入；不承诺常数内存。单文档上限 1 MiB、深度 32；筛选按键排序。磁盘加密、租户鉴权、分布式共识均不在现有承诺内。
+- 受限容器的运行配置、卷与身份约束、健康探针、停止/强制终止演练见 [容器运行手册](docs/container-runbook.md) 与 `deploy/`。命令：
+  `python3 deploy/container/strataleaf_ops.py --config deploy/container/service.conf preflight|probe|verify|space`，
+  `STRATALEAF_DRILL_ALLOW_PSEUDO=1 python3 deploy/container/strataleaf_ops.py --config deploy/container/service.conf drill --workspace /tmp/drill --mode all`
+  在无持久卷的沙箱里运行演练必须显式放宽，报告会记录真实文件系统类别。
 
-见 [完整规格](PROJECT_SPEC.md)、[数据与兼容边界](docs/storage-semantics.md)、[恢复与观测](docs/operations.md)。
+见 [完整规格](PROJECT_SPEC.md)、[数据与兼容边界](docs/storage-semantics.md)、[恢复与观测](docs/operations.md)、[受限容器运行手册](docs/container-runbook.md)。
