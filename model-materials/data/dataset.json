@@ -1,0 +1,268 @@
+{
+  "collection": "items",
+  "schema": {
+    "fields": {
+      "sku": "string",
+      "qty": "integer",
+      "active": "boolean",
+      "tags": "array",
+      "profile": "object"
+    },
+    "required": [
+      "sku",
+      "qty",
+      "active"
+    ]
+  },
+  "documents": {
+    "item_01": {
+      "purpose": "基准文档：各字段均为常规值；rev4 被补丁（qty 5→1，note→fresh-v2）",
+      "document": {
+        "sku": "A-01",
+        "qty": 5,
+        "price": 9.5,
+        "active": true,
+        "tags": [
+          "red",
+          "sale"
+        ],
+        "profile": {
+          "score": 10,
+          "flagged": false
+        },
+        "note": "fresh"
+      }
+    },
+    "item_02": {
+      "purpose": "缺失组：无 price、无 note，profile 为空对象（score 缺失）",
+      "document": {
+        "sku": "A-02",
+        "qty": 0,
+        "active": false,
+        "tags": [],
+        "profile": {}
+      }
+    },
+    "item_03": {
+      "purpose": "空值组：price、note、profile.score 都是显式 null（与 item_02 的缺失对照）",
+      "document": {
+        "sku": "A-03",
+        "qty": 3,
+        "price": null,
+        "active": true,
+        "tags": [
+          "red"
+        ],
+        "profile": {
+          "score": null
+        },
+        "note": null
+      }
+    },
+    "item_04": {
+      "purpose": "数值 1 组：qty/price/score 都是数值 1，note 是字符串 \"1\"（与 item_05 的布尔对照）",
+      "document": {
+        "sku": "A-04",
+        "qty": 1,
+        "price": 1,
+        "active": true,
+        "tags": [
+          1,
+          2
+        ],
+        "profile": {
+          "score": 1
+        },
+        "note": "1"
+      }
+    },
+    "item_05": {
+      "purpose": "布尔组：price/score/tags 用布尔占位，检验“布尔不当数值、true 不等于 1”",
+      "document": {
+        "sku": "A-05",
+        "qty": 7,
+        "price": true,
+        "active": false,
+        "tags": [
+          true,
+          false
+        ],
+        "profile": {
+          "score": true
+        },
+        "note": "true"
+      }
+    },
+    "item_06": {
+      "purpose": "同内容组 A：与 item_07 内容完全相同、键不同",
+      "document": {
+        "sku": "A-06",
+        "qty": 2,
+        "price": 4.0,
+        "active": true,
+        "tags": [
+          "blue"
+        ],
+        "profile": {
+          "score": 10,
+          "flagged": false
+        },
+        "note": "dup"
+      }
+    },
+    "item_07": {
+      "purpose": "同内容组 B：与 item_06 内容相同且字段书写顺序不同（验证键序无关）",
+      "document": {
+        "note": "dup",
+        "profile": {
+          "flagged": false,
+          "score": 10
+        },
+        "tags": [
+          "blue"
+        ],
+        "active": true,
+        "price": 4.0,
+        "qty": 2,
+        "sku": "A-06"
+      }
+    },
+    "item_08": {
+      "purpose": "字符串组：price/score/tags 是数字外观的字符串，note 反而是数值 9.5",
+      "document": {
+        "sku": "A-08",
+        "qty": 12,
+        "price": "9.5",
+        "active": true,
+        "tags": [
+          "9",
+          "10"
+        ],
+        "profile": {
+          "score": "10"
+        },
+        "note": 9.5
+      }
+    },
+    "item_09": {
+      "purpose": "浮点组：score 10.0、tags 1.0，检验 int/float 在相等与索引中统一",
+      "document": {
+        "sku": "A-09",
+        "qty": 8,
+        "price": 10,
+        "active": false,
+        "tags": [
+          1.0,
+          2.5
+        ],
+        "profile": {
+          "score": 10.0
+        },
+        "note": null
+      }
+    },
+    "item_10": {
+      "purpose": "删除重建组：rev2 删除留墓碑，rev3 以新内容重建（见 ITEM10_RECREATED）",
+      "document": {
+        "sku": "A-10",
+        "qty": 4,
+        "price": 2.0,
+        "active": true,
+        "tags": [
+          "legacy"
+        ],
+        "profile": {
+          "score": 3
+        },
+        "note": "original"
+      }
+    },
+    "item_11": {
+      "purpose": "零值组：0、0.0、空串、空数组、空对象——都是“存在但为假值”，与缺失/null 对照",
+      "document": {
+        "sku": "A-11",
+        "qty": 0,
+        "price": 0.0,
+        "active": false,
+        "tags": [],
+        "profile": {},
+        "note": ""
+      }
+    },
+    "item_12": {
+      "purpose": "嵌套组：三层点路径 profile.audit.count 与对象数组 history",
+      "document": {
+        "sku": "A-12",
+        "qty": 6,
+        "price": 3.25,
+        "active": true,
+        "tags": [
+          "red",
+          "blue"
+        ],
+        "profile": {
+          "score": 8,
+          "flagged": true,
+          "audit": {
+            "count": 2
+          }
+        },
+        "note": "nested",
+        "history": [
+          {
+            "qty": 5
+          },
+          {
+            "qty": 6
+          }
+        ]
+      }
+    }
+  },
+  "item_10_recreated": {
+    "sku": "A-10",
+    "qty": 40,
+    "price": 20.0,
+    "active": false,
+    "tags": [
+      "legacy",
+      "restocked"
+    ],
+    "profile": {
+      "score": 30
+    },
+    "note": "recreated"
+  },
+  "item_01_patch": {
+    "qty": 1,
+    "note": "fresh-v2"
+  },
+  "item_13_late": {
+    "sku": "A-13",
+    "qty": 9,
+    "price": 1.5,
+    "active": true,
+    "tags": [
+      "new"
+    ],
+    "profile": {
+      "score": 1
+    },
+    "note": "late"
+  },
+  "keys_in_order": [
+    "item_01",
+    "item_02",
+    "item_03",
+    "item_04",
+    "item_05",
+    "item_06",
+    "item_07",
+    "item_08",
+    "item_09",
+    "item_10",
+    "item_11",
+    "item_12",
+    "item_13"
+  ]
+}

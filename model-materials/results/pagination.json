@@ -1,0 +1,62 @@
+{
+  "predicate": null,
+  "limit": 5,
+  "pages": [
+    {
+      "index": 1,
+      "keys": [
+        "item_01",
+        "item_02",
+        "item_03",
+        "item_04",
+        "item_05"
+      ],
+      "revision": 4,
+      "cursor_issued": true
+    },
+    {
+      "index": 2,
+      "keys": [
+        "item_06",
+        "item_07",
+        "item_08",
+        "item_09",
+        "item_10"
+      ],
+      "revision": 4,
+      "cursor_issued": true
+    },
+    {
+      "index": 3,
+      "keys": [
+        "item_11",
+        "item_12"
+      ],
+      "revision": 4,
+      "cursor_issued": false
+    }
+  ],
+  "write_during_pagination": {
+    "key": "item_13",
+    "revision": 5
+  },
+  "item_13_in_pages": false,
+  "fresh_head_query": {
+    "revision": 5,
+    "keys": [
+      "item_01",
+      "item_02",
+      "item_03",
+      "item_04",
+      "item_05",
+      "item_06",
+      "item_07",
+      "item_08",
+      "item_09",
+      "item_10",
+      "item_11",
+      "item_12",
+      "item_13"
+    ]
+  }
+}

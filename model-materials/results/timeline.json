@@ -1,0 +1,181 @@
+{
+  "events": [
+    {
+      "revision": 0,
+      "event": "创建集合 items（目录操作，不推进文档修订）",
+      "head": 0
+    },
+    {
+      "revision": 1,
+      "event": "种子写入 item_01..item_12（单批次 12 个 put）",
+      "head": 1
+    },
+    {
+      "revision": 2,
+      "event": "删除 item_10（写入墓碑）",
+      "head": 2
+    },
+    {
+      "revision": 3,
+      "event": "以 expected=2（墓碑版本）重建 item_10，内容全部更换",
+      "head": 3
+    },
+    {
+      "revision": 4,
+      "event": "补丁 item_01：qty 5→1，note→fresh-v2（expected 是文档自身版本 rev1，不是全局 head）",
+      "head": 4
+    },
+    {
+      "revision": null,
+      "event": "创建索引 by_qty/by_active/by_score（目录操作，不推进文档修订）；唯一索引 uniq_sku 被拒绝",
+      "head": 4
+    },
+    {
+      "revision": 5,
+      "event": "分页演示过程中新增 item_13（验证游标固定读视图）",
+      "head": 5
+    }
+  ],
+  "item_10_chain": [
+    {
+      "revision": 1,
+      "state": "visible",
+      "document": {
+        "active": true,
+        "note": "original",
+        "price": 2.0,
+        "profile": {
+          "score": 3
+        },
+        "qty": 4,
+        "sku": "A-10",
+        "tags": [
+          "legacy"
+        ]
+      }
+    },
+    {
+      "revision": 2,
+      "state": "tombstone",
+      "document": null
+    },
+    {
+      "revision": 3,
+      "state": "visible",
+      "document": {
+        "active": false,
+        "note": "recreated",
+        "price": 20.0,
+        "profile": {
+          "score": 30
+        },
+        "qty": 40,
+        "sku": "A-10",
+        "tags": [
+          "legacy",
+          "restocked"
+        ]
+      }
+    },
+    {
+      "revision": 4,
+      "state": "visible",
+      "document": {
+        "active": false,
+        "note": "recreated",
+        "price": 20.0,
+        "profile": {
+          "score": 30
+        },
+        "qty": 40,
+        "sku": "A-10",
+        "tags": [
+          "legacy",
+          "restocked"
+        ]
+      }
+    },
+    {
+      "revision": 5,
+      "state": "visible",
+      "document": {
+        "active": false,
+        "note": "recreated",
+        "price": 20.0,
+        "profile": {
+          "score": 30
+        },
+        "qty": 40,
+        "sku": "A-10",
+        "tags": [
+          "legacy",
+          "restocked"
+        ]
+      }
+    }
+  ],
+  "item_01_chain": [
+    {
+      "revision": 1,
+      "state": "visible",
+      "document": {
+        "active": true,
+        "note": "fresh",
+        "price": 9.5,
+        "profile": {
+          "flagged": false,
+          "score": 10
+        },
+        "qty": 5,
+        "sku": "A-01",
+        "tags": [
+          "red",
+          "sale"
+        ]
+      }
+    },
+    {
+      "revision": 4,
+      "state": "visible",
+      "document": {
+        "active": true,
+        "note": "fresh-v2",
+        "price": 9.5,
+        "profile": {
+          "flagged": false,
+          "score": 10
+        },
+        "qty": 1,
+        "sku": "A-01",
+        "tags": [
+          "red",
+          "sale"
+        ]
+      }
+    }
+  ],
+  "item_13_chain": [
+    {
+      "revision": 4,
+      "state": "absent",
+      "document": null
+    },
+    {
+      "revision": 5,
+      "state": "visible",
+      "document": {
+        "active": true,
+        "note": "late",
+        "price": 1.5,
+        "profile": {
+          "score": 1
+        },
+        "qty": 9,
+        "sku": "A-13",
+        "tags": [
+          "new"
+        ]
+      }
+    }
+  ]
+}

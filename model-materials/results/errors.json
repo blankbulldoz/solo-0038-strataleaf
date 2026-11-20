@@ -1,0 +1,66 @@
+[
+  {
+    "id": "E1",
+    "scenario": "用 expected=0 重建已删除的键（0 只允许从未出现过的键）",
+    "result": {
+      "error": "Conflict",
+      "message": "revision conflict for items/item_10: expected 0, found 2"
+    }
+  },
+  {
+    "id": "E2",
+    "scenario": "item_06/item_07 内容相同（sku 同为 A-06）时建唯一索引 uniq_sku",
+    "result": {
+      "error": "Conflict",
+      "message": "existing documents violate unique index"
+    }
+  },
+  {
+    "id": "E3",
+    "scenario": "读取超过 head 的修订",
+    "result": {
+      "error": "InvalidDocument",
+      "message": "read revision must be between zero and current head"
+    }
+  },
+  {
+    "id": "E4",
+    "scenario": "查询不存在的集合",
+    "result": {
+      "error": "NotFound",
+      "message": "unknown collection"
+    }
+  },
+  {
+    "id": "E5",
+    "scenario": "谓词使用未定义的操作符 like",
+    "result": {
+      "error": "InvalidDocument",
+      "message": "predicate must have field, op and value"
+    }
+  },
+  {
+    "id": "E6",
+    "scenario": "页大小 limit=0",
+    "result": {
+      "error": "InvalidDocument",
+      "message": "page size must be between 1 and 1000"
+    }
+  },
+  {
+    "id": "E7",
+    "scenario": "in 的候选值不是数组",
+    "result": {
+      "error": "InvalidDocument",
+      "message": "in requires an array"
+    }
+  },
+  {
+    "id": "E8",
+    "scenario": "把首页游标用于另一个谓词（游标绑定谓词摘要）",
+    "result": {
+      "error": "InvalidCursor",
+      "message": "cursor does not belong to this query/read revision"
+    }
+  }
+]

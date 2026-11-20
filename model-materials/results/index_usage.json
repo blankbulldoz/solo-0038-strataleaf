@@ -1,0 +1,385 @@
+{
+  "indexes": [
+    {
+      "name": "by_qty",
+      "field": "qty",
+      "unique": false
+    },
+    {
+      "name": "by_active",
+      "field": "active",
+      "unique": false
+    },
+    {
+      "name": "by_score",
+      "field": "profile.score",
+      "unique": false
+    }
+  ],
+  "unique_index_conflict": {
+    "error": "Conflict",
+    "message": "existing documents violate unique index"
+  },
+  "head_revision_at_battery": 4,
+  "comparison_at_head": [
+    {
+      "id": "A1",
+      "access": "version_scan",
+      "index": null,
+      "examined": 12,
+      "scan_access": "version_scan",
+      "scan_examined": 12,
+      "identical_results": true
+    },
+    {
+      "id": "A2",
+      "access": "version_scan",
+      "index": null,
+      "examined": 12,
+      "scan_access": "version_scan",
+      "scan_examined": 12,
+      "identical_results": true
+    },
+    {
+      "id": "A3",
+      "access": "version_scan",
+      "index": null,
+      "examined": 12,
+      "scan_access": "version_scan",
+      "scan_examined": 12,
+      "identical_results": true
+    },
+    {
+      "id": "A4",
+      "access": "version_scan",
+      "index": null,
+      "examined": 12,
+      "scan_access": "version_scan",
+      "scan_examined": 12,
+      "identical_results": true
+    },
+    {
+      "id": "A5",
+      "access": "version_scan",
+      "index": null,
+      "examined": 12,
+      "scan_access": "version_scan",
+      "scan_examined": 12,
+      "identical_results": true
+    },
+    {
+      "id": "B1",
+      "access": "equality_index",
+      "index": "by_qty",
+      "examined": 2,
+      "scan_access": "version_scan",
+      "scan_examined": 12,
+      "identical_results": true
+    },
+    {
+      "id": "B2",
+      "access": "equality_index",
+      "index": "by_qty",
+      "examined": 0,
+      "scan_access": "version_scan",
+      "scan_examined": 12,
+      "identical_results": true
+    },
+    {
+      "id": "B3",
+      "access": "equality_index",
+      "index": "by_active",
+      "examined": 0,
+      "scan_access": "version_scan",
+      "scan_examined": 12,
+      "identical_results": true
+    },
+    {
+      "id": "B4",
+      "access": "equality_index",
+      "index": "by_active",
+      "examined": 7,
+      "scan_access": "version_scan",
+      "scan_examined": 12,
+      "identical_results": true
+    },
+    {
+      "id": "B5",
+      "access": "version_scan",
+      "index": null,
+      "examined": 12,
+      "scan_access": "version_scan",
+      "scan_examined": 12,
+      "identical_results": true
+    },
+    {
+      "id": "B6",
+      "access": "version_scan",
+      "index": null,
+      "examined": 12,
+      "scan_access": "version_scan",
+      "scan_examined": 12,
+      "identical_results": true
+    },
+    {
+      "id": "C1",
+      "access": "version_scan",
+      "index": null,
+      "examined": 12,
+      "scan_access": "version_scan",
+      "scan_examined": 12,
+      "identical_results": true
+    },
+    {
+      "id": "C2",
+      "access": "equality_index",
+      "index": "by_score",
+      "examined": 4,
+      "scan_access": "version_scan",
+      "scan_examined": 12,
+      "identical_results": true
+    },
+    {
+      "id": "C3",
+      "access": "version_scan",
+      "index": null,
+      "examined": 12,
+      "scan_access": "version_scan",
+      "scan_examined": 12,
+      "identical_results": true
+    },
+    {
+      "id": "C4",
+      "access": "version_scan",
+      "index": null,
+      "examined": 12,
+      "scan_access": "version_scan",
+      "scan_examined": 12,
+      "identical_results": true
+    },
+    {
+      "id": "C5",
+      "access": "version_scan",
+      "index": null,
+      "examined": 12,
+      "scan_access": "version_scan",
+      "scan_examined": 12,
+      "identical_results": true
+    },
+    {
+      "id": "D1",
+      "access": "version_scan",
+      "index": null,
+      "examined": 12,
+      "scan_access": "version_scan",
+      "scan_examined": 12,
+      "identical_results": true
+    },
+    {
+      "id": "D2",
+      "access": "version_scan",
+      "index": null,
+      "examined": 12,
+      "scan_access": "version_scan",
+      "scan_examined": 12,
+      "identical_results": true
+    },
+    {
+      "id": "D3",
+      "access": "version_scan",
+      "index": null,
+      "examined": 12,
+      "scan_access": "version_scan",
+      "scan_examined": 12,
+      "identical_results": true
+    },
+    {
+      "id": "D4",
+      "access": "version_scan",
+      "index": null,
+      "examined": 12,
+      "scan_access": "version_scan",
+      "scan_examined": 12,
+      "identical_results": true
+    },
+    {
+      "id": "D5",
+      "access": "version_scan",
+      "index": null,
+      "examined": 12,
+      "scan_access": "version_scan",
+      "scan_examined": 12,
+      "identical_results": true
+    },
+    {
+      "id": "D6",
+      "access": "version_scan",
+      "index": null,
+      "examined": 12,
+      "scan_access": "version_scan",
+      "scan_examined": 12,
+      "identical_results": true
+    },
+    {
+      "id": "D7",
+      "access": "version_scan",
+      "index": null,
+      "examined": 12,
+      "scan_access": "version_scan",
+      "scan_examined": 12,
+      "identical_results": true
+    },
+    {
+      "id": "E1",
+      "access": "version_scan",
+      "index": null,
+      "examined": 12,
+      "scan_access": "version_scan",
+      "scan_examined": 12,
+      "identical_results": true
+    },
+    {
+      "id": "E2",
+      "access": "version_scan",
+      "index": null,
+      "examined": 12,
+      "scan_access": "version_scan",
+      "scan_examined": 12,
+      "identical_results": true
+    },
+    {
+      "id": "E3",
+      "access": "equality_index",
+      "index": "by_active",
+      "examined": 7,
+      "scan_access": "version_scan",
+      "scan_examined": 12,
+      "identical_results": true
+    },
+    {
+      "id": "E4",
+      "access": "version_scan",
+      "index": null,
+      "examined": 12,
+      "scan_access": "version_scan",
+      "scan_examined": 12,
+      "identical_results": true
+    },
+    {
+      "id": "E5",
+      "access": "version_scan",
+      "index": null,
+      "examined": 12,
+      "scan_access": "version_scan",
+      "scan_examined": 12,
+      "identical_results": true
+    }
+  ],
+  "historical_access": {
+    "1": [
+      "version_scan"
+    ],
+    "2": [
+      "version_scan"
+    ],
+    "3": [
+      "version_scan"
+    ]
+  },
+  "historical_note": "rev1–3 的全部谓词都走 version_scan：索引只服务当前 head，历史读回退版本扫描",
+  "scalar_tokens": [
+    {
+      "value": "null",
+      "token": "v:null",
+      "note": "null 是可索引标量（eq null 可走索引）"
+    },
+    {
+      "value": "true",
+      "token": "b:1",
+      "note": "布尔有独立命名空间 b:，与数值不相交"
+    },
+    {
+      "value": "false",
+      "token": "b:0",
+      "note": "布尔有独立命名空间 b:，与数值不相交"
+    },
+    {
+      "value": "0",
+      "token": "n:0",
+      "note": "数值命名空间 n:，整数直接表示"
+    },
+    {
+      "value": "1",
+      "token": "n:1",
+      "note": "数值命名空间 n:，整数直接表示"
+    },
+    {
+      "value": "1.0",
+      "token": "n:1",
+      "note": "整数值浮点与整数 1 共用同一 token n:1"
+    },
+    {
+      "value": "2.5",
+      "token": "n:2.5",
+      "note": "非整浮点保留完整表示"
+    },
+    {
+      "value": "\"1\"",
+      "token": "v:\"1\"",
+      "note": "字符串命名空间 v:，与数值/布尔不相交"
+    },
+    {
+      "value": "\"true\"",
+      "token": "v:\"true\"",
+      "note": "字符串命名空间 v:，与数值/布尔不相交"
+    },
+    {
+      "value": "\"red\"",
+      "token": "v:\"red\"",
+      "note": "字符串命名空间 v:，与数值/布尔不相交"
+    },
+    {
+      "value": "\"\"",
+      "token": "v:\"\"",
+      "note": "字符串命名空间 v:，与数值/布尔不相交"
+    },
+    {
+      "value": "[]",
+      "token": null,
+      "note": "数组与对象不产生 token，不可索引（eq 对象/数组只能全扫）"
+    },
+    {
+      "value": "[1]",
+      "token": null,
+      "note": "数组与对象不产生 token，不可索引（eq 对象/数组只能全扫）"
+    },
+    {
+      "value": "{}",
+      "token": null,
+      "note": "数组与对象不产生 token，不可索引（eq 对象/数组只能全扫）"
+    },
+    {
+      "value": "{\"a\": 1}",
+      "token": null,
+      "note": "数组与对象不产生 token，不可索引（eq 对象/数组只能全扫）"
+    }
+  ],
+  "integrity": {
+    "ok": true,
+    "issues": [],
+    "head": 5,
+    "floor": 0,
+    "counts": {
+      "collections": 1,
+      "versions": 16,
+      "commits": 5,
+      "index_defs": 3,
+      "index_values": 37,
+      "pins": 0,
+      "consumers": 0
+    },
+    "sqlite": [
+      "ok"
+    ]
+  }
+}
