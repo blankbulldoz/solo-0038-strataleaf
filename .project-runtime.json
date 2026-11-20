@@ -25,6 +25,10 @@
       "command": "python3 -m examples.workflows snapshot"
     },
     {
+      "workflow_id": "history",
+      "command": "python3 -m examples.workflows history"
+    },
+    {
       "workflow_id": "query",
       "command": "python3 -m examples.workflows query"
     },

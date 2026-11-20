@@ -4,7 +4,7 @@ from .catalog import Catalog
 from .diagnostics import Diagnostics
 from .feeds import ChangeFeed
 from .indexes import Indexes
-from .mvcc import read_record
+from .mvcc import read_history, read_record
 from .patch import patch_document
 from .query import QueryEngine
 from .replica import Replication
@@ -39,6 +39,10 @@ class Database:
 
     def get(self, collection, key, revision=None):
         return read_record(self._store, collection, key, revision)
+
+    def history(self, collection, key, since=None, until=None, limit=100, cursor=None):
+        """Resumably traverse a key's present/absent spans over a revision interval."""
+        return read_history(self._store, collection, key, since, until, limit, cursor)
 
     def query(self, collection, predicate=None, limit=100, cursor=None, revision=None, force_scan=False):
         return self._queries.select(collection, predicate, limit, cursor, revision, force_scan)

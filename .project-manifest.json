@@ -9,6 +9,7 @@
       "扫描已存文档后提交兼容模式",
       "多集合批次共用提交版本且失败零可见",
       "固定版本读取旧文档与删除边界",
+      "可继续的历史有效区间遍历与未知前缀",
       "谓词过滤与游标跨写入保持同一读版本",
       "当前索引候选与完整谓词结果一致",
       "完整提交交付与单调确认",
@@ -302,6 +303,25 @@
       "success": "固定版本读取旧文档与删除边界",
       "failure": "水位外读取拒绝",
       "verification": "python3 -m examples.workflows snapshot"
+    },
+    {
+      "id": "history",
+      "name": "历史区间遍历",
+      "entry": "Database.history",
+      "module_ids": [
+        "snapshot",
+        "cursor",
+        "codec",
+        "storage"
+      ],
+      "steps": [
+        "输入校验与读取已有事实",
+        "修订水位、版本可见性与墓碑",
+        "形成可观察结果"
+      ],
+      "success": "固定区间内有效与不存在时段可继续遍历且与单修订读取一致",
+      "failure": "区间外端点、越界修订与已回收覆盖明确拒绝或标注",
+      "verification": "python3 -m examples.workflows history"
     },
     {
       "id": "query",
