@@ -1,0 +1,210 @@
+{
+  "source": {
+    "database_id": "560f96f7-7ea4-4089-b5ca-21df9a6195a4",
+    "head": 23,
+    "floor": 6
+  },
+  "collections": {
+    "docs": {
+      "additional": true,
+      "fields": {
+        "n": "integer",
+        "seq": "integer",
+        "text": "string"
+      },
+      "required": [
+        "text"
+      ]
+    },
+    "refs": {
+      "additional": true,
+      "fields": {
+        "note": "string",
+        "target": "string"
+      },
+      "required": [
+        "target"
+      ]
+    }
+  },
+  "lifecycles": [
+    {
+      "request_id": "req-2",
+      "source": {
+        "collection": "docs",
+        "key": "D",
+        "lifecycle_ordinal": 1,
+        "lifecycle_origin": "commit",
+        "create_rev": 7,
+        "delete_rev": 8,
+        "content_rev": 7,
+        "delete_expected": 7,
+        "body_sha256": "ffec391596ed184768331f5ff04e5db229424bcc950c942518a5e5252c5fc5a2"
+      },
+      "target": {
+        "collection": "docs",
+        "key": "D#life1"
+      },
+      "document": {
+        "text": "delta-1"
+      }
+    },
+    {
+      "request_id": "req-3",
+      "source": {
+        "collection": "docs",
+        "key": "A",
+        "lifecycle_ordinal": 1,
+        "lifecycle_origin": "commit",
+        "create_rev": 9,
+        "delete_rev": 12,
+        "content_rev": 10,
+        "delete_expected": 10,
+        "body_sha256": "cab19b94062b34c6b0ee50fa9a5c8605392cadd213c9b5278280bc9908c469bd"
+      },
+      "target": {
+        "collection": "docs",
+        "key": "A#life1"
+      },
+      "document": {
+        "n": 2,
+        "text": "alpha-2"
+      }
+    },
+    {
+      "request_id": "req-4",
+      "source": {
+        "collection": "docs",
+        "key": "A",
+        "lifecycle_ordinal": 2,
+        "lifecycle_origin": "commit",
+        "create_rev": 13,
+        "delete_rev": 15,
+        "content_rev": 13,
+        "delete_expected": 13,
+        "body_sha256": "cab19b94062b34c6b0ee50fa9a5c8605392cadd213c9b5278280bc9908c469bd"
+      },
+      "target": {
+        "collection": "docs",
+        "key": "A#life2"
+      },
+      "document": {
+        "n": 2,
+        "text": "alpha-2"
+      }
+    },
+    {
+      "request_id": "req-5",
+      "source": {
+        "collection": "docs",
+        "key": "A",
+        "lifecycle_ordinal": 3,
+        "lifecycle_origin": "commit",
+        "create_rev": 16,
+        "delete_rev": 18,
+        "content_rev": 17,
+        "delete_expected": 17,
+        "body_sha256": "61263cd4816993519c93d6d71eb7ae4a96f25773b5e330190cc79ddfe656c1aa"
+      },
+      "target": {
+        "collection": "docs",
+        "key": "A#life3"
+      },
+      "document": {
+        "n": 1,
+        "text": "alpha-1"
+      }
+    }
+  ],
+  "references": [
+    {
+      "ref_key": "r1",
+      "write_rev": 11,
+      "original_target": "A",
+      "original_document": {
+        "note": "r1",
+        "target": "A"
+      },
+      "resolution": "resolved_recovered",
+      "imported": true,
+      "lifecycle_ordinal": 1,
+      "target_key": "A#life1",
+      "reason": "unique live lifecycle of docs/A at record revision 11 is recovered lifecycle 1"
+    },
+    {
+      "ref_key": "r2",
+      "write_rev": 14,
+      "original_target": "A",
+      "original_document": {
+        "note": "r2",
+        "target": "A"
+      },
+      "resolution": "resolved_recovered",
+      "imported": true,
+      "lifecycle_ordinal": 2,
+      "target_key": "A#life2",
+      "reason": "unique live lifecycle of docs/A at record revision 14 is recovered lifecycle 2"
+    },
+    {
+      "ref_key": "r3",
+      "write_rev": 20,
+      "original_target": "A",
+      "original_document": {
+        "note": "r3",
+        "target": "A"
+      },
+      "resolution": "resolved_live_at_head",
+      "imported": false,
+      "lifecycle_ordinal": 4,
+      "reason": "unique target is the currently live lifecycle; recovery scope is deleted lifecycles and references must not be wired to the current same-named document"
+    },
+    {
+      "ref_key": "r4",
+      "write_rev": 21,
+      "original_target": "B",
+      "original_document": {
+        "note": "r4",
+        "target": "B"
+      },
+      "resolution": "no_live_target",
+      "imported": false,
+      "reason": "target docs/B was not live at record revision 21: target key never existed (only a delete with expected=0 is retained)"
+    },
+    {
+      "ref_key": "r5",
+      "write_rev": 23,
+      "original_target": "D",
+      "original_document": {
+        "note": "r5",
+        "target": "D"
+      },
+      "resolution": "no_live_target",
+      "imported": false,
+      "reason": "target docs/D was not live at record revision 23: target was tombstoned at rev 8 and not recreated"
+    },
+    {
+      "ref_key": "rc",
+      "write_rev": 4,
+      "original_target": "C",
+      "original_document": {
+        "note": "rc",
+        "target": "C"
+      },
+      "resolution": "ambiguous",
+      "imported": false,
+      "reason": "record revision 4 < retained floor 6: target state at record time is unreadable; not wiring to any current or recovered document"
+    },
+    {
+      "ref_key": "rd",
+      "write_rev": 6,
+      "original_target": "D",
+      "original_document": {
+        "note": "rd",
+        "target": "D"
+      },
+      "resolution": "no_live_target",
+      "imported": false,
+      "reason": "target docs/D was not live at record revision 6: target key did not exist before rev 7 (create commit expected=0)"
+    }
+  ]
+}

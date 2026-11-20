@@ -1,0 +1,481 @@
+{
+  "ok": true,
+  "checks": [
+    {
+      "check": "source_state_stable_during_recovery",
+      "ok": true,
+      "detail": null
+    },
+    {
+      "check": "source_library_unchanged",
+      "ok": true,
+      "detail": {
+        "head": 23,
+        "floor": 6
+      }
+    },
+    {
+      "check": "recovered_request_set",
+      "ok": true,
+      "detail": {
+        "delivered": [
+          "req-2",
+          "req-3",
+          "req-4",
+          "req-5"
+        ],
+        "expected": [
+          "req-2",
+          "req-3",
+          "req-4",
+          "req-5"
+        ]
+      }
+    },
+    {
+      "check": "identity:req-2",
+      "ok": true,
+      "detail": {
+        "delivered": {
+          "key": "D",
+          "delete_rev": 8,
+          "content_rev": 7,
+          "lifecycle_ordinal": 1
+        },
+        "expected": {
+          "key": "D",
+          "delete_rev": 8,
+          "content_rev": 7,
+          "lifecycle_ordinal": 1
+        }
+      }
+    },
+    {
+      "check": "target_key:req-2",
+      "ok": true,
+      "detail": "D#life1"
+    },
+    {
+      "check": "body:req-2",
+      "ok": true,
+      "detail": {
+        "text": "delta-1"
+      }
+    },
+    {
+      "check": "identity:req-3",
+      "ok": true,
+      "detail": {
+        "delivered": {
+          "key": "A",
+          "delete_rev": 12,
+          "content_rev": 10,
+          "lifecycle_ordinal": 1
+        },
+        "expected": {
+          "key": "A",
+          "delete_rev": 12,
+          "content_rev": 10,
+          "lifecycle_ordinal": 1
+        }
+      }
+    },
+    {
+      "check": "target_key:req-3",
+      "ok": true,
+      "detail": "A#life1"
+    },
+    {
+      "check": "body:req-3",
+      "ok": true,
+      "detail": {
+        "n": 2,
+        "text": "alpha-2"
+      }
+    },
+    {
+      "check": "identity:req-4",
+      "ok": true,
+      "detail": {
+        "delivered": {
+          "key": "A",
+          "delete_rev": 15,
+          "content_rev": 13,
+          "lifecycle_ordinal": 2
+        },
+        "expected": {
+          "key": "A",
+          "delete_rev": 15,
+          "content_rev": 13,
+          "lifecycle_ordinal": 2
+        }
+      }
+    },
+    {
+      "check": "target_key:req-4",
+      "ok": true,
+      "detail": "A#life2"
+    },
+    {
+      "check": "body:req-4",
+      "ok": true,
+      "detail": {
+        "n": 2,
+        "text": "alpha-2"
+      }
+    },
+    {
+      "check": "identity:req-5",
+      "ok": true,
+      "detail": {
+        "delivered": {
+          "key": "A",
+          "delete_rev": 18,
+          "content_rev": 17,
+          "lifecycle_ordinal": 3
+        },
+        "expected": {
+          "key": "A",
+          "delete_rev": 18,
+          "content_rev": 17,
+          "lifecycle_ordinal": 3
+        }
+      }
+    },
+    {
+      "check": "target_key:req-5",
+      "ok": true,
+      "detail": "A#life3"
+    },
+    {
+      "check": "body:req-5",
+      "ok": true,
+      "detail": {
+        "n": 1,
+        "text": "alpha-1"
+      }
+    },
+    {
+      "check": "unretrieved_request_set",
+      "ok": true,
+      "detail": {
+        "delivered": [
+          "req-1",
+          "req-6",
+          "req-7"
+        ],
+        "expected": [
+          "req-1",
+          "req-6",
+          "req-7"
+        ]
+      }
+    },
+    {
+      "check": "unretrieved_status:req-1",
+      "ok": true,
+      "detail": "unretrievable"
+    },
+    {
+      "check": "unretrieved_status:req-6",
+      "ok": true,
+      "detail": "no_prior_content"
+    },
+    {
+      "check": "unretrieved_status:req-7",
+      "ok": true,
+      "detail": "not_found"
+    },
+    {
+      "check": "evidence_boundary_floor",
+      "ok": true,
+      "detail": {
+        "floor": 6,
+        "head": 23,
+        "retained_commits": "7..23",
+        "note": "commits at or below the floor are recycled and reads below the floor are rejected; facts in that range cannot be confirmed or derived"
+      }
+    },
+    {
+      "check": "reference_set",
+      "ok": true,
+      "detail": {
+        "delivered": [
+          "r1",
+          "r2",
+          "r3",
+          "r4",
+          "r5",
+          "rc",
+          "rd"
+        ],
+        "expected": [
+          "r1",
+          "r2",
+          "r3",
+          "r4",
+          "r5",
+          "rc",
+          "rd"
+        ]
+      }
+    },
+    {
+      "check": "reference_resolution:rc",
+      "ok": true,
+      "detail": {
+        "delivered": {
+          "resolution": "ambiguous",
+          "imported": false,
+          "target_key": null
+        },
+        "expected": {
+          "resolution": "ambiguous",
+          "imported": false
+        }
+      }
+    },
+    {
+      "check": "reference_resolution:rd",
+      "ok": true,
+      "detail": {
+        "delivered": {
+          "resolution": "no_live_target",
+          "imported": false,
+          "target_key": null
+        },
+        "expected": {
+          "resolution": "no_live_target",
+          "imported": false
+        }
+      }
+    },
+    {
+      "check": "reference_resolution:r1",
+      "ok": true,
+      "detail": {
+        "delivered": {
+          "resolution": "resolved_recovered",
+          "imported": true,
+          "target_key": "A#life1"
+        },
+        "expected": {
+          "resolution": "resolved_recovered",
+          "imported": true,
+          "target_key": "A#life1"
+        }
+      }
+    },
+    {
+      "check": "reference_resolution:r2",
+      "ok": true,
+      "detail": {
+        "delivered": {
+          "resolution": "resolved_recovered",
+          "imported": true,
+          "target_key": "A#life2"
+        },
+        "expected": {
+          "resolution": "resolved_recovered",
+          "imported": true,
+          "target_key": "A#life2"
+        }
+      }
+    },
+    {
+      "check": "reference_resolution:r3",
+      "ok": true,
+      "detail": {
+        "delivered": {
+          "resolution": "resolved_live_at_head",
+          "imported": false,
+          "target_key": null
+        },
+        "expected": {
+          "resolution": "resolved_live_at_head",
+          "imported": false
+        }
+      }
+    },
+    {
+      "check": "reference_resolution:r4",
+      "ok": true,
+      "detail": {
+        "delivered": {
+          "resolution": "no_live_target",
+          "imported": false,
+          "target_key": null
+        },
+        "expected": {
+          "resolution": "no_live_target",
+          "imported": false
+        }
+      }
+    },
+    {
+      "check": "reference_resolution:r5",
+      "ok": true,
+      "detail": {
+        "delivered": {
+          "resolution": "no_live_target",
+          "imported": false,
+          "target_key": null
+        },
+        "expected": {
+          "resolution": "no_live_target",
+          "imported": false
+        }
+      }
+    },
+    {
+      "check": "docs_line_count",
+      "ok": true,
+      "detail": 4
+    },
+    {
+      "check": "refs_line_count",
+      "ok": true,
+      "detail": 2
+    },
+    {
+      "check": "importable_body:D#life1",
+      "ok": true,
+      "detail": {
+        "text": "delta-1"
+      }
+    },
+    {
+      "check": "importable_body:A#life1",
+      "ok": true,
+      "detail": {
+        "n": 2,
+        "text": "alpha-2"
+      }
+    },
+    {
+      "check": "importable_body:A#life2",
+      "ok": true,
+      "detail": {
+        "n": 2,
+        "text": "alpha-2"
+      }
+    },
+    {
+      "check": "importable_body:A#life3",
+      "ok": true,
+      "detail": {
+        "n": 1,
+        "text": "alpha-1"
+      }
+    },
+    {
+      "check": "identical_bodies_keep_occurrences",
+      "ok": true,
+      "detail": [
+        "A#life1",
+        "A#life2"
+      ]
+    },
+    {
+      "check": "content_back_to_original_value",
+      "ok": true,
+      "detail": {
+        "n": 1,
+        "text": "alpha-1"
+      }
+    },
+    {
+      "check": "target_docs_key_set",
+      "ok": true,
+      "detail": [
+        "A#life1",
+        "A#life2",
+        "A#life3",
+        "D#life1"
+      ]
+    },
+    {
+      "check": "target_refs_key_set",
+      "ok": true,
+      "detail": [
+        "r1",
+        "r2"
+      ]
+    },
+    {
+      "check": "target_body:D#life1",
+      "ok": true,
+      "detail": null
+    },
+    {
+      "check": "target_body:A#life1",
+      "ok": true,
+      "detail": null
+    },
+    {
+      "check": "target_body:A#life2",
+      "ok": true,
+      "detail": null
+    },
+    {
+      "check": "target_body:A#life3",
+      "ok": true,
+      "detail": null
+    },
+    {
+      "check": "target_ref_absent:rc",
+      "ok": true,
+      "detail": null
+    },
+    {
+      "check": "target_ref_absent:rd",
+      "ok": true,
+      "detail": null
+    },
+    {
+      "check": "target_ref_wired:r1",
+      "ok": true,
+      "detail": {
+        "note": "r1",
+        "target": "A#life1"
+      }
+    },
+    {
+      "check": "target_ref_wired:r2",
+      "ok": true,
+      "detail": {
+        "note": "r2",
+        "target": "A#life2"
+      }
+    },
+    {
+      "check": "target_ref_absent:r3",
+      "ok": true,
+      "detail": null
+    },
+    {
+      "check": "target_ref_absent:r4",
+      "ok": true,
+      "detail": null
+    },
+    {
+      "check": "target_ref_absent:r5",
+      "ok": true,
+      "detail": null
+    },
+    {
+      "check": "no_wiring_to_current_document",
+      "ok": true,
+      "detail": null
+    },
+    {
+      "check": "target_head",
+      "ok": true,
+      "detail": 2
+    }
+  ],
+  "totals": {
+    "checks": 51,
+    "failed": 0
+  }
+}

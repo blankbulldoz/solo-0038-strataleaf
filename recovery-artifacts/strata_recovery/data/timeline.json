@@ -1,0 +1,262 @@
+{
+  "collections": {
+    "docs": {
+      "fields": {
+        "text": "string",
+        "seq": "integer",
+        "n": "integer"
+      },
+      "required": [
+        "text"
+      ]
+    },
+    "refs": {
+      "fields": {
+        "target": "string",
+        "note": "string"
+      },
+      "required": [
+        "target"
+      ]
+    }
+  },
+  "compact_target": 6,
+  "floor": 6,
+  "head": 23,
+  "events": [
+    {
+      "rev": 1,
+      "op": "put",
+      "collection": "docs",
+      "key": "C",
+      "body": {
+        "text": "gamma-1",
+        "seq": 1
+      },
+      "expected": 0
+    },
+    {
+      "rev": 2,
+      "op": "put",
+      "collection": "docs",
+      "key": "C",
+      "body": {
+        "text": "gamma-2",
+        "seq": 2
+      },
+      "expected": 1
+    },
+    {
+      "rev": 3,
+      "op": "delete",
+      "collection": "docs",
+      "key": "C",
+      "body": null,
+      "expected": 2
+    },
+    {
+      "rev": 4,
+      "op": "put",
+      "collection": "refs",
+      "key": "rc",
+      "body": {
+        "target": "C",
+        "note": "rc"
+      },
+      "expected": 0
+    },
+    {
+      "rev": 5,
+      "op": "put",
+      "collection": "docs",
+      "key": "C",
+      "body": {
+        "text": "gamma-3",
+        "seq": 3
+      },
+      "expected": 3
+    },
+    {
+      "rev": 6,
+      "op": "put",
+      "collection": "refs",
+      "key": "rd",
+      "body": {
+        "target": "D",
+        "note": "rd"
+      },
+      "expected": 0
+    },
+    {
+      "rev": 7,
+      "op": "put",
+      "collection": "docs",
+      "key": "D",
+      "body": {
+        "text": "delta-1"
+      },
+      "expected": 0
+    },
+    {
+      "rev": 8,
+      "op": "delete",
+      "collection": "docs",
+      "key": "D",
+      "body": null,
+      "expected": 7
+    },
+    {
+      "rev": 9,
+      "op": "put",
+      "collection": "docs",
+      "key": "A",
+      "body": {
+        "text": "alpha-1",
+        "n": 1
+      },
+      "expected": 0
+    },
+    {
+      "rev": 10,
+      "op": "put",
+      "collection": "docs",
+      "key": "A",
+      "body": {
+        "text": "alpha-2",
+        "n": 2
+      },
+      "expected": 9
+    },
+    {
+      "rev": 11,
+      "op": "put",
+      "collection": "refs",
+      "key": "r1",
+      "body": {
+        "target": "A",
+        "note": "r1"
+      },
+      "expected": 0
+    },
+    {
+      "rev": 12,
+      "op": "delete",
+      "collection": "docs",
+      "key": "A",
+      "body": null,
+      "expected": 10
+    },
+    {
+      "rev": 13,
+      "op": "put",
+      "collection": "docs",
+      "key": "A",
+      "body": {
+        "text": "alpha-2",
+        "n": 2
+      },
+      "expected": 12
+    },
+    {
+      "rev": 14,
+      "op": "put",
+      "collection": "refs",
+      "key": "r2",
+      "body": {
+        "target": "A",
+        "note": "r2"
+      },
+      "expected": 0
+    },
+    {
+      "rev": 15,
+      "op": "delete",
+      "collection": "docs",
+      "key": "A",
+      "body": null,
+      "expected": 13
+    },
+    {
+      "rev": 16,
+      "op": "put",
+      "collection": "docs",
+      "key": "A",
+      "body": {
+        "text": "alpha-3",
+        "n": 3
+      },
+      "expected": 15
+    },
+    {
+      "rev": 17,
+      "op": "put",
+      "collection": "docs",
+      "key": "A",
+      "body": {
+        "text": "alpha-1",
+        "n": 1
+      },
+      "expected": 16
+    },
+    {
+      "rev": 18,
+      "op": "delete",
+      "collection": "docs",
+      "key": "A",
+      "body": null,
+      "expected": 17
+    },
+    {
+      "rev": 19,
+      "op": "put",
+      "collection": "docs",
+      "key": "A",
+      "body": {
+        "text": "alpha-current",
+        "n": 4
+      },
+      "expected": 18
+    },
+    {
+      "rev": 20,
+      "op": "put",
+      "collection": "refs",
+      "key": "r3",
+      "body": {
+        "target": "A",
+        "note": "r3"
+      },
+      "expected": 0
+    },
+    {
+      "rev": 21,
+      "op": "put",
+      "collection": "refs",
+      "key": "r4",
+      "body": {
+        "target": "B",
+        "note": "r4"
+      },
+      "expected": 0
+    },
+    {
+      "rev": 22,
+      "op": "delete",
+      "collection": "docs",
+      "key": "B",
+      "body": null,
+      "expected": 0
+    },
+    {
+      "rev": 23,
+      "op": "put",
+      "collection": "refs",
+      "key": "r5",
+      "body": {
+        "target": "D",
+        "note": "r5"
+      },
+      "expected": 0
+    }
+  ]
+}

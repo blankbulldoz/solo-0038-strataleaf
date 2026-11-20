@@ -1,0 +1,46 @@
+{
+  "requests": [
+    {
+      "id": "req-1",
+      "collection": "docs",
+      "key": "C",
+      "delete_revision": 3
+    },
+    {
+      "id": "req-2",
+      "collection": "docs",
+      "key": "D",
+      "delete_revision": 8
+    },
+    {
+      "id": "req-3",
+      "collection": "docs",
+      "key": "A",
+      "delete_revision": 12
+    },
+    {
+      "id": "req-4",
+      "collection": "docs",
+      "key": "A",
+      "delete_revision": 15
+    },
+    {
+      "id": "req-5",
+      "collection": "docs",
+      "key": "A",
+      "delete_revision": 18
+    },
+    {
+      "id": "req-6",
+      "collection": "docs",
+      "key": "B",
+      "delete_revision": 22
+    },
+    {
+      "id": "req-7",
+      "collection": "docs",
+      "key": "A",
+      "delete_revision": 21
+    }
+  ]
+}

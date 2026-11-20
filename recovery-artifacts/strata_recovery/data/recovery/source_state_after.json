@@ -1,0 +1,28 @@
+{
+  "inspect": {
+    "ok": true,
+    "issues": [],
+    "head": 23,
+    "floor": 6,
+    "database_id": "560f96f7-7ea4-4089-b5ca-21df9a6195a4",
+    "mode": "primary",
+    "counts": {
+      "collections": 2,
+      "versions": 20,
+      "commits": 17,
+      "index_defs": 0,
+      "index_values": 0,
+      "pins": 0,
+      "consumers": 0
+    },
+    "sqlite": [
+      "ok"
+    ],
+    "foreign_keys": []
+  },
+  "fingerprint": {
+    "revision": 23,
+    "documents": 9,
+    "sha256": "6155c35a19e56875cc5273bbccb7c7f4811fb83e27a1045227fa5b8315a89f18"
+  }
+}

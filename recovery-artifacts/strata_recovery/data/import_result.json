@@ -1,0 +1,15 @@
+{
+  "target_db": "/tmp/strata_recovery/data/isolated/target.db",
+  "docs_import": {
+    "revision": 1,
+    "count": 4,
+    "replayed": false
+  },
+  "refs_import": {
+    "revision": 2,
+    "count": 2,
+    "replayed": false
+  },
+  "head": 2,
+  "ok": true
+}
