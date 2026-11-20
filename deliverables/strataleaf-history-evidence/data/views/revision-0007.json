@@ -1,0 +1,67 @@
+{
+  "format": "strataleaf-history-evidence/1",
+  "record_kind": "historical_read_view",
+  "record_kind_zh": "历史读视图（固定修订的可见文档快照）",
+  "description_zh": "该文件只描述指定读修订下的可见文档；actual_version 是该文档在版本链中的实际修订号。",
+  "collection": "segments",
+  "read_revision": 7,
+  "source_api": "Database.query(collection, revision=read_revision, limit=1000)",
+  "predicate": null,
+  "fingerprint": {
+    "revision": 7,
+    "documents": 4,
+    "sha256": "c91f987538b3ba5bda72b9d169001c4d61fd2d8c8276b56b5de3627ed3486f4d"
+  },
+  "document_count": 4,
+  "records": [
+    {
+      "key": "seg_center_06",
+      "actual_version": 7,
+      "document": {
+        "label": "updated",
+        "region": "center",
+        "sequence": 66
+      },
+      "expires_at": null,
+      "content_sha256": "cc02234e3a3471146f8312879766039fc6c90302cbcb0187f15570065f628687"
+    },
+    {
+      "key": "seg_east_01",
+      "actual_version": 3,
+      "document": {
+        "label": "baseline",
+        "region": "east",
+        "sequence": 1
+      },
+      "expires_at": null,
+      "content_sha256": "2de3b9f45adcd74fbda5a35b2daef33d39e7da61cbf191da50d72d8c7d0e13d5"
+    },
+    {
+      "key": "seg_legacy_05",
+      "actual_version": 3,
+      "document": {
+        "label": "revised",
+        "region": "east",
+        "sequence": 55
+      },
+      "expires_at": null,
+      "content_sha256": "15246680325c94a6b1a409381e4cc2302ed9d4394f7689e8c672dcda83d1c0d3"
+    },
+    {
+      "key": "seg_west_02",
+      "actual_version": 5,
+      "document": {
+        "label": "baseline",
+        "region": "west",
+        "sequence": 2
+      },
+      "expires_at": null,
+      "content_sha256": "94c7470029dc2672ffdeb2485102bf35aa67a95a0cec6a69a3b3a21add21577b"
+    }
+  ],
+  "absent_keys": [
+    "seg_north_03",
+    "seg_south_04"
+  ],
+  "absence_note_zh": "absent_keys 可能是尚未创建或已被墓碑隐藏；逐键原因见 data/document-inventory.json。"
+}

@@ -1,0 +1,93 @@
+{
+  "format": "strataleaf-history-evidence/1",
+  "record_kind": "key_explanation",
+  "record_kind_zh": "同内容异版本解释（派生说明）",
+  "description_zh": "列出端点内容相同但实际版本不同、且中间发生过变化的键，并给出各中间版本与所属提交。",
+  "derivation_zh": "端点取自 data/views/*.json 的可见记录；中间版本取自 data/document-inventory.json。",
+  "explanations": [
+    {
+      "key": "seg_east_01",
+      "explanation_type": "same_endpoint_content_different_actual_version",
+      "endpoint_definition_zh": "端点为该键在所选读视图中的首次可见记录与末次可见记录。",
+      "first_endpoint": {
+        "view_revision": 1,
+        "actual_version": 1,
+        "content_sha256": "2de3b9f45adcd74fbda5a35b2daef33d39e7da61cbf191da50d72d8c7d0e13d5"
+      },
+      "last_endpoint": {
+        "view_revision": 7,
+        "actual_version": 3,
+        "content_sha256": "2de3b9f45adcd74fbda5a35b2daef33d39e7da61cbf191da50d72d8c7d0e13d5"
+      },
+      "same_content_but_different_version": true,
+      "intermediate_versions": [
+        {
+          "actual_version": 2,
+          "commit_revision": 2,
+          "commit_request_key": "revise_alpha_north",
+          "operation_index": 0,
+          "operation": "put",
+          "status": "rewritten",
+          "document": {
+            "label": "interim",
+            "region": "east",
+            "sequence": 11
+          },
+          "expires_at": null,
+          "content_sha256": "b507b74e395270338a666bc91a510fdb00d7cb855b760569f95f7254b7b9d337",
+          "api_confirmation": {
+            "outcome": "record_returned",
+            "observed": {
+              "collection": "segments",
+              "key": "seg_east_01",
+              "revision": 2,
+              "document": {
+                "label": "interim",
+                "region": "east",
+                "sequence": 11
+              },
+              "expires_at": null
+            }
+          }
+        }
+      ],
+      "why_zh": "首末端点内容哈希相同，但 actual_version 不同；中间版本发生过变化。因此内容哈希只能说明“内容相同”，不能替代版本号或提交号。",
+      "recipient_rule_zh": "引用该键时必须同时给出 actual_version 与 commit_revision；若只说“内容相同”，会掩盖中间删除或改写。"
+    },
+    {
+      "key": "seg_west_02",
+      "explanation_type": "same_endpoint_content_different_actual_version",
+      "endpoint_definition_zh": "端点为该键在所选读视图中的首次可见记录与末次可见记录。",
+      "first_endpoint": {
+        "view_revision": 1,
+        "actual_version": 1,
+        "content_sha256": "94c7470029dc2672ffdeb2485102bf35aa67a95a0cec6a69a3b3a21add21577b"
+      },
+      "last_endpoint": {
+        "view_revision": 7,
+        "actual_version": 5,
+        "content_sha256": "94c7470029dc2672ffdeb2485102bf35aa67a95a0cec6a69a3b3a21add21577b"
+      },
+      "same_content_but_different_version": true,
+      "intermediate_versions": [
+        {
+          "actual_version": 4,
+          "commit_revision": 4,
+          "commit_request_key": "retire_west",
+          "operation_index": 0,
+          "operation": "delete",
+          "status": "deleted",
+          "document": null,
+          "expires_at": null,
+          "content_sha256": null,
+          "api_confirmation": {
+            "outcome": "tombstone_hides_document",
+            "observed": null
+          }
+        }
+      ],
+      "why_zh": "首末端点内容哈希相同，但 actual_version 不同；中间版本发生过变化。因此内容哈希只能说明“内容相同”，不能替代版本号或提交号。",
+      "recipient_rule_zh": "引用该键时必须同时给出 actual_version 与 commit_revision；若只说“内容相同”，会掩盖中间删除或改写。"
+    }
+  ]
+}

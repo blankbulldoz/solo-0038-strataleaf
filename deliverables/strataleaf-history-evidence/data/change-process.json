@@ -1,0 +1,257 @@
+{
+  "format": "strataleaf-history-evidence/1",
+  "record_kind": "change_process",
+  "record_kind_zh": "变更过程记录（不是历史读视图）",
+  "description_zh": "按提交修订列出每个操作；回答“哪个提交对哪个键做了什么”，不回答“某个修订可见什么”。",
+  "source_api": "Database.feed.read(since=0, limit=1000)",
+  "commit_request_key_source_zh": "提交记录本身不携带 request_key；此处由本材料生成时的 Database.batch(request_key).commit() 回执补充映射。",
+  "commits": [
+    {
+      "revision": 1,
+      "commit_request_key": "seed_baseline",
+      "operation_count": 5,
+      "operations": [
+        {
+          "operation_index": 0,
+          "action": "put",
+          "collection": "segments",
+          "key": "seg_east_01",
+          "document": {
+            "label": "baseline",
+            "region": "east",
+            "sequence": 1
+          },
+          "expected": 0,
+          "expires_at": null,
+          "content_sha256": "2de3b9f45adcd74fbda5a35b2daef33d39e7da61cbf191da50d72d8c7d0e13d5"
+        },
+        {
+          "operation_index": 1,
+          "action": "put",
+          "collection": "segments",
+          "key": "seg_west_02",
+          "document": {
+            "label": "baseline",
+            "region": "west",
+            "sequence": 2
+          },
+          "expected": 0,
+          "expires_at": null,
+          "content_sha256": "94c7470029dc2672ffdeb2485102bf35aa67a95a0cec6a69a3b3a21add21577b"
+        },
+        {
+          "operation_index": 2,
+          "action": "put",
+          "collection": "segments",
+          "key": "seg_north_03",
+          "document": {
+            "label": "baseline",
+            "region": "north",
+            "sequence": 3
+          },
+          "expected": 0,
+          "expires_at": null,
+          "content_sha256": "952f156a2bb861607ad7d29394ac3afd40f2bb27c638668f01463215013001b9"
+        },
+        {
+          "operation_index": 3,
+          "action": "put",
+          "collection": "segments",
+          "key": "seg_south_04",
+          "document": {
+            "label": "baseline",
+            "region": "south",
+            "sequence": 4
+          },
+          "expected": 0,
+          "expires_at": null,
+          "content_sha256": "86c3e0a6067f65e6dc1ce9dc45feaa5ab45f56bf26fca900e0201dc241ed75c6"
+        },
+        {
+          "operation_index": 4,
+          "action": "put",
+          "collection": "segments",
+          "key": "seg_legacy_05",
+          "document": {
+            "label": "baseline",
+            "region": "east",
+            "sequence": 5
+          },
+          "expected": 0,
+          "expires_at": null,
+          "content_sha256": "19b681c9027db85f936b4e93cc38548a7998254b085223927345fc114bda8e0c"
+        }
+      ]
+    },
+    {
+      "revision": 2,
+      "commit_request_key": "revise_alpha_north",
+      "operation_count": 2,
+      "operations": [
+        {
+          "operation_index": 0,
+          "action": "put",
+          "collection": "segments",
+          "key": "seg_east_01",
+          "document": {
+            "label": "interim",
+            "region": "east",
+            "sequence": 11
+          },
+          "expected": 1,
+          "expires_at": null,
+          "content_sha256": "b507b74e395270338a666bc91a510fdb00d7cb855b760569f95f7254b7b9d337"
+        },
+        {
+          "operation_index": 1,
+          "action": "put",
+          "collection": "segments",
+          "key": "seg_north_03",
+          "document": {
+            "label": "revised",
+            "region": "north",
+            "sequence": 33
+          },
+          "expected": 1,
+          "expires_at": null,
+          "content_sha256": "d4e50d82b8a8cb22c2413aa4860e92fc970553849737cad67bfc1442b1892406"
+        }
+      ]
+    },
+    {
+      "revision": 3,
+      "commit_request_key": "restore_alpha_revise_legacy",
+      "operation_count": 2,
+      "operations": [
+        {
+          "operation_index": 0,
+          "action": "put",
+          "collection": "segments",
+          "key": "seg_east_01",
+          "document": {
+            "label": "baseline",
+            "region": "east",
+            "sequence": 1
+          },
+          "expected": 2,
+          "expires_at": null,
+          "content_sha256": "2de3b9f45adcd74fbda5a35b2daef33d39e7da61cbf191da50d72d8c7d0e13d5"
+        },
+        {
+          "operation_index": 1,
+          "action": "put",
+          "collection": "segments",
+          "key": "seg_legacy_05",
+          "document": {
+            "label": "revised",
+            "region": "east",
+            "sequence": 55
+          },
+          "expected": 1,
+          "expires_at": null,
+          "content_sha256": "15246680325c94a6b1a409381e4cc2302ed9d4394f7689e8c672dcda83d1c0d3"
+        }
+      ]
+    },
+    {
+      "revision": 4,
+      "commit_request_key": "retire_west",
+      "operation_count": 1,
+      "operations": [
+        {
+          "operation_index": 0,
+          "action": "delete",
+          "collection": "segments",
+          "key": "seg_west_02",
+          "document": null,
+          "expected": 1,
+          "expires_at": null,
+          "content_sha256": null
+        }
+      ]
+    },
+    {
+      "revision": 5,
+      "commit_request_key": "recreate_west",
+      "operation_count": 1,
+      "operations": [
+        {
+          "operation_index": 0,
+          "action": "put",
+          "collection": "segments",
+          "key": "seg_west_02",
+          "document": {
+            "label": "baseline",
+            "region": "west",
+            "sequence": 2
+          },
+          "expected": 4,
+          "expires_at": null,
+          "content_sha256": "94c7470029dc2672ffdeb2485102bf35aa67a95a0cec6a69a3b3a21add21577b"
+        }
+      ]
+    },
+    {
+      "revision": 6,
+      "commit_request_key": "retire_south_add_center",
+      "operation_count": 2,
+      "operations": [
+        {
+          "operation_index": 0,
+          "action": "delete",
+          "collection": "segments",
+          "key": "seg_south_04",
+          "document": null,
+          "expected": 1,
+          "expires_at": null,
+          "content_sha256": null
+        },
+        {
+          "operation_index": 1,
+          "action": "put",
+          "collection": "segments",
+          "key": "seg_center_06",
+          "document": {
+            "label": "new",
+            "region": "center",
+            "sequence": 6
+          },
+          "expected": 0,
+          "expires_at": null,
+          "content_sha256": "27bec1aa653f2c58f21da06ecbb89fcaba227a6e5c8b0b008ae53c7157e53c88"
+        }
+      ]
+    },
+    {
+      "revision": 7,
+      "commit_request_key": "final_touch",
+      "operation_count": 2,
+      "operations": [
+        {
+          "operation_index": 0,
+          "action": "delete",
+          "collection": "segments",
+          "key": "seg_north_03",
+          "document": null,
+          "expected": 2,
+          "expires_at": null,
+          "content_sha256": null
+        },
+        {
+          "operation_index": 1,
+          "action": "put",
+          "collection": "segments",
+          "key": "seg_center_06",
+          "document": {
+            "label": "updated",
+            "region": "center",
+            "sequence": 66
+          },
+          "expected": 6,
+          "expires_at": null,
+          "content_sha256": "cc02234e3a3471146f8312879766039fc6c90302cbcb0187f15570065f628687"
+        }
+      ]
+    }
+  ]
+}

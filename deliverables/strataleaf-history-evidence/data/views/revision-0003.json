@@ -1,0 +1,77 @@
+{
+  "format": "strataleaf-history-evidence/1",
+  "record_kind": "historical_read_view",
+  "record_kind_zh": "历史读视图（固定修订的可见文档快照）",
+  "description_zh": "该文件只描述指定读修订下的可见文档；actual_version 是该文档在版本链中的实际修订号。",
+  "collection": "segments",
+  "read_revision": 3,
+  "source_api": "Database.query(collection, revision=read_revision, limit=1000)",
+  "predicate": null,
+  "fingerprint": {
+    "revision": 3,
+    "documents": 5,
+    "sha256": "8da87a3b61320ef814e537520cf43a2c17e89c917b97d08bc2be143aafab46ba"
+  },
+  "document_count": 5,
+  "records": [
+    {
+      "key": "seg_east_01",
+      "actual_version": 3,
+      "document": {
+        "label": "baseline",
+        "region": "east",
+        "sequence": 1
+      },
+      "expires_at": null,
+      "content_sha256": "2de3b9f45adcd74fbda5a35b2daef33d39e7da61cbf191da50d72d8c7d0e13d5"
+    },
+    {
+      "key": "seg_legacy_05",
+      "actual_version": 3,
+      "document": {
+        "label": "revised",
+        "region": "east",
+        "sequence": 55
+      },
+      "expires_at": null,
+      "content_sha256": "15246680325c94a6b1a409381e4cc2302ed9d4394f7689e8c672dcda83d1c0d3"
+    },
+    {
+      "key": "seg_north_03",
+      "actual_version": 2,
+      "document": {
+        "label": "revised",
+        "region": "north",
+        "sequence": 33
+      },
+      "expires_at": null,
+      "content_sha256": "d4e50d82b8a8cb22c2413aa4860e92fc970553849737cad67bfc1442b1892406"
+    },
+    {
+      "key": "seg_south_04",
+      "actual_version": 1,
+      "document": {
+        "label": "baseline",
+        "region": "south",
+        "sequence": 4
+      },
+      "expires_at": null,
+      "content_sha256": "86c3e0a6067f65e6dc1ce9dc45feaa5ab45f56bf26fca900e0201dc241ed75c6"
+    },
+    {
+      "key": "seg_west_02",
+      "actual_version": 1,
+      "document": {
+        "label": "baseline",
+        "region": "west",
+        "sequence": 2
+      },
+      "expires_at": null,
+      "content_sha256": "94c7470029dc2672ffdeb2485102bf35aa67a95a0cec6a69a3b3a21add21577b"
+    }
+  ],
+  "absent_keys": [
+    "seg_center_06"
+  ],
+  "absence_note_zh": "absent_keys 可能是尚未创建或已被墓碑隐藏；逐键原因见 data/document-inventory.json。"
+}
