@@ -1,0 +1,28 @@
+{
+  "schema_version": 1,
+  "kind": "off-repository artifact index",
+  "index_author": "acceptance runner, not the model",
+  "sample_author": "model session",
+  "session_id": "04c1070a-e60e-4c32-9468-4b72a983c6c4",
+  "prompt_id": "d4c24fc9-4911-442b-bbcb-b882e63d9065",
+  "trace_sha256": "9b73ab188b3955b44e9663aed032ea45e1c22c1ec85de1fc2d34eb8f4d5f7987",
+  "archive_package": "model-sample/",
+  "container_path": "/tmp/strataleaf-intake",
+  "files_sha256": {
+    "out/RUNBOOK.md": "c0b9dc34ef3a7e4e0c0d3f7e1521ad88546178311d092659203ead3a227f1b62",
+    "out/adjudication_report.json": "a3ad62fabfc17d5716abbf3ec258cce06d55d1592dc316b680084a26fdef3dbc",
+    "out/confirmed_import.jsonl": "af772f2ba7a17df865ba496e731e9b39e326c073ff4332d65ff7be98c1496417",
+    "out/intake_policy.md": "39a2c231597040229c6a0a52100edd734cc6b7cf32964f9bd83badf9eb7cf2ae",
+    "out/intake_verification.json": "2c833743d4068b411fee95b8cf7188b375ca070096fa7efdd73091c3337315f0",
+    "out/lineage.json": "15150188571490a38992d34f18e1504d9db48a065471cb758308026b141ca219",
+    "out/naive_comparison.json": "a5e37a8481abb0ae8cb5177ce254d5b3aa8a4666a9d1963a9d635b39909ccc11",
+    "out/pending_decisions.json": "73e8b74cfcdfbf61a7d75504dc4f6f47330330494b34ab1af734e34c8b7bcb03",
+    "run/intake.db": "c3414cc3b6ddd2e673256fe292166a6d75864ea403804728a3d31d2eaae31a0e",
+    "scripts/adjudicate.py": "c2359cf77222cae8895f869c2247f04fc9aed7f3a45f6c8d4c59accfa190d317",
+    "scripts/compare_naive.py": "fba463b8fc5835bce70d2c1e8d4c1fa4b3306dc08a6e4997ccf793f22b4953da",
+    "scripts/ingest_and_verify.py": "4ea0d9ae35dcc9033216fa1d2763f962558d36968176610b650e06387e6d1325",
+    "sources/alpha/feed.json": "2ad71fae50b56ca9a08064d375ef85522df0ca8a5be89af055e92d260b16df26",
+    "sources/bravo/feed.json": "eb9e62be502ef64a2d6d6c259c17397b500e6674ac7895a7d84e64361f45292e",
+    "sources/charlie/feed.json": "e7ce00d52ca5de2b05a5216945509d4e247e2cad5c9682c9cf7ad096e6a0be97"
+  }
+}
