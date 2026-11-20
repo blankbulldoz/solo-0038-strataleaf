@@ -1,7 +1,8 @@
+from .adjudication import UniqueOccupation
 from .codec import digest, dumps, loads
-from .errors import Conflict, ReplicationError
-from .indexes import refresh_document
-from .mvcc import checked_revision
+from .errors import ReplicationError
+from .indexes import projection_entries, replace_projection
+from .mvcc import checked_revision, visible_rows
 
 
 class Replication:
@@ -59,10 +60,18 @@ class Replication:
                     applied += 1
                 self.store.set("head", body["through"])
                 self.store.set("catalog_epoch", body["catalog_epoch"] if body["through"] == body["head"] else -1)
-                from .mvcc import visible_rows
+                occupation = UniqueOccupation()
                 for collection in connection.execute("SELECT name FROM collections").fetchall():
+                    definitions = connection.execute(
+                        "SELECT name,field,unique_flag FROM index_defs WHERE collection=?", (collection[0],)).fetchall()
+                    fields = [(row["name"], row["field"]) for row in definitions]
+                    unique = {row["name"] for row in definitions if row["unique_flag"]}
                     for row in visible_rows(connection, collection[0], body["through"]):
-                        refresh_document(connection, collection[0], row["key"], loads(row["body"]))
+                        entries = projection_entries(loads(row["body"]), fields)
+                        for index_name, token in entries:
+                            if index_name in unique:
+                                occupation.claim(collection[0], row["key"], index_name, token)
+                        replace_projection(connection, collection[0], row["key"], entries)
                 return {"revision": body["through"], "applied": applied}
         except (KeyError, TypeError, ValueError) as exc:
             raise ReplicationError("malformed replication envelope") from exc

@@ -3,20 +3,25 @@ from .errors import Conflict, InvalidDocument, NotFound
 from .mvcc import visible_rows
 
 
-def refresh_document(connection, collection, key, document):
-    connection.execute("DELETE FROM index_values WHERE collection=? AND key=?", (collection, key))
+def projection_entries(document, definitions):
+    """Pure projection math: the (index name, token) pairs a document
+    contributes for the given (name, field) definitions, in definition order."""
     if document is None:
-        return
-    for definition in connection.execute("SELECT * FROM index_defs WHERE collection=?", (collection,)).fetchall():
-        token = scalar_token(field(document, definition["field"]))
-        if token is None:
-            continue
-        if definition["unique_flag"]:
-            existing = connection.execute("SELECT key FROM index_values WHERE collection=? AND name=? AND token=? LIMIT 1",
-                                          (collection, definition["name"], token)).fetchone()
-            if existing:
-                raise Conflict("unique index conflict: " + definition["name"])
-        connection.execute("INSERT INTO index_values VALUES (?,?,?,?)", (collection, definition["name"], token, key))
+        return ()
+    entries = []
+    for index_name, path in definitions:
+        token = scalar_token(field(document, path))
+        if token is not None:
+            entries.append((index_name, token))
+    return tuple(entries)
+
+
+def replace_projection(connection, collection, key, entries):
+    """Persistence only: replace a key's projection rows with the given
+    entries. Acceptability is ruled elsewhere; this writer decides nothing."""
+    connection.execute("DELETE FROM index_values WHERE collection=? AND key=?", (collection, key))
+    for index_name, token in entries:
+        connection.execute("INSERT INTO index_values VALUES (?,?,?,?)", (collection, index_name, token, key))
 
 
 class Indexes:

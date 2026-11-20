@@ -1,10 +1,9 @@
 import math
 from dataclasses import dataclass
+from .adjudication import Replay, decide
 from .codec import digest, dumps, key as checked_key, loads, name
-from .errors import Conflict, InvalidDocument, NotFound
-from .indexes import refresh_document
-from .mvcc import latest_row
-from .schema import validate_document
+from .errors import Conflict, InvalidDocument
+from .journal import apply_plan, load_facts
 
 
 @dataclass(frozen=True)
@@ -61,38 +60,14 @@ class WriteBatch:
         fingerprint = digest(self.operations)
         try:
             with self.store.atomic(writable=True) as connection:
-                if self.request_key is not None:
-                    prior = connection.execute("SELECT * FROM receipts WHERE request_key=?", (self.request_key,)).fetchone()
-                    if prior:
-                        if prior["request_hash"] != fingerprint:
-                            raise Conflict("request key was used with different operations")
-                        self.state = "committed"
-                        return CommitResult(prior["rev"], prior["count"], True)
-                head = int(self.store.get("head"))
-                for op in self.operations:
-                    schema = connection.execute("SELECT schema FROM collections WHERE name=?", (op["collection"],)).fetchone()
-                    if schema is None:
-                        raise NotFound("unknown collection: " + op["collection"])
-                    old = latest_row(connection, op["collection"], op["key"], head)
-                    current = old["rev"] if old is not None else 0
-                    if op["expected"] is not None and op["expected"] != current:
-                        raise Conflict(f"revision conflict for {op['collection']}/{op['key']}: expected {op['expected']}, found {current}")
-                    if op["document"] is not None:
-                        validate_document(op["document"], loads(schema[0]))
-                revision = head + 1
-                for op in self.operations:
-                    body = dumps(op["document"]) if op["document"] is not None else None
-                    connection.execute("INSERT INTO versions VALUES (?,?,?,?,?)",
-                                       (op["collection"], op["key"], revision, body, op["expires_at"]))
-                    refresh_document(connection, op["collection"], op["key"], op["document"])
-                payload = {"revision": revision, "operations": self.operations}
-                connection.execute("INSERT INTO commits VALUES (?,?,?,?)",
-                                   (revision, dumps(payload), self.request_key, fingerprint))
-                if self.request_key is not None:
-                    connection.execute("INSERT INTO receipts VALUES (?,?,?,?)", (self.request_key, revision, fingerprint, len(self.operations)))
-                self.store.set("head", revision)
+                facts = load_facts(connection, self.operations, self.request_key)
+                ruling = decide(facts, self.operations, self.request_key, fingerprint)
+                if isinstance(ruling, Replay):
+                    self.state = "committed"
+                    return CommitResult(ruling.revision, ruling.count, True)
+                apply_plan(connection, ruling)
         except BaseException:
             self.state = "aborted"
             raise
         self.state = "committed"
-        return CommitResult(revision, len(self.operations))
+        return CommitResult(ruling.revision, ruling.count)

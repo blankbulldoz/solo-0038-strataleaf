@@ -10,7 +10,7 @@
 
 ## 职责划分
 
-`storage` 拥有连接、WAL 与提交边界；`codec` 负责 JSON 表示及键路径语义；`schema` 负责文档约束；`catalog` 拥有集合当前模式；`transaction` 负责写前置条件与提交回执；`mvcc` 负责版本可见性；`indexes` 拥有当前索引投影；`predicates` 定义筛选语义；`query` 与 `cursors` 协同固定读取视图；`feeds` 拥有消费者确认；`retention` 计算水位和显式到期删除；`archive` 负责完整数据库快照；`replica` 解释提交连续性与目录时序；`aggregate` 计算固定读版本分组；`patch` 负责合并语义及条件写入；`transfer` 管理逻辑文档流；`diagnostics` 比较当前版本与物化索引；`database` 提供组合 API。
+`storage` 拥有连接、WAL 与提交边界；`codec` 负责 JSON 表示及键路径语义；`schema` 负责文档约束；`catalog` 拥有集合当前模式；`transaction` 维护写批次状态并编排提交；`adjudication` 依据同一事实快照裁决批次重放、拒绝或生成提交计划；`journal` 负责裁决事实读取与提交计划的 SQLite 落盘，不作可接受性判断；`mvcc` 负责版本可见性；`indexes` 拥有当前索引投影；`predicates` 定义筛选语义；`query` 与 `cursors` 协同固定读取视图；`feeds` 拥有消费者确认；`retention` 计算水位和显式到期删除；`archive` 负责完整数据库快照；`replica` 解释提交连续性与目录时序；`aggregate` 计算固定读版本分组；`patch` 负责合并语义及条件写入；`transfer` 管理逻辑文档流；`diagnostics` 比较当前版本与物化索引；`database` 提供组合 API。
 
 ## 完整工作流
 
