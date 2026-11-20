@@ -45,7 +45,36 @@ def retention_pressure(folder):
         return {'both_holds': both, 'one_hold': one, 'released': none, 'inspection': db.diagnostics.inspect(True)}
 
 
+def numeric_modes(folder):
+    """Show how the same historical rows behave under each numeric mode."""
+    with Database(folder / 'observe.db') as db:
+        seed(db)
+        db.catalog.create('weights', {'fields': {'bucket': 'string'}})
+        db.batch().put('weights', 'w1', {'bucket': 'rounding', 'value': 1e16}).put(
+            'weights', 'w2', {'bucket': 'rounding', 'value': 1.0}).put(
+            'weights', 'w3', {'bucket': 'rounding', 'value': -1e16}).put(
+            'weights', 'w4', {'bucket': 'big', 'value': 10**30}).put(
+            'weights', 'w5', {'bucket': 'big', 'value': 1}).put(
+            'weights', 'w6', {'bucket': 'mixed', 'value': True}).put(
+            'weights', 'w7', {'bucket': 'mixed'}).put(
+            'weights', 'w8', {'bucket': 'sparse'}).commit()
+        revision = db.revision
+        observations = {}
+        for mode in ('native', 'float', 'exact'):
+            result = db.aggregates.group('weights', 'bucket', 'value', revision=revision, numeric=mode)
+            observations[mode] = {
+                'summary': result['summary'],
+                'groups': {group['key']: {name: group[name] for name in
+                                          ('sum', 'average', 'min', 'max', 'numeric_count', 'invalid_measure_count')}
+                           for group in result['groups']},
+                'reasons': sorted({(error['group'], error['reason']) for error in result['errors']}),
+            }
+        return {'revision': revision, 'modes': observations,
+                'head_unchanged': db.revision == revision}
+
+
 if __name__ == '__main__':
     with tempfile.TemporaryDirectory(prefix='strataleaf-observation-') as directory:
-        operation = {'contention': contention, 'retention_pressure': retention_pressure}[sys.argv[1]]
+        operation = {'contention': contention, 'retention_pressure': retention_pressure,
+                     'numeric_modes': numeric_modes}[sys.argv[1]]
         print(json.dumps(operation(Path(directory)), ensure_ascii=False, sort_keys=True))
