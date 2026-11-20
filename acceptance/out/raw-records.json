@@ -1,0 +1,71 @@
+{
+  "collection": "loose_samples",
+  "records": [
+    {
+      "sensor": "s1",
+      "record_key": "r1",
+      "source": {
+        "system": "logger-a",
+        "source_key": "logger-a:r1"
+      },
+      "value": "21.5",
+      "unit": "C",
+      "time": "2026-11-18T08:00:00+08:00"
+    },
+    {
+      "sensor": "s2",
+      "record_key": "r2",
+      "source": {
+        "system": "logger-a",
+        "source_key": "logger-a:r2"
+      },
+      "value": 70.7,
+      "unit": "F",
+      "time": "2026-11-18T00:00:00Z"
+    },
+    {
+      "sensor": "s3",
+      "record_key": "r3",
+      "source": {
+        "system": "logger-a",
+        "source_key": "logger-a:r3"
+      },
+      "value": 20,
+      "reading": {
+        "value": 23
+      },
+      "unit": "C"
+    },
+    {
+      "sensor": "s4",
+      "record_key": "r4",
+      "source": {
+        "system": "logger-a",
+        "source_key": "logger-a:r4"
+      },
+      "value": true,
+      "unit": "C"
+    },
+    {
+      "sensor": "s5",
+      "record_key": "r5",
+      "source": {
+        "system": "logger-a",
+        "source_key": "logger-a:r5"
+      },
+      "value": null,
+      "unit": "C"
+    },
+    {
+      "sensor": "s1",
+      "record_key": "r6",
+      "source": {
+        "system": "logger-b",
+        "source_key": "logger-b:r6"
+      },
+      "value": 22,
+      "unit": "C",
+      "time": "2026-11-18T08:00:00+08:00"
+    }
+  ]
+}

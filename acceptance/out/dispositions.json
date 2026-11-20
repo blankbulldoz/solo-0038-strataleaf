@@ -1,0 +1,603 @@
+{
+  "scenario": "loose_samples",
+  "target_collection": "samples_readings",
+  "target_schema": {
+    "fields": {
+      "sensor": "string",
+      "value": "number",
+      "sampled_ms": "integer",
+      "source": "object"
+    },
+    "required": [
+      "sensor",
+      "value",
+      "sampled_ms"
+    ],
+    "additional": false
+  },
+  "receiving_schema": {
+    "fields": {
+      "sensor": "string",
+      "value": "number",
+      "sampled_ms": "integer",
+      "source": "object"
+    }
+  },
+  "dispositions": [
+    {
+      "origin_key": "logger-a~r1",
+      "sensor": "s1",
+      "record_key": "r1",
+      "source_system": "logger-a",
+      "original": {
+        "sensor": "s1",
+        "record_key": "r1",
+        "source": {
+          "system": "logger-a",
+          "source_key": "logger-a:r1"
+        },
+        "value": "21.5",
+        "unit": "C",
+        "time": "2026-11-18T08:00:00+08:00"
+      },
+      "reasons": [],
+      "notes": [
+        "同一 sensor、同一采样时刻另有来源 logger-b 的记录；以不同文档键并存，未互相覆盖"
+      ],
+      "sampled_ms": 1794960000000,
+      "utc": "2026-11-18T00:00:00+00:00",
+      "celsius": "21.5",
+      "unit_basis": "单位已是摄氏，未做算术变换",
+      "decision": "accepted",
+      "peer_sources": [
+        "logger-b"
+      ]
+    },
+    {
+      "origin_key": "logger-a~r2",
+      "sensor": "s2",
+      "record_key": "r2",
+      "source_system": "logger-a",
+      "original": {
+        "sensor": "s2",
+        "record_key": "r2",
+        "source": {
+          "system": "logger-a",
+          "source_key": "logger-a:r2"
+        },
+        "value": 70.7,
+        "unit": "F",
+        "time": "2026-11-18T00:00:00Z"
+      },
+      "reasons": [],
+      "notes": [],
+      "sampled_ms": 1794960000000,
+      "utc": "2026-11-18T00:00:00+00:00",
+      "celsius": "21.5",
+      "unit_basis": "(F - 32) * 5 / 9，十进制精确计算，仅最后一步按 1e-9 °C 量化",
+      "decision": "accepted"
+    },
+    {
+      "origin_key": "logger-a~r3",
+      "sensor": "s3",
+      "record_key": "r3",
+      "source_system": "logger-a",
+      "original": {
+        "sensor": "s3",
+        "record_key": "r3",
+        "source": {
+          "system": "logger-a",
+          "source_key": "logger-a:r3"
+        },
+        "value": 20,
+        "reading": {
+          "value": 23
+        },
+        "unit": "C"
+      },
+      "reasons": [
+        "同一条记录内数值矛盾（value=20 与 reading.value=23），且没有可信的优先级说明",
+        "时间缺失；不能推断采样时刻"
+      ],
+      "notes": [],
+      "celsius": "20",
+      "unit_basis": "单位已是摄氏，未做算术变换",
+      "decision": "pending"
+    },
+    {
+      "origin_key": "logger-a~r4",
+      "sensor": "s4",
+      "record_key": "r4",
+      "source_system": "logger-a",
+      "original": {
+        "sensor": "s4",
+        "record_key": "r4",
+        "source": {
+          "system": "logger-a",
+          "source_key": "logger-a:r4"
+        },
+        "value": true,
+        "unit": "C"
+      },
+      "reasons": [
+        "值是布尔值；布尔不是温度，且被排除在数值之外",
+        "时间缺失；不能推断采样时刻"
+      ],
+      "notes": [],
+      "decision": "pending"
+    },
+    {
+      "origin_key": "logger-a~r5",
+      "sensor": "s5",
+      "record_key": "r5",
+      "source_system": "logger-a",
+      "original": {
+        "sensor": "s5",
+        "record_key": "r5",
+        "source": {
+          "system": "logger-a",
+          "source_key": "logger-a:r5"
+        },
+        "value": null,
+        "unit": "C"
+      },
+      "reasons": [
+        "值是 JSON null；目标要求数值",
+        "时间缺失；不能推断采样时刻"
+      ],
+      "notes": [],
+      "decision": "pending"
+    },
+    {
+      "origin_key": "logger-b~r6",
+      "sensor": "s1",
+      "record_key": "r6",
+      "source_system": "logger-b",
+      "original": {
+        "sensor": "s1",
+        "record_key": "r6",
+        "source": {
+          "system": "logger-b",
+          "source_key": "logger-b:r6"
+        },
+        "value": 22,
+        "unit": "C",
+        "time": "2026-11-18T08:00:00+08:00"
+      },
+      "reasons": [],
+      "notes": [
+        "同一 sensor、同一采样时刻另有来源 logger-a 的记录；以不同文档键并存，未互相覆盖"
+      ],
+      "sampled_ms": 1794960000000,
+      "utc": "2026-11-18T00:00:00+00:00",
+      "celsius": "22",
+      "unit_basis": "单位已是摄氏，未做算术变换",
+      "decision": "accepted",
+      "peer_sources": [
+        "logger-a"
+      ]
+    }
+  ],
+  "accepted_lines": [
+    {
+      "key": "logger-a~r1",
+      "document": {
+        "sensor": "s1",
+        "value": 21.5,
+        "sampled_ms": 1794960000000,
+        "source": {
+          "system": "logger-a",
+          "record_key": "r1",
+          "original": {
+            "sensor": "s1",
+            "record_key": "r1",
+            "source": {
+              "system": "logger-a",
+              "source_key": "logger-a:r1"
+            },
+            "value": "21.5",
+            "unit": "C",
+            "time": "2026-11-18T08:00:00+08:00"
+          },
+          "conversion": {
+            "from_unit": "C",
+            "to_unit": "C",
+            "method": "单位已是摄氏，未做算术变换",
+            "time_base": "Unix epoch milliseconds, UTC",
+            "original_time": "2026-11-18T08:00:00+08:00",
+            "utc_time": "2026-11-18T00:00:00+00:00"
+          }
+        }
+      }
+    },
+    {
+      "key": "logger-a~r2",
+      "document": {
+        "sensor": "s2",
+        "value": 21.5,
+        "sampled_ms": 1794960000000,
+        "source": {
+          "system": "logger-a",
+          "record_key": "r2",
+          "original": {
+            "sensor": "s2",
+            "record_key": "r2",
+            "source": {
+              "system": "logger-a",
+              "source_key": "logger-a:r2"
+            },
+            "value": 70.7,
+            "unit": "F",
+            "time": "2026-11-18T00:00:00Z"
+          },
+          "conversion": {
+            "from_unit": "F",
+            "to_unit": "C",
+            "method": "(F - 32) * 5 / 9，十进制精确计算，仅最后一步按 1e-9 °C 量化",
+            "time_base": "Unix epoch milliseconds, UTC",
+            "original_time": "2026-11-18T00:00:00Z",
+            "utc_time": "2026-11-18T00:00:00+00:00"
+          }
+        }
+      }
+    },
+    {
+      "key": "logger-b~r6",
+      "document": {
+        "sensor": "s1",
+        "value": 22.0,
+        "sampled_ms": 1794960000000,
+        "source": {
+          "system": "logger-b",
+          "record_key": "r6",
+          "original": {
+            "sensor": "s1",
+            "record_key": "r6",
+            "source": {
+              "system": "logger-b",
+              "source_key": "logger-b:r6"
+            },
+            "value": 22,
+            "unit": "C",
+            "time": "2026-11-18T08:00:00+08:00"
+          },
+          "conversion": {
+            "from_unit": "C",
+            "to_unit": "C",
+            "method": "单位已是摄氏，未做算术变换",
+            "time_base": "Unix epoch milliseconds, UTC",
+            "original_time": "2026-11-18T08:00:00+08:00",
+            "utc_time": "2026-11-18T00:00:00+00:00"
+          }
+        }
+      }
+    }
+  ],
+  "independent_problems": [],
+  "staging": {
+    "seeded_revision": 1,
+    "received_revision": 2,
+    "confirmation": {
+      "logger-a~r1": 2,
+      "logger-a~r2": 2,
+      "logger-b~r6": 2
+    },
+    "submitted_generation": 1,
+    "schema_generation": 2,
+    "tightened_schema": {
+      "name": "samples_readings",
+      "schema": {
+        "additional": false,
+        "fields": {
+          "sampled_ms": "integer",
+          "sensor": "string",
+          "source": "object",
+          "value": "number"
+        },
+        "required": [
+          "sampled_ms",
+          "sensor",
+          "value"
+        ]
+      },
+      "generation": 2
+    },
+    "loose_schema": {
+      "name": "loose_samples",
+      "schema": {
+        "additional": true,
+        "fields": {
+          "sensor": "string",
+          "source": "object"
+        },
+        "required": [
+          "sensor",
+          "source"
+        ]
+      },
+      "generation": 1
+    },
+    "loose_fingerprint": {
+      "revision": 1,
+      "documents": 6,
+      "sha256": "f4360f302216ae6890ca515bfe626bd2b04e02a2a053377c182683840c18ca89"
+    },
+    "tightened_fingerprint": {
+      "revision": 2,
+      "documents": 9,
+      "sha256": "4166afc89e8a56e9d1b0e744ba3ffbf34fc176f06428d644705d3702dbebb745"
+    },
+    "reopen_fingerprint": {
+      "revision": 1,
+      "documents": 6,
+      "sha256": "f4360f302216ae6890ca515bfe626bd2b04e02a2a053377c182683840c18ca89"
+    },
+    "history": {
+      "logger-a~r1": {
+        "read_revision": 2,
+        "old_value": 21.5,
+        "origin_record": {
+          "record_key": "r1",
+          "sensor": "s1",
+          "source": {
+            "source_key": "logger-a:r1",
+            "system": "logger-a"
+          },
+          "time": "2026-11-18T08:00:00+08:00",
+          "unit": "C",
+          "value": "21.5"
+        }
+      },
+      "logger-a~r2": {
+        "read_revision": 2,
+        "old_value": 21.5,
+        "origin_record": {
+          "record_key": "r2",
+          "sensor": "s2",
+          "source": {
+            "source_key": "logger-a:r2",
+            "system": "logger-a"
+          },
+          "time": "2026-11-18T00:00:00Z",
+          "unit": "F",
+          "value": 70.7
+        }
+      },
+      "logger-b~r6": {
+        "read_revision": 2,
+        "old_value": 22.0,
+        "origin_record": {
+          "record_key": "r6",
+          "sensor": "s1",
+          "source": {
+            "source_key": "logger-b:r6",
+            "system": "logger-b"
+          },
+          "time": "2026-11-18T08:00:00+08:00",
+          "unit": "C",
+          "value": 22
+        }
+      }
+    },
+    "stored_documents": {
+      "logger-a~r1": {
+        "sampled_ms": 1794960000000,
+        "sensor": "s1",
+        "source": {
+          "conversion": {
+            "from_unit": "C",
+            "method": "单位已是摄氏，未做算术变换",
+            "original_time": "2026-11-18T08:00:00+08:00",
+            "time_base": "Unix epoch milliseconds, UTC",
+            "to_unit": "C",
+            "utc_time": "2026-11-18T00:00:00+00:00"
+          },
+          "original": {
+            "record_key": "r1",
+            "sensor": "s1",
+            "source": {
+              "source_key": "logger-a:r1",
+              "system": "logger-a"
+            },
+            "time": "2026-11-18T08:00:00+08:00",
+            "unit": "C",
+            "value": "21.5"
+          },
+          "record_key": "r1",
+          "system": "logger-a"
+        },
+        "value": 21.5
+      },
+      "logger-a~r2": {
+        "sampled_ms": 1794960000000,
+        "sensor": "s2",
+        "source": {
+          "conversion": {
+            "from_unit": "F",
+            "method": "(F - 32) * 5 / 9，十进制精确计算，仅最后一步按 1e-9 °C 量化",
+            "original_time": "2026-11-18T00:00:00Z",
+            "time_base": "Unix epoch milliseconds, UTC",
+            "to_unit": "C",
+            "utc_time": "2026-11-18T00:00:00+00:00"
+          },
+          "original": {
+            "record_key": "r2",
+            "sensor": "s2",
+            "source": {
+              "source_key": "logger-a:r2",
+              "system": "logger-a"
+            },
+            "time": "2026-11-18T00:00:00Z",
+            "unit": "F",
+            "value": 70.7
+          },
+          "record_key": "r2",
+          "system": "logger-a"
+        },
+        "value": 21.5
+      },
+      "logger-b~r6": {
+        "sampled_ms": 1794960000000,
+        "sensor": "s1",
+        "source": {
+          "conversion": {
+            "from_unit": "C",
+            "method": "单位已是摄氏，未做算术变换",
+            "original_time": "2026-11-18T08:00:00+08:00",
+            "time_base": "Unix epoch milliseconds, UTC",
+            "to_unit": "C",
+            "utc_time": "2026-11-18T00:00:00+00:00"
+          },
+          "original": {
+            "record_key": "r6",
+            "sensor": "s1",
+            "source": {
+              "source_key": "logger-b:r6",
+              "system": "logger-b"
+            },
+            "time": "2026-11-18T08:00:00+08:00",
+            "unit": "C",
+            "value": 22
+          },
+          "record_key": "r6",
+          "system": "logger-b"
+        },
+        "value": 22.0
+      }
+    },
+    "inspection": {
+      "ok": true,
+      "issues": [],
+      "head": 2,
+      "floor": 0,
+      "database_id": "4050a052-bcfd-4b68-8cb8-03602b0e1201",
+      "mode": "primary",
+      "counts": {
+        "collections": 2,
+        "versions": 9,
+        "commits": 2,
+        "index_defs": 0,
+        "index_values": 0,
+        "pins": 1,
+        "consumers": 0
+      },
+      "sqlite": [
+        "ok"
+      ],
+      "foreign_keys": []
+    },
+    "violations": {
+      "loose_evolve": {
+        "error": "InvalidDocument",
+        "message": "missing required field: sampled_ms"
+      },
+      "probe_write": {
+        "error": "InvalidDocument",
+        "message": "missing required field: sampled_ms"
+      },
+      "probe_extra": {
+        "error": "InvalidDocument",
+        "message": "undeclared top-level fields: unit"
+      },
+      "probe_string": {
+        "error": "InvalidDocument",
+        "message": "field value must be number"
+      }
+    },
+    "fresh_import": {
+      "revision": 1,
+      "fingerprint": {
+        "revision": 1,
+        "documents": 3,
+        "sha256": "91c79bf1d3f4b59119dd3593441d7df1edb23ef91f349841938accc93f9bef71"
+      },
+      "documents": {
+        "logger-a~r1": {
+          "sampled_ms": 1794960000000,
+          "sensor": "s1",
+          "source": {
+            "conversion": {
+              "from_unit": "C",
+              "method": "单位已是摄氏，未做算术变换",
+              "original_time": "2026-11-18T08:00:00+08:00",
+              "time_base": "Unix epoch milliseconds, UTC",
+              "to_unit": "C",
+              "utc_time": "2026-11-18T00:00:00+00:00"
+            },
+            "original": {
+              "record_key": "r1",
+              "sensor": "s1",
+              "source": {
+                "source_key": "logger-a:r1",
+                "system": "logger-a"
+              },
+              "time": "2026-11-18T08:00:00+08:00",
+              "unit": "C",
+              "value": "21.5"
+            },
+            "record_key": "r1",
+            "system": "logger-a"
+          },
+          "value": 21.5
+        },
+        "logger-a~r2": {
+          "sampled_ms": 1794960000000,
+          "sensor": "s2",
+          "source": {
+            "conversion": {
+              "from_unit": "F",
+              "method": "(F - 32) * 5 / 9，十进制精确计算，仅最后一步按 1e-9 °C 量化",
+              "original_time": "2026-11-18T00:00:00Z",
+              "time_base": "Unix epoch milliseconds, UTC",
+              "to_unit": "C",
+              "utc_time": "2026-11-18T00:00:00+00:00"
+            },
+            "original": {
+              "record_key": "r2",
+              "sensor": "s2",
+              "source": {
+                "source_key": "logger-a:r2",
+                "system": "logger-a"
+              },
+              "time": "2026-11-18T00:00:00Z",
+              "unit": "F",
+              "value": 70.7
+            },
+            "record_key": "r2",
+            "system": "logger-a"
+          },
+          "value": 21.5
+        },
+        "logger-b~r6": {
+          "sampled_ms": 1794960000000,
+          "sensor": "s1",
+          "source": {
+            "conversion": {
+              "from_unit": "C",
+              "method": "单位已是摄氏，未做算术变换",
+              "original_time": "2026-11-18T08:00:00+08:00",
+              "time_base": "Unix epoch milliseconds, UTC",
+              "to_unit": "C",
+              "utc_time": "2026-11-18T00:00:00+00:00"
+            },
+            "original": {
+              "record_key": "r6",
+              "sensor": "s1",
+              "source": {
+                "source_key": "logger-b:r6",
+                "system": "logger-b"
+              },
+              "time": "2026-11-18T08:00:00+08:00",
+              "unit": "C",
+              "value": 22
+            },
+            "record_key": "r6",
+            "system": "logger-b"
+          },
+          "value": 22.0
+        }
+      }
+    },
+    "old_rows_intact": true
+  }
+}
