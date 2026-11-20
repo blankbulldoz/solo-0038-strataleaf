@@ -1,9 +1,9 @@
 from dataclasses import dataclass
 from .codec import digest
 from .cursors import decode_cursor, encode_cursor
-from .errors import InvalidCursor, InvalidDocument, NotFound
+from .errors import InvalidCursor, InvalidDocument
 from .indexes import equality_candidates
-from .mvcc import checked_revision, record, visible_rows, latest_row
+from .mvcc import ReadView, record
 from .predicates import equality_terms, matches, validate_predicate
 
 
@@ -23,9 +23,8 @@ class QueryEngine:
         validate_predicate(predicate)
         if isinstance(limit, bool) or not isinstance(limit, int) or not 1 <= limit <= 1000:
             raise InvalidDocument("page size must be between 1 and 1000")
-        with self.store.read() as connection:
-            if not connection.execute("SELECT 1 FROM collections WHERE name=?", (collection,)).fetchone():
-                raise NotFound("unknown collection")
+        with ReadView(self.store) as view:
+            view.require_collection(collection)
             fingerprint = digest({"collection": collection, "predicate": predicate})
             after = None
             if cursor is not None:
@@ -35,20 +34,21 @@ class QueryEngine:
                 revision, after = payload.get("revision"), payload.get("after")
                 if not isinstance(after, str):
                     raise InvalidCursor("cursor has no key boundary")
-            revision = checked_revision(self.store, revision)
+            revision = view.fix_revision(revision)
             plan = {"access": "version_scan", "index": None}
             candidates = None
+            # 索引投影只描述当前 head；历史读（含 floor 基准版本）一律版本扫描。
             if not force_scan and revision == int(self.store.get("head")):
                 for path, value in equality_terms(predicate):
-                    indexed = equality_candidates(connection, collection, path, value)
+                    indexed = equality_candidates(view.connection, collection, path, value)
                     if indexed is not None:
                         index_name, candidates = indexed
                         plan = {"access": "equality_index", "index": index_name}
                         break
             if candidates is None:
-                rows = visible_rows(connection, collection, revision)
+                rows = view.rows(collection)
             else:
-                rows = [latest_row(connection, collection, key, revision) for key in sorted(candidates)]
+                rows = [view.row(collection, key) for key in sorted(candidates)]
             output = []
             examined = 0
             for row in rows:

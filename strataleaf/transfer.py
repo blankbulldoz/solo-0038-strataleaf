@@ -1,6 +1,6 @@
 from .codec import dumps, loads
-from .errors import InvalidDocument, NotFound
-from .mvcc import checked_revision, record, visible_rows
+from .errors import InvalidDocument
+from .mvcc import ReadView, record
 from .transaction import WriteBatch
 
 
@@ -9,12 +9,11 @@ class Transfer:
         self.store = store
 
     def export_lines(self, collection, revision=None):
-        with self.store.read() as connection:
-            revision = checked_revision(self.store, revision)
-            if not connection.execute("SELECT 1 FROM collections WHERE name=?", (collection,)).fetchone():
-                raise NotFound("unknown collection")
+        with ReadView(self.store, revision) as view:
+            revision = view.fix_revision()
+            view.require_collection(collection)
             output = []
-            for row in visible_rows(connection, collection, revision):
+            for row in view.rows(collection):
                 item = record(row)
                 output.append(dumps({"key": item.key, "document": item.document, "expires_at": item.expires_at}))
             return {"revision": revision, "lines": output}

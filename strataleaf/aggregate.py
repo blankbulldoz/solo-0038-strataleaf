@@ -1,6 +1,5 @@
 from .codec import MISSING, dumps, field, loads
-from .errors import InvalidDocument, NotFound
-from .mvcc import checked_revision, visible_rows
+from .mvcc import ReadView
 from .predicates import matches, validate_predicate
 
 
@@ -13,12 +12,11 @@ class Aggregates:
         if measure is not None:
             field({}, measure)
         validate_predicate(predicate)
-        with self.store.read() as connection:
-            revision = checked_revision(self.store, revision)
-            if not connection.execute("SELECT 1 FROM collections WHERE name=?", (collection,)).fetchone():
-                raise NotFound("unknown collection")
+        with ReadView(self.store, revision) as view:
+            revision = view.fix_revision()
+            view.require_collection(collection)
             groups = {}
-            for row in visible_rows(connection, collection, revision):
+            for row in view.rows(collection):
                 document = loads(row["body"])
                 if not matches(document, predicate):
                     continue

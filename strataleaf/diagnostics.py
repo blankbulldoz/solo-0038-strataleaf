@@ -1,5 +1,5 @@
 from .codec import digest, field, loads, scalar_token
-from .mvcc import visible_rows
+from .mvcc import ReadView
 
 
 class Diagnostics:
@@ -7,7 +7,8 @@ class Diagnostics:
         self.store = store
 
     def inspect(self, deep=False):
-        with self.store.read() as connection:
+        with ReadView(self.store) as view:
+            connection = view.connection
             head, floor = int(self.store.get("head")), int(self.store.get("floor"))
             integrity = [row[0] for row in connection.execute("PRAGMA integrity_check" if deep else "PRAGMA quick_check")]
             references = [tuple(row) for row in connection.execute("PRAGMA foreign_key_check")]
@@ -30,7 +31,8 @@ class Diagnostics:
                 expected = set()
                 for definition in connection.execute("SELECT * FROM index_defs"):
                     tokens = set()
-                    for row in visible_rows(connection, definition["collection"], head):
+                    # 以当前 head 重算可见文档，与物化索引投影逐项比对。
+                    for row in view.rows(definition["collection"], head):
                         token = scalar_token(field(loads(row["body"]), definition["field"]))
                         if token is None:
                             continue
@@ -46,12 +48,11 @@ class Diagnostics:
                     "counts": counts, "sqlite": integrity, "foreign_keys": references}
 
     def fingerprint(self, revision=None):
-        from .mvcc import checked_revision
-        with self.store.read() as connection:
-            revision = checked_revision(self.store, revision)
+        with ReadView(self.store, revision) as view:
+            revision = view.fix_revision()
             content = []
-            for collection in connection.execute("SELECT name FROM collections ORDER BY name"):
+            for collection in view.connection.execute("SELECT name FROM collections ORDER BY name"):
                 content.extend({"collection": collection[0], "key": row["key"], "revision": row["rev"],
                                 "document": loads(row["body"]), "expires_at": row["expires"]}
-                               for row in visible_rows(connection, collection[0], revision))
+                               for row in view.rows(collection[0]))
             return {"revision": revision, "documents": len(content), "sha256": digest(content)}
